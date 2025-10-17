@@ -1,0 +1,8 @@
+## Build artifacts
+/target/
+
+## Rust tooling
+**/*.rs.bk
+
+## Dependency lockfile (keep if this is a binary crate)
+Cargo.lock

@@ -1,4 +1,7 @@
-enum Instruction {
+use crate::types::Ingredient;
+
+#[derive(Clone, Debug)]
+pub enum Instruction {
     Take(Ingredient),
     Put(Ingredient, usize),
     Fold(Ingredient, usize),
@@ -14,7 +17,7 @@ enum Instruction {
     Mix(usize),
     Clean(usize),
     Pour(usize, usize), // from_bowl, to_dish
-    Loop { 
+    Loop {
         condition_var: Ingredient,
         verb: String,
         body: Vec<Instruction>,

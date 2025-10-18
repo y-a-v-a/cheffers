@@ -9,3 +9,13 @@ pub use types::{
     ChefError, ExecutionContext, Measure, ParseError, ParseResult, Recipe, Result, RuntimeError,
     RuntimeResult, Value,
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn interpreter_default_is_available() {
+        let _ = Interpreter::default();
+    }
+}

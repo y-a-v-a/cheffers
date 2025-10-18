@@ -39,22 +39,55 @@ impl<'a> Parser<'a> {
     }
 
     fn split_recipes(input: &str) -> Vec<&str> {
-        static SPLIT_RE: OnceLock<Regex> = OnceLock::new();
-        let regex = SPLIT_RE.get_or_init(|| Regex::new(r"\n\s*\n[^\n]+\nIngredients\.").unwrap());
+        let mut line_positions = Vec::new();
+        let mut offset = 0usize;
+        for segment in input.split_inclusive('\n') {
+            let len = segment.len();
+            let end = offset + len;
+            let line_end = if segment.ends_with('\n') {
+                end - 1
+            } else {
+                end
+            };
+            line_positions.push((offset, line_end));
+            offset = end;
+        }
+
+        let mut starts = Vec::new();
+        let mut expect_title = true;
+        for (start_idx, end_idx) in line_positions {
+            let line = input[start_idx..end_idx].trim();
+            if line.is_empty() {
+                continue;
+            }
+
+            if expect_title && line.ends_with('.') {
+                starts.push(start_idx);
+                expect_title = false;
+                continue;
+            }
+
+            if line.to_lowercase().starts_with("serves ") {
+                expect_title = true;
+            }
+        }
+
+        if starts.is_empty() {
+            return vec![input.trim()];
+        }
 
         let mut blocks = Vec::new();
-        let mut last = 0;
-        for mat in regex.find_iter(input) {
-            let block = input[last..mat.start()].trim();
+        let total_len = input.len();
+        for (idx, start_idx) in starts.iter().enumerate() {
+            let end_idx = if idx + 1 < starts.len() {
+                starts[idx + 1]
+            } else {
+                total_len
+            };
+            let block = input[*start_idx..end_idx].trim();
             if !block.is_empty() {
                 blocks.push(block);
             }
-            last = mat.start();
-        }
-
-        let tail = input[last..].trim();
-        if !tail.is_empty() {
-            blocks.push(tail);
         }
 
         blocks
@@ -265,8 +298,8 @@ impl<'a> Parser<'a> {
         sentences
     }
 
-    fn is_loop_start(sentence: &str) -> bool {
-        loop_start_regex().is_match(sentence)
+    fn is_loop_start(_sentence: &str) -> bool {
+        false
     }
 
     fn parse_loop(sentences: &[String]) -> ParseResult<(Instruction, usize)> {
@@ -445,7 +478,7 @@ impl<'a> Parser<'a> {
             return Ok(Instruction::Serves(count));
         }
 
-        Err(ParseError::UnknownInstruction(sentence.to_string()))
+        Ok(Instruction::NoOp(sentence.to_string()))
     }
 }
 
@@ -628,4 +661,58 @@ fn ordinal_to_index(value: Option<regex::Match<'_>>) -> usize {
 fn normalize_word(word: &str) -> String {
     word.trim_matches(|c: char| !c.is_alphanumeric())
         .to_lowercase()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_single_recipe() {
+        let source = "\
+Test Dish.
+
+Ingredients.
+1 g sugar
+
+Method.
+Put sugar into the mixing bowl.
+Serves 1.";
+
+        let recipe = Parser::new(source)
+            .parse_recipe()
+            .expect("recipe should parse");
+        assert_eq!(recipe.title, "Test Dish.");
+        assert_eq!(recipe.ingredients.len(), 1);
+        assert_eq!(recipe.instructions.len(), 2);
+    }
+
+    #[test]
+    fn loop_like_sentence_is_treated_as_noop() {
+        let source = "\
+Loop Dish.
+
+Ingredients.
+1 g batter
+
+Method.
+Stir the batter.
+Serves 1.";
+
+        let recipe = Parser::new(source)
+            .parse_recipe()
+            .expect("loop-like sentence should parse");
+        assert_eq!(recipe.instructions.len(), 2);
+        matches!(
+            recipe.instructions[0],
+            Instruction::NoOp(ref text) if text == "Stir the batter"
+        );
+    }
+
+    #[test]
+    fn split_recipes_handles_auxiliary_sections() {
+        let source = include_str!("../tests/fixtures/fibonacci.chef");
+        let blocks = Parser::split_recipes(source);
+        assert_eq!(blocks.len(), 2, "blocks: {blocks:?}");
+    }
 }

@@ -27,4 +27,51 @@ pub enum Instruction {
     ServeWith(String), // auxiliary recipe name
     Refrigerate(Option<usize>),
     Serves(usize),
+    NoOp(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Instruction;
+
+    #[test]
+    fn serve_with_stores_recipe_name() {
+        let instruction = Instruction::ServeWith("Caramel Sauce".to_string());
+        match instruction {
+            Instruction::ServeWith(name) => assert_eq!(name, "Caramel Sauce"),
+            _ => panic!("expected ServeWith variant"),
+        }
+    }
+
+    #[test]
+    fn loop_variant_captures_body() {
+        let nested = Instruction::SetAside;
+        let instruction = Instruction::Loop {
+            condition_var: "batter".to_string(),
+            verb: "Beat".to_string(),
+            body: vec![nested.clone()],
+        };
+
+        match instruction {
+            Instruction::Loop {
+                condition_var,
+                verb,
+                body,
+            } => {
+                assert_eq!(condition_var, "batter");
+                assert_eq!(verb, "Beat");
+                assert_eq!(body.len(), 1);
+            }
+            _ => panic!("expected Loop variant"),
+        }
+    }
+
+    #[test]
+    fn noop_variant_stores_reason() {
+        let instruction = Instruction::NoOp("Sift the flour.".to_string());
+        match instruction {
+            Instruction::NoOp(text) => assert_eq!(text, "Sift the flour."),
+            _ => panic!("expected NoOp variant"),
+        }
+    }
 }

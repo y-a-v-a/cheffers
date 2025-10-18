@@ -84,6 +84,10 @@ pub enum RuntimeError {
     UnknownRecipe(String),
     #[error("no recipe available to execute")]
     NoRecipe,
+    #[error("call stack limit reached")]
+    RecursionLimit,
+    #[error("division by zero")]
+    DivisionByZero,
 }
 
 #[derive(Debug, Error)]
@@ -99,3 +103,21 @@ pub enum ChefError {
 pub type Result<T> = std::result::Result<T, ChefError>;
 pub type ParseResult<T> = std::result::Result<T, ParseError>;
 pub type RuntimeResult<T> = std::result::Result<T, RuntimeError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn measure_default_is_unspecified() {
+        assert!(matches!(Measure::default(), Measure::Unspecified));
+    }
+
+    #[test]
+    fn execution_context_initial_state() {
+        let context = ExecutionContext::new();
+        assert_eq!(context.mixing_bowls.len(), 1);
+        assert_eq!(context.baking_dishes.len(), 1);
+        assert!(context.call_stack.is_empty());
+    }
+}

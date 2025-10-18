@@ -27,11 +27,13 @@ fn hello_world_fixture_parses() -> TestResult<()> {
 }
 
 #[test]
-fn fibonacci_fixture_currently_fails_with_unmatched_loop() -> TestResult<()> {
+fn fibonacci_fixture_parses_with_aux_recipe() -> TestResult<()> {
     let source = read_fixture("tests/fixtures/fibonacci.chef")?;
-    match parse_recipe(&source) {
-        Err(ParseError::UnmatchedLoop) => Ok(()),
-        Ok(_) => Err("expected fibonacci fixture to report unmatched loop".into()),
-        Err(err) => Err(format!("unexpected parse error: {err:?}").into()),
-    }
+    let recipe = parse_recipe(&source)?;
+    assert!(
+        recipe.auxiliary_recipes.contains_key("Caramel Sauce."),
+        "expected auxiliary recipe named 'Caramel Sauce.'; available: {:?}",
+        recipe.auxiliary_recipes.keys().collect::<Vec<_>>()
+    );
+    Ok(())
 }

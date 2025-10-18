@@ -1,0 +1,12 @@
+Redeclared Ingredient Test.
+
+This recipe verifies that the last declaration of an ingredient overrides earlier values.
+
+Ingredients.
+5 g value
+0 g value
+
+Method.
+Put value into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

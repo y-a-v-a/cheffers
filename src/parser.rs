@@ -40,8 +40,7 @@ impl<'a> Parser<'a> {
 
     fn split_recipes(input: &str) -> Vec<&str> {
         static SPLIT_RE: OnceLock<Regex> = OnceLock::new();
-        let regex =
-            SPLIT_RE.get_or_init(|| Regex::new(r"\n\s*\n(?=[^\n]+\nIngredients\.)").unwrap());
+        let regex = SPLIT_RE.get_or_init(|| Regex::new(r"\n\s*\n[^\n]+\nIngredients\.").unwrap());
 
         let mut blocks = Vec::new();
         let mut last = 0;
@@ -50,7 +49,7 @@ impl<'a> Parser<'a> {
             if !block.is_empty() {
                 blocks.push(block);
             }
-            last = mat.end();
+            last = mat.start();
         }
 
         let tail = input[last..].trim();

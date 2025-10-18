@@ -23,8 +23,13 @@ impl Interpreter {
     }
 
     pub fn run(&mut self) -> Result<()> {
-        let recipe = self.recipes.values().next().ok_or(RuntimeError::NoRecipe)?;
-        self.execute(recipe)?;
+        let recipe = self
+            .recipes
+            .values()
+            .next()
+            .cloned()
+            .ok_or(RuntimeError::NoRecipe)?;
+        self.execute(&recipe)?;
         Ok(())
     }
 
@@ -85,6 +90,7 @@ impl Interpreter {
         let aux_recipe = self
             .recipes
             .get(recipe_name)
+            .cloned()
             .ok_or_else(|| RuntimeError::UnknownRecipe(recipe_name.to_string()))?;
 
         let frame = CallFrame {
@@ -95,7 +101,7 @@ impl Interpreter {
         };
         self.context.call_stack.push(frame);
 
-        self.execute(aux_recipe)?;
+        self.execute(&aux_recipe)?;
 
         if let Some(frame) = self.context.call_stack.pop() {
             self.context.variables = frame.variables;
@@ -129,9 +135,16 @@ impl Interpreter {
         }
     }
 
+    #[allow(dead_code)]
     fn ensure_dish(&mut self, idx: usize) {
         while self.context.baking_dishes.len() <= idx {
             self.context.baking_dishes.push(VecDeque::new());
         }
+    }
+}
+
+impl Default for Interpreter {
+    fn default() -> Self {
+        Self::new()
     }
 }

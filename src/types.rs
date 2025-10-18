@@ -4,17 +4,12 @@ use thiserror::Error;
 
 use crate::instruction::Instruction;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub enum Measure {
     Dry,
     Liquid,
+    #[default]
     Unspecified,
-}
-
-impl Default for Measure {
-    fn default() -> Self {
-        Measure::Unspecified
-    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -59,6 +54,7 @@ pub struct CallFrame {
     pub variables: HashMap<Ingredient, Value>,
     pub mixing_bowls: Vec<MixingBowl>,
     pub baking_dishes: Vec<BakingDish>,
+    #[allow(dead_code)]
     pub return_address: usize,
 }
 

@@ -1,5 +1,6 @@
 use crate::types::Ingredient;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum Instruction {
     Take(Ingredient),

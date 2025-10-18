@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)https://www.dangermouse.net/esoteric/chef.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>DM's Esoteric Programming Languages - Chef</title>
+
+<link rel="stylesheet" type="text/css" href="./Chef_files/style.css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="993300" vlink="663300">
+<h1>Chef</h1>
+<hr>
+
+<h2>Introduction</h2>
+<p>
+Chef is a programming language in which programs look like recipes.
+</p><p>
+<span class="red">NEW: Additional syntax specifications added 17 July, 2003, marked in red. Fixed spelling of "liquefy" keyword.</span>
+</p>
+
+<h2>Design Principles</h2>
+<ul>
+<li>Program recipes should not only generate valid output, but be easy to prepare and delicious.</li>
+<li>Recipes may appeal to cooks with different budgets.</li>
+<li>Recipes will be metric, but may use traditional cooking measures such as cups and tablespoons.</li>
+</ul>
+
+<h2>Language Concepts</h2>
+<h3>Ingredients</h3>
+<p>
+All recipes have ingredients! The ingredients hold individual data values. All ingredients are numerical, though they can be interpreted as Unicode for I/O purposes. Liquid ingredients will be output as Unicode characters, while dry or unspecified ingredients will be output as numbers.
+</p>
+
+<h3>Mixing Bowls and Baking Dishes</h3>
+<p>
+Chef has access to an unlimited supply of mixing bowls and baking dishes. These can contain ingredient values. The ingredients in a mixing bowl or baking dish are ordered, like a stack of pancakes. New ingredients are placed on top, and if values are removed they are removed from the top. Note that if the value of an ingredient changes, the value in the mixing bowl or baking dish does not. The values in the mixing bowls and baking dishes also retain their dry or liquid designations.
+</p><p>
+Multiple mixing bowls and baking dishes are referred to by an ordinal identifier - "the 2nd mixing bowl". If no identifier is used, the recipe only has one of the relevant utensil. Ordinal identifiers must be digits followed by "st", "nd", "rd" or "th", not words.
+</p>
+
+<h2>Syntax Elements</h2>
+<p>
+The following items appear in a Chef recipe. Some are optional. Items must appear in the order shown below, with a blank line (two newlines) between each item.
+</p>
+
+<h3>Recipe Title</h3>
+<p>
+The recipe title describes in a few words what the program does. For example: "Hello World Souffle", or "Fibonacci Numbers with Caramel Sauce". The recipe title is always the first line of a Chef recipe, and is followed by a full stop.
+</p><p class="code">
+<i>recipe-title</i>.
+</p>
+
+<h3>Comments</h3>
+<p>
+Comments are placed in a free-form paragraph after the recipe title. Comments are optional.
+</p>
+
+<h3>Ingredient List</h3>
+<p>
+The next item in a Chef recipe is the ingredient list. This lists the ingredients to be used by the program. The syntax is
+</p><p class="code">
+Ingredients.<br>
+<i><span class="red">[</span>initial-value<span class="red">]</span> [[measure-type] measure] ingredient-name</i><br>
+[<i>further ingredients</i>]
+</p><p>
+Ingredients are listed one per line. The <i>intial-value</i> is a number<span class="red">, and is optional. Attempting to use an ingredient without a defined value is a run-time error</span>. The optional <i>measure</i> can be any of the following:
+</p>
+
+<ul>
+<li><code>g | kg | pinch[es]</code> : These always indicate dry measures.</li>
+<li><code>ml | l | dash[es]</code> : These always indicate liquid measures.</li>
+<li><code>cup[s] | teaspoon[s] | tablespoon[s]</code> : These indicate measures which may be either dry or liquid.</li>
+</ul>
+
+<p>
+The optional <i>measure-type</i> may be any of the following:
+</p>
+
+<ul>
+<li><code>heaped | level</code> : These indicate that the measure is dry.</li>
+</ul>
+
+<p>
+The <i>ingredient-name</i> may be anything reasonable, and may include space characters. The ingredient list is optional. If present, it declares ingredients with the given initial values and measures. If an ingredient is repeated, the new vaue is used and previous values for that ingredient are ignored.
+</p>
+
+<h3>Cooking Time</h3>
+<p class="code">
+Cooking time: <i>time</i> (hour[s] | minute[s]).
+</p><p>
+The cooking time statement is optional. The time is a number.
+</p>
+
+<h3>Oven Temperature</h3>
+<p class="code">
+Pre-heat oven to <i>temperature</i> degrees Celsius [(gas mark <i>mark</i>)].
+</p><p>
+Some recipes require baking. If so, there will be an oven temperature statement. This is optional. The <i>temperature</i> and <i>mark</i> are numbers.
+</p>
+
+<h3>Method</h3>
+<p class="code">
+Method.<br>
+<i>method statements</i>
+</p><p>
+The method contains the actual recipe instructions. These are written in sentences. Line breaks are ignored in the method of a recipe. Valid method instructions are:
+</p>
+
+<ul>
+<li><code>Take <i>ingredient</i> from refrigerator.</code><br>
+This reads a numeric value from STDIN into the <i>ingredient</i> named, overwriting any previous value.</li>
+<li><code>Put <i>ingredient</i> into [<i>nth</i>] mixing bowl.</code><br>
+This puts the <i>ingredient</i> into the <i>nth</i> mixing bowl.</li>
+<li><code>Fold <i>ingredient</i> into [<i>nth</i>] mixing bowl.</code><br>
+This removes the top value from the <i>nth</i> mixing bowl and places it in the <i>ingredient</i>.</li>
+<li><code>Add <i>ingredient</i> [to [<i>nth</i>] mixing bowl].</code><br>
+This adds the value of <i>ingredient</i> to the value of the ingredient on top of the <i>nth</i> mixing bowl and stores the result in the <i>nth</i> mixing bowl.</li>
+<li><code>Remove <i>ingredient</i> [from [<i>nth</i>] mixing bowl].</code><br>
+This subtracts the value of <i>ingredient</i> from the value of the ingredient on top of the <i>nth</i> mixing bowl and stores the result in the <i>nth</i> mixing bowl.</li>
+<li><code>Combine <i>ingredient</i> [into [<i>nth</i>] mixing bowl].</code><br>
+This multiplies the value of <i>ingredient</i> by the value of the ingredient on top of the <i>nth</i> mixing bowl and stores the result in the <i>nth</i> mixing bowl.</li>
+<li><code>Divide <i>ingredient</i> [into [<i>nth</i>] mixing bowl].</code><br>
+This divides the value of <i>ingredient</i> into the value of the ingredient on top of the <i>nth</i> mixing bowl and stores the result in the <i>nth</i> mixing bowl.</li>
+<li><code>Add dry ingredients [to [<i>nth</i>] mixing bowl].</code><br>
+This adds the values of all the dry ingredients together and places the result into the <i>nth</i> mixing bowl.</li>
+<li><code><span class="red">Liquefy |</span> Liquify <i>ingredient</i>.</code><br>
+This turns the ingredient into a liquid, i.e. a Unicode character for output purposes. (Note: The original specification used the word "Liquify", which is a spelling error. "Liquify" is deprecated. Use "Liquefy" in all new code.)</li>
+<li><code><span class="red">Liquefy |</span> Liquify contents of the [<i>nth</i>] mixing bowl.</code><br>
+This turns all the ingredients in the <i>nth</i> mixing bowl into a liquid, i.e. a Unicode characters for output purposes.</li>
+<li><code>Stir [the [<i>nth</i>] mixing bowl] for <i>number</i> minutes.</code><br>
+This "rolls" the top <i>number</i> ingredients in the <i>nth</i> mixing bowl, such that the top ingredient goes down that number of ingredients and all ingredients above it rise one place. If there are not that many ingredients in the bowl, the top ingredient goes to tbe bottom of the bowl and all the others rise one place.</li>
+<li><code>Stir <i>ingredient</i> into the [<i>nth</i>] mixing bowl.</code><br>
+This rolls the number of ingredients in the <i>nth</i> mixing bowl equal to the value of <i>ingredient</i>, such that the top ingredient goes down that number of ingredients and all ingredients above it rise one place. If there are not that many ingredients in the bowl, the top ingredient goes to the bottom of the bowl and all the others rise one place.</li>
+<li><code>Mix [the [<i>nth</i>] mixing bowl] well.</code><br>
+This randomises the order of the ingredients in the <i>nth</i> mixing bowl.</li>
+<li><code>Clean [<i>nth</i>] mixing bowl.</code><br>
+This removes all the ingredients from the <i>nth</i> mixing bowl.</li>
+<li><code>Pour contents of the [<i>nth</i>] mixing bowl into the [<i>pth</i>] baking dish.</code><br>
+This copies all the ingredients from the <i>nth</i> mixing bowl to the <i>pth</i> baking dish, retaining the order and putting them on top of anything already in the baking dish.</li>
+<li><code><i>Verb</i> the <i>ingredient</i>.</code><br>
+This marks the beginning of a loop. It must appear as a matched pair with the following statement. The loop executes as follows: The value of <i>ingredient</i> is checked. If it is non-zero, the body of the loop executes until it reaches the "until" statement. The value of <i>ingredient</i> is rechecked. If it is non-zero, the loop executes again. If at any check the value of <i>ingredient</i> is zero, the loop exits and execution continues at the statement after the "until". Loops may be nested.</li>
+<li><code><i>Verb</i> [the <i>ingredient</i>] until <i>verbed</i>.</code><br>
+This marks the end of a loop. It must appear as a matched pair with the above statement. <i>verbed</i> must match the <i>Verb</i> in the matching loop start statement. The <i>Verb</i> in this statement may be arbitrary and is ignored. If the <i>ingredient</i> appears in this statement, its value is decremented by 1 when this statement executes. The <i>ingredient</i> does not have to match the <i>ingredient</i> in the matching loop start statement.</li>
+<li><code>Set aside.</code><br>
+This causes execution of the innermost loop in which it occurs to end immediately and execution to continue at the statement after the "until".</li>
+<li><code>Serve with <i>auxiliary-recipe</i>.</code><br>
+This invokes a sous-chef to immediately prepare the named <i>auxiliary-recipe</i>. The calling chef waits until the sous-chef is finished before continuing. See the section on auxiliary recipes below.</li>
+<li><code>Refrigerate [for <i>number</i> hours].</code><br>
+This causes execution of the recipe in which it appears to end immediately. If in an auxiliary recipe, the auxiliary recipe ends and the sous-chef's first mixing bowl is passed back to the calling chef as normal. If a <i>number</i> of hours is specified, the recipe will print out its first <i>number</i> baking dishes (see the Serves statement below) before ending.</li>
+<!-- <li><code>Increase oven temperature</code></li> -->
+</ul>
+
+<h3>Serves</h3>
+<p>
+The final statement in a Chef recipe is a statement of how many people it serves.
+</p><p class="code">
+Serves <i>number-of-diners</i>.
+</p><p>
+This statement writes to STDOUT the contents of the first <i>number-of-diners</i> baking dishes. It begins with the 1st baking dish, removing values from the top one by one and printing them until the dish is empty, then progresses to the next dish, until all the dishes have been printed. The serves statement is optional, but is required if the recipe is to output anything!
+</p>
+
+<h3>Auxiliary Recipes</h3>
+<p>
+These are small recipes which are needed to produce specialised ingredients for the main recipe (such as sauces). They are listed after the main recipe. Auxiliary recipes are made by sous-chefs, so they have their own set of mixing bowls and baking dishes which the head Chef never sees, but take copies of all the mixing bowls and baking dishes currently in use by the calling chef when they are called upon. When the auxiliary recipe is finished, the ingredients in its first mixing bowl are placed in the same order into the calling chef's first mixing bowl.
+</p><p>
+For example, the main recipe calls for a sauce at some point. The sauce recipe is begun by the sous-chef with an exact copy of all the calling chef's mixing bowls and baking dishes. Changes to these bowls and dishes do not affect the calling chef's bowls and dishes. When the sous-chef is finished, he passes his first mixing bowl back to the calling chef, who empties it into his first mixing bowl.
+</p><p>
+An auxiliary recipe may have all the same items as a main recipe.
+</p>
+
+<h2>Sample Recipes</h2>
+<ul>
+<li><a href="https://www.dangermouse.net/esoteric/chef_hello.html">Hello World Souffle</a></li>
+<li><a href="https://www.dangermouse.net/esoteric/chef_fib.html">Fibonacci Numbers with Caramel Sauce</a></li>
+</ul>
+
+<h2>Chef on the Net</h2>
+<ul>
+<li>Chef was featured in <a href="http://www.mit.edu/~puzzle/02/round2/05/Puzzle.html">Round Two</a> of the 2002 <a href="http://www.mit.edu/~puzzle/">MIT Mystery Hunt</a>!</li>
+<li><a href="http://steffen-mueller.net/">Steffen Müller</a> has written a <a href="http://search.cpan.org/author/SMUELLER/Acme-Chef/">Chef interpeter perl module</a>.</li>
+<li>Chef was assigned for a student project in the <a href="http://bogost.com/teaching/introduction_to_computational/">LCC 2700 Introduction to Computational Media</a> course at the Georgia Institute of Technology, Fall 2005 semester. The Chef component remains on the curriculum as of 2017, and it is claimed that students of this course have written 99% of all Chef programs in the world.</li>
+<li>Mike Worth has created a recipe which not only prints "Hello world!", but <a href="http://www.mike-worth.com/2013/03/31/baking-a-hello-world-cake/">also works as an actual recipe for a chocolate cake</a>! And he baked it and ate it!</li>
+<li>Wesley Janssen, Joost Rijneveld, and Mathijs Vos have a <a href="https://github.com/joostrijneveld/Chef-Interpreter">Chef interpreter on GitHub</a>.</li>
+<li>Cary Abend reports that Chef was featured on a question in his company's monthly hacker trivia contest:<br>
+<img src="./Chef_files/chef_trivia_sm.jpg" width="600" height="400" alt="quiz question"></li>
+<li>Daniel Temkin has written an article on "<a href="https://esoteric.codes/blog/chef-multicoding-esolang-aesthetics">Chef and the Aesthetics of Multicoding</a>" on his esoteric languages blog, <a href="https://esoteric.codes/">esoteric.codes</a>.</li>
+<li>DorIsch has written a Chef program to <a href="https://github.com/DorIsch0/Pi-e">approximate pi and at the same time produce a nice pie</a>. Released to Github on Pi Day, 2022.</li>
+</ul>
+
+<hr>
+<a href="https://www.dangermouse.net/">Home</a> | <a href="https://www.dangermouse.net/esoteric/">Esoteric Programming Languages</a><br>
+
+<i>Last updated: Monday, 14 March, 2022; 15:36:45 PDT.</i><br>
+Copyright © 1990-2025, David Morgan-Mar. <i>dmm@dangermouse.net</i><br>
+<i>Hosted by: <a href="http://www.dreamhost.com/rewards.cgi?dmmaus">DreamHost</a></i>
+
+
+
+</body></html>

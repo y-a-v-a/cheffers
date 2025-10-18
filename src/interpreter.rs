@@ -52,7 +52,11 @@ impl Interpreter {
         self.context.baking_dishes.push(VecDeque::new());
 
         for instruction in &recipe.instructions {
-            self.execute_instruction(instruction)?;
+            match self.execute_instruction(instruction) {
+                Err(RuntimeError::EarlyTermination) => break,
+                Err(e) => return Err(e),
+                Ok(()) => {}
+            }
         }
 
         Ok(())
@@ -198,8 +202,54 @@ impl Interpreter {
             Instruction::Serves(count) => {
                 self.output(*count)?;
             }
-            Instruction::SetAside => {}
-            _ => {}
+            Instruction::Loop {
+                condition_var,
+                verb: _,
+                body,
+                decrement_var,
+            } => {
+                loop {
+                    let condition_value = self
+                        .context
+                        .variables
+                        .get(condition_var)
+                        .ok_or(RuntimeError::UndefinedIngredient)?
+                        .amount;
+
+                    if condition_value == 0 {
+                        break;
+                    }
+
+                    for instruction in body {
+                        match self.execute_instruction(instruction) {
+                            Err(RuntimeError::BreakLoop) => return Ok(()), // Break out of loop
+                            Err(e) => return Err(e),
+                            Ok(()) => {}
+                        }
+                    }
+
+                    // Decrement the ingredient if specified in the until statement
+                    if let Some(ref decr_var) = decrement_var {
+                        let value = self
+                            .context
+                            .variables
+                            .get_mut(decr_var)
+                            .ok_or(RuntimeError::UndefinedIngredient)?;
+                        value.amount -= 1;
+                    }
+                }
+            }
+            Instruction::SetAside => {
+                return Err(RuntimeError::BreakLoop);
+            }
+            Instruction::Take(_) => {}
+            Instruction::NoOp(_) => {}
+            Instruction::Refrigerate(hours) => {
+                if let Some(dish_count) = hours {
+                    self.output(*dish_count)?;
+                }
+                return Err(RuntimeError::EarlyTermination);
+            }
         }
 
         Ok(())
@@ -227,10 +277,24 @@ impl Interpreter {
 
         self.execute(&aux_recipe)?;
 
+        // Get the auxiliary's first mixing bowl before restoring state
+        let aux_first_bowl = if !self.context.mixing_bowls.is_empty() {
+            self.context.mixing_bowls[0].clone()
+        } else {
+            VecDeque::new()
+        };
+
         if let Some(frame) = self.context.call_stack.pop() {
             self.context.variables = frame.variables;
             self.context.mixing_bowls = frame.mixing_bowls;
             self.context.baking_dishes = frame.baking_dishes;
+
+            // Transfer auxiliary's first mixing bowl to caller's first mixing bowl
+            // "empties it into his first mixing bowl" means we add all values from aux bowl
+            self.ensure_bowl(0);
+            for value in aux_first_bowl.iter().rev() {
+                self.context.mixing_bowls[0].push_front(*value);
+            }
         }
 
         Ok(())
@@ -677,6 +741,37 @@ mod tests {
         assert!(interpreter.context.mixing_bowls[0]
             .iter()
             .all(|value| matches!(value.measure, Measure::Liquid)));
+    }
+
+    #[test]
+    fn loop_decrements_ingredient() {
+        let mut interpreter = Interpreter::new();
+        interpreter.context.variables.insert(
+            "counter".to_string(),
+            Value {
+                amount: 3,
+                measure: Measure::Dry,
+            },
+        );
+
+        let loop_inst = Instruction::Loop {
+            condition_var: "counter".to_string(),
+            verb: "Beat".to_string(),
+            body: vec![],
+            decrement_var: Some("counter".to_string()),
+        };
+
+        interpreter
+            .execute_instruction(&loop_inst)
+            .expect("loop should execute");
+
+        let counter_value = interpreter
+            .context
+            .variables
+            .get("counter")
+            .expect("counter should exist")
+            .amount;
+        assert_eq!(counter_value, 0, "counter should be decremented to 0");
     }
 
     #[test]

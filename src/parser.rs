@@ -258,9 +258,19 @@ impl<'a> Parser<'a> {
         while idx < sentences.len() {
             let sentence = sentences[idx].as_str();
             if Self::is_loop_start(sentence) {
-                let (loop_inst, consumed) = Self::parse_loop(&sentences[idx..])?;
-                instructions.push(loop_inst);
-                idx += consumed;
+                // Try to parse as a loop
+                match Self::parse_loop(&sentences[idx..]) {
+                    Ok((loop_inst, consumed)) => {
+                        instructions.push(loop_inst);
+                        idx += consumed;
+                    }
+                    Err(ParseError::UnmatchedLoop) => {
+                        // Not a valid loop, treat as regular instruction
+                        instructions.push(Self::parse_instruction(sentence)?);
+                        idx += 1;
+                    }
+                    Err(e) => return Err(e),
+                }
             } else {
                 instructions.push(Self::parse_instruction(sentence)?);
                 idx += 1;
@@ -298,8 +308,13 @@ impl<'a> Parser<'a> {
         sentences
     }
 
-    fn is_loop_start(_sentence: &str) -> bool {
-        false
+    fn is_loop_start(sentence: &str) -> bool {
+        // Check if this sentence contains "until" - if so, it's a single-line loop
+        if sentence.to_lowercase().contains("until") {
+            return loop_start_regex().is_match(sentence);
+        }
+        // Otherwise, we'll determine if it's a loop start when we try to parse it
+        loop_start_regex().is_match(sentence)
     }
 
     fn parse_loop(sentences: &[String]) -> ParseResult<(Instruction, usize)> {
@@ -309,18 +324,70 @@ impl<'a> Parser<'a> {
         let verb = caps.name("verb").unwrap().as_str().to_string();
         let condition_var = caps.name("ingredient").unwrap().as_str().to_string();
 
-        let until_regex =
-            Regex::new(&format!(r"(?i)^{}\b.*\buntil\b", regex::escape(&verb))).unwrap();
-
+        // Find the matching "until verbed" statement
+        // The spec says: "verbed must match the Verb in the matching loop start statement"
+        // We need to find sentences containing "until" followed by a form of the verb
+        // For simplicity, we check if "until <something>" contains the verb stem
         let end_idx = sentences
             .iter()
-            .position(|s| until_regex.is_match(s))
+            .position(|s| {
+                let lower = s.to_lowercase();
+                if let Some(until_pos) = lower.find(" until ") {
+                    // Get the word after "until"
+                    let after_until = &lower[until_pos + 7..]; // " until " = 7 chars
+                                                               // Check if the verb stem appears in the verbed form
+                                                               // Simple heuristic: check if after_until starts with the verb stem
+                    after_until.starts_with(&verb.to_lowercase())
+                } else {
+                    false
+                }
+            })
             .ok_or(ParseError::UnmatchedLoop)?;
 
-        if end_idx == 0 {
-            return Err(ParseError::InvalidLoop);
-        }
+        // Parse the until statement to extract optional decrement ingredient
+        // Pattern: "AnyVerb [the ingredient] until verbed."
+        // The verb at the start can be arbitrary and is ignored
+        // We need to extract the ingredient between ANY verb and "until"
+        let until_stmt = &sentences[end_idx];
 
+        let decrement_var = {
+            let lower_stmt = until_stmt.to_lowercase();
+
+            // Find "until" position
+            if let Some(until_pos) = lower_stmt.find(" until") {
+                // Extract everything before " until"
+                let before_until = &until_stmt[..until_pos];
+
+                // The pattern is "Verb [the] ingredient"
+                // Skip the first word (the verb) and extract the rest
+                let parts: Vec<&str> = before_until.split_whitespace().collect();
+                if parts.len() >= 2 {
+                    // Skip first word (verb), join the rest
+                    let ingredient_parts = &parts[1..];
+                    let ingredient_with_the = ingredient_parts.join(" ");
+
+                    // Remove optional "the" prefix
+                    let ingredient = if ingredient_with_the.to_lowercase().starts_with("the ") {
+                        &ingredient_with_the[4..]
+                    } else {
+                        ingredient_with_the.as_str()
+                    }
+                    .trim();
+
+                    if !ingredient.is_empty() {
+                        Some(ingredient.to_string())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        };
+
+        // If end_idx == 0, this is a single-line loop with empty body
         let mut body = Vec::new();
         let mut idx = 1;
         while idx < end_idx {
@@ -340,6 +407,7 @@ impl<'a> Parser<'a> {
                 condition_var,
                 verb,
                 body,
+                decrement_var,
             },
             end_idx + 1,
         ))
@@ -489,7 +557,9 @@ fn ingredient_regex() -> &'static Regex {
 
 fn loop_start_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^(?P<verb>[A-Za-z]+) the (?P<ingredient>.+)$").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"^(?P<verb>[A-Za-z]+) the (?P<ingredient>.+?)(?:\s+until\s|$)").unwrap()
+    })
 }
 
 fn take_regex() -> &'static Regex {
@@ -688,7 +758,7 @@ Serves 1.";
     }
 
     #[test]
-    fn loop_like_sentence_is_treated_as_noop() {
+    fn loop_like_sentence_without_until_is_noop() {
         let source = "\
 Loop Dish.
 
@@ -696,16 +766,17 @@ Ingredients.
 1 g batter
 
 Method.
-Stir the batter.
+Beat the batter.
 Serves 1.";
 
         let recipe = Parser::new(source)
             .parse_recipe()
-            .expect("loop-like sentence should parse");
+            .expect("sentence without matching 'until' should parse as NoOp");
         assert_eq!(recipe.instructions.len(), 2);
-        matches!(
-            recipe.instructions[0],
-            Instruction::NoOp(ref text) if text == "Stir the batter"
+        assert!(
+            matches!(recipe.instructions[0], Instruction::NoOp(_)),
+            "expected NoOp, got: {:?}",
+            recipe.instructions[0]
         );
     }
 
@@ -714,5 +785,78 @@ Serves 1.";
         let source = include_str!("../tests/fixtures/fibonacci.chef");
         let blocks = Parser::split_recipes(source);
         assert_eq!(blocks.len(), 2, "blocks: {blocks:?}");
+    }
+
+    #[test]
+    fn parses_simple_loop_with_decrement() {
+        let source = "\
+Simple Loop.
+
+Ingredients.
+3 g counter
+
+Method.
+Beat the counter until beaten.
+Serves 0.";
+
+        let recipe = Parser::new(source)
+            .parse_recipe()
+            .expect("simple loop should parse");
+
+        assert_eq!(recipe.instructions.len(), 2);
+        match &recipe.instructions[0] {
+            Instruction::Loop {
+                condition_var,
+                decrement_var,
+                ..
+            } => {
+                assert_eq!(condition_var, "counter");
+                assert_eq!(
+                    decrement_var.as_deref(),
+                    Some("counter"),
+                    "decrement_var should be 'counter'"
+                );
+            }
+            other => panic!("expected Loop instruction, got: {:?}", other),
+        }
+    }
+
+    #[test]
+    fn parses_loop_with_different_ending_verb() {
+        let source = "\
+Loop with Different Ending.
+
+Ingredients.
+3 g ingredient
+
+Method.
+Melt the ingredient.
+Put ingredient into mixing bowl.
+Heat the ingredient until melted.
+Serves 0.";
+
+        let recipe = Parser::new(source)
+            .parse_recipe()
+            .expect("loop with different ending verb should parse");
+
+        // Should have: Loop, Serves
+        assert_eq!(recipe.instructions.len(), 2);
+        match &recipe.instructions[0] {
+            Instruction::Loop {
+                condition_var,
+                body,
+                decrement_var,
+                ..
+            } => {
+                assert_eq!(condition_var, "ingredient");
+                assert_eq!(body.len(), 1, "loop body should have 1 instruction");
+                assert_eq!(
+                    decrement_var.as_deref(),
+                    Some("ingredient"),
+                    "decrement_var should be 'ingredient'"
+                );
+            }
+            other => panic!("expected Loop instruction, got: {:?}", other),
+        }
     }
 }

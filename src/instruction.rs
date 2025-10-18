@@ -22,6 +22,7 @@ pub enum Instruction {
         condition_var: Ingredient,
         verb: String,
         body: Vec<Instruction>,
+        decrement_var: Option<Ingredient>,
     },
     SetAside,
     ServeWith(String), // auxiliary recipe name
@@ -50,6 +51,7 @@ mod tests {
             condition_var: "batter".to_string(),
             verb: "Beat".to_string(),
             body: vec![nested.clone()],
+            decrement_var: None,
         };
 
         match instruction {
@@ -57,10 +59,12 @@ mod tests {
                 condition_var,
                 verb,
                 body,
+                decrement_var,
             } => {
                 assert_eq!(condition_var, "batter");
                 assert_eq!(verb, "Beat");
                 assert_eq!(body.len(), 1);
+                assert!(decrement_var.is_none());
             }
             _ => panic!("expected Loop variant"),
         }

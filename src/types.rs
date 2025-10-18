@@ -88,6 +88,10 @@ pub enum RuntimeError {
     RecursionLimit,
     #[error("division by zero")]
     DivisionByZero,
+    #[error("early termination")]
+    EarlyTermination,
+    #[error("break loop")]
+    BreakLoop,
 }
 
 #[derive(Debug, Error)]

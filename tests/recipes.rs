@@ -3,6 +3,7 @@ use std::fs;
 
 use cheffers::parser::Parser;
 use cheffers::types::{ParseError, Recipe};
+use cheffers::Interpreter;
 
 type TestResult<T> = Result<T, Box<dyn Error>>;
 
@@ -35,5 +36,27 @@ fn fibonacci_fixture_parses_with_aux_recipe() -> TestResult<()> {
         "expected auxiliary recipe named 'Caramel Sauce.'; available: {:?}",
         recipe.auxiliary_recipes.keys().collect::<Vec<_>>()
     );
+    Ok(())
+}
+
+#[test]
+fn loop_test_recipe_parses_and_executes() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/loop-test.chef")?;
+    let recipe = parse_recipe(&source)?;
+
+    // Verify loop was parsed
+    assert!(
+        recipe
+            .instructions
+            .iter()
+            .any(|inst| matches!(inst, cheffers::instruction::Instruction::Loop { .. })),
+        "expected loop instruction to be parsed"
+    );
+
+    // Verify it executes without error
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
     Ok(())
 }

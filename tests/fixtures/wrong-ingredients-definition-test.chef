@@ -1,0 +1,11 @@
+Wrong ingredients definition.
+
+This recipe misses a full stop, or period or dot at the end of the word ingredients. The interpreter should throw an error.
+
+Ingredients
+42 g answer
+
+Method.
+Put answer into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

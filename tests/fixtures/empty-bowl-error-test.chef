@@ -1,0 +1,12 @@
+Empty Bowl Operation Error.
+
+This recipe should produce a runtime error when folding from an empty bowl.
+
+Ingredients.
+42 g value
+
+Method.
+Fold value into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

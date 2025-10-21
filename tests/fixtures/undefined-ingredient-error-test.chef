@@ -1,0 +1,12 @@
+Undefined Ingredient Error.
+
+This recipe should produce a runtime error when accessing an undefined ingredient.
+
+Ingredients.
+5 g defined_value
+
+Method.
+Put undefined_ingredient into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

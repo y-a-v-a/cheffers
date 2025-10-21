@@ -1,0 +1,15 @@
+Refrigerate with Hours Output.
+
+This recipe demonstrates refrigerating with dish output before exit.
+
+Ingredients.
+1 g first_value
+2 g second_value
+
+Method.
+Put first_value into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+Clean mixing bowl.
+Put second_value into mixing bowl.
+Pour contents of the mixing bowl into the 2nd baking dish.
+Refrigerate for 2 hours.

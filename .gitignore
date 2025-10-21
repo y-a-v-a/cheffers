@@ -6,3 +6,7 @@
 
 ## Dependency lockfile (keep if this is a binary crate)
 Cargo.lock
+
+.claude
+
+.vscode

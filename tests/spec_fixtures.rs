@@ -154,6 +154,8 @@ spec_test!(spec_loop_same_ingredient, "loop-same-ingredient-test.chef");
 spec_test!(spec_loop_different_ingredients, "loop-different-ingredients-test.chef");
 spec_test!(spec_nested_loops, "nested-loops-test.chef");
 spec_test!(spec_empty_loop_body, "empty-loop-body-test.chef");
+spec_test!(spec_loop_with_clean_instruction, "loop-with-clean-instruction-test.chef");
+spec_test!(spec_loop_with_verb_pattern_instructions, "loop-with-verb-pattern-instructions-test.chef");
 spec_test!(spec_set_aside, "set-aside-test.chef");
 
 // ============================================================================

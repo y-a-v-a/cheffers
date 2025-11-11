@@ -60,3 +60,31 @@ fn loop_test_recipe_parses_and_executes() -> TestResult<()> {
 
     Ok(())
 }
+
+#[test]
+fn golden_ratio_fixture_parses_and_executes() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/golden-ratio.chef")?;
+    let recipe = parse_recipe(&source)?;
+
+    assert_eq!(recipe.title, "Golden Ratio Biscotti.");
+
+    // Verify loop was parsed (Fibonacci iteration loop)
+    assert!(
+        recipe
+            .instructions
+            .iter()
+            .any(|inst| matches!(inst, cheffers::instruction::Instruction::Loop { .. })),
+        "expected loop instruction to be parsed for Fibonacci sequence"
+    );
+
+    // Execute and verify it completes without error
+    // Expected output: "1.6180" (approximation of golden ratio φ)
+    // The program uses Fibonacci numbers F(25)/F(24) = 121393/75025 ≈ 1.6180339985
+    // with fixed-point arithmetic (×10000) to display as "1.6180"
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+    // Note: Output verification requires stdout capture, which is tested manually
+
+    Ok(())
+}

@@ -416,14 +416,16 @@ impl<'a> Parser<'a> {
         // For simplicity, we check if "until <something>" contains the verb stem
         let end_idx = sentences
             .iter()
-            .position(|s| {
+            .enumerate()
+            .position(|(_i, s)| {
                 let lower = s.to_lowercase();
                 if let Some(until_pos) = lower.find(" until ") {
                     // Get the word after "until"
                     let after_until = &lower[until_pos + 7..]; // " until " = 7 chars
                                                                // Check if the verb stem appears in the verbed form
                                                                // Simple heuristic: check if after_until starts with the verb stem
-                    after_until.starts_with(&verb.to_lowercase())
+                    let matches = after_until.starts_with(&verb.to_lowercase());
+                    matches
                 } else {
                     false
                 }
@@ -479,9 +481,19 @@ impl<'a> Parser<'a> {
         while idx < end_idx {
             let sentence = sentences[idx].as_str();
             if Self::is_loop_start(sentence) {
-                let (nested, consumed) = Self::parse_loop(&sentences[idx..])?;
-                body.push(nested);
-                idx += consumed;
+                // Try to parse as a nested loop
+                match Self::parse_loop(&sentences[idx..]) {
+                    Ok((nested, consumed)) => {
+                        body.push(nested);
+                        idx += consumed;
+                    }
+                    Err(ParseError::UnmatchedLoop) => {
+                        // Not a valid loop, treat as regular instruction
+                        body.push(Self::parse_instruction(sentence)?);
+                        idx += 1;
+                    }
+                    Err(e) => return Err(e),
+                }
             } else {
                 body.push(Self::parse_instruction(sentence)?);
                 idx += 1;

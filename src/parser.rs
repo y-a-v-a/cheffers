@@ -55,12 +55,24 @@ impl<'a> Parser<'a> {
 
         let mut starts = Vec::new();
         let mut expect_title = true;
+        let mut found_first_non_empty = false;
+
         for (start_idx, end_idx) in line_positions {
             let line = input[start_idx..end_idx].trim();
+
+            // For the FIRST recipe, always start from position 0 (to catch blank lines before title)
+            if expect_title && !found_first_non_empty && !line.is_empty() {
+                starts.push(0); // Start from beginning to preserve blank lines for validation
+                found_first_non_empty = true;
+                expect_title = false;
+                continue;
+            }
+
             if line.is_empty() {
                 continue;
             }
 
+            // For auxiliary recipes, look for titles after "Serves"
             if expect_title && line.ends_with('.') {
                 starts.push(start_idx);
                 expect_title = false;
@@ -84,7 +96,13 @@ impl<'a> Parser<'a> {
             } else {
                 total_len
             };
-            let block = input[*start_idx..end_idx].trim();
+            // For the first block (idx == 0), don't trim leading whitespace to preserve blank lines for validation
+            // For auxiliary recipes, trim as before
+            let block = if idx == 0 {
+                input[*start_idx..end_idx].trim_end()
+            } else {
+                input[*start_idx..end_idx].trim()
+            };
             if !block.is_empty() {
                 blocks.push(block);
             }
@@ -95,6 +113,15 @@ impl<'a> Parser<'a> {
 
     fn parse_single_recipe(block: &str) -> ParseResult<Recipe> {
         let title = Self::parse_title(block)?;
+
+        // Validate title ends with period (Chef spec requirement)
+        if !title.ends_with('.') {
+            return Err(ParseError::InvalidTitle(format!(
+                "Recipe title must end with a period: '{}'",
+                title
+            )));
+        }
+
         let method_idx = block
             .find("Method.")
             .ok_or_else(|| ParseError::MissingSection("Method".into()))?;
@@ -107,6 +134,12 @@ impl<'a> Parser<'a> {
             let ingredients_text = &block[ingredients_idx + "Ingredients.".len()..method_idx];
             Self::parse_ingredients(ingredients_text)?
         } else {
+            // Check if "Ingredients" (without period) exists - this is an error
+            if block.contains("Ingredients\n") || block.contains("Ingredients ") {
+                return Err(ParseError::MissingSection(
+                    "Ingredients section must end with a period: 'Ingredients.'".into(),
+                ));
+            }
             HashMap::new()
         };
 
@@ -122,12 +155,20 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_title(block: &str) -> ParseResult<String> {
-        block
-            .lines()
-            .map(str::trim)
-            .find(|line| !line.is_empty() && *line != "Ingredients." && *line != "Method.")
-            .map(|line| line.to_string())
-            .ok_or_else(|| ParseError::MissingSection("Title".into()))
+        // Chef spec requires title to be on the first line
+        let first_line = block.lines().next().unwrap_or("").trim();
+
+        if first_line.is_empty() {
+            return Err(ParseError::InvalidTitle(
+                "Recipe title must be on the first line (no blank lines before title)".into(),
+            ));
+        }
+
+        if first_line == "Ingredients." || first_line == "Method." {
+            return Err(ParseError::MissingSection("Title".into()));
+        }
+
+        Ok(first_line.to_string())
     }
 
     fn parse_ingredients(text: &str) -> ParseResult<HashMap<Ingredient, Value>> {
@@ -158,6 +199,19 @@ impl<'a> Parser<'a> {
             if ingredient.is_empty() {
                 return Err(ParseError::InvalidIngredient(line.to_string()));
             }
+
+            // Check for duplicate ingredient declaration
+            if ingredients.contains_key(&ingredient) {
+                return Err(ParseError::DuplicateIngredient(format!(
+                    "Ingredient '{}' is declared multiple times",
+                    ingredient
+                )));
+            }
+
+            // Always validate measurement units, even if no valid unit was found
+            // This catches invalid units like "tons", "meters", etc.
+            Self::validate_measure_line(rest)?;
+
             ingredients.insert(
                 ingredient,
                 Value {
@@ -257,6 +311,29 @@ impl<'a> Parser<'a> {
             word,
             "heaped" | "level" | "rounded" | "flat" | "large" | "small" | "fluid"
         )
+    }
+
+    fn validate_measure_line(ingredient_line: &str) -> ParseResult<()> {
+        // Check if there are invalid measurement-like words
+        // Common invalid units that people might try to use
+        let invalid_units = [
+            "ton", "tons", "metric ton", "tonne", "tonnes",
+            "stone", "stones", "yard", "yards", "meter", "meters", "metre", "metres",
+            "inch", "inches", "foot", "feet", "mile", "miles",
+        ];
+
+        let words: Vec<&str> = ingredient_line.split_whitespace().collect();
+        for word in words.iter() {
+            let normalized = normalize_word(word);
+            if invalid_units.contains(&normalized.as_str()) {
+                return Err(ParseError::InvalidMeasure(format!(
+                    "Invalid measurement unit '{}' - not a valid Chef unit. Valid units are: g, kg, ml, l, cup(s), teaspoon(s), tablespoon(s), pinch(es), dash(es)",
+                    word
+                )));
+            }
+        }
+
+        Ok(())
     }
 
     fn parse_method(text: &str) -> ParseResult<Vec<Instruction>> {

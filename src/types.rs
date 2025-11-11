@@ -72,6 +72,12 @@ pub enum ParseError {
     InvalidLoop,
     #[error("unmatched loop markers")]
     UnmatchedLoop,
+    #[error("invalid title: {0}")]
+    InvalidTitle(String),
+    #[error("invalid measure: {0}")]
+    InvalidMeasure(String),
+    #[error("duplicate ingredient: {0}")]
+    DuplicateIngredient(String),
 }
 
 #[derive(Debug, Error)]

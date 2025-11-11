@@ -41,7 +41,7 @@ fn fibonacci_fixture_parses_with_aux_recipe() -> TestResult<()> {
 
 #[test]
 fn loop_test_recipe_parses_and_executes() -> TestResult<()> {
-    let source = read_fixture("tests/fixtures/loop-test.chef")?;
+    let source = read_fixture("tests/fixtures/spec/loop-test.chef")?;
     let recipe = parse_recipe(&source)?;
 
     // Verify loop was parsed

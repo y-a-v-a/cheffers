@@ -278,7 +278,23 @@ impl Interpreter {
         };
         self.context.call_stack.push(frame);
 
-        self.execute(&aux_recipe)?;
+        // Add auxiliary recipe's ingredients to variables (don't clear mixing bowls)
+        for (name, value) in &aux_recipe.ingredients {
+            self.context.variables.insert(name.clone(), *value);
+        }
+
+        // Execute auxiliary recipe's instructions without clearing mixing bowls
+        for instruction in &aux_recipe.instructions {
+            match self.execute_instruction(instruction) {
+                Err(RuntimeError::EarlyTermination) => break,
+                Err(e) => {
+                    // Clean up call stack before propagating error
+                    self.context.call_stack.pop();
+                    return Err(e);
+                }
+                Ok(()) => {}
+            }
+        }
 
         // Get the auxiliary's first mixing bowl before restoring state
         let aux_first_bowl = if !self.context.mixing_bowls.is_empty() {

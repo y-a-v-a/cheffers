@@ -1,0 +1,20 @@
+Loop With Clean Instruction in Body.
+
+This recipe tests that loop bodies can contain instructions like "Clean the X"
+which match the loop start pattern but are not actual loops (no matching "until").
+
+Ingredients.
+3 g counter
+10 g value
+48 g base
+
+Method.
+Beat the counter.
+Clean the mixing bowl.
+Put value into mixing bowl.
+Add base to mixing bowl.
+Beat the counter until beaten.
+Liquefy contents of the mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

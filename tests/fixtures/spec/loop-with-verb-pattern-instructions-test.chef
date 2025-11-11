@@ -1,0 +1,29 @@
+Loop With Multiple Verb-Pattern Instructions.
+
+This recipe tests that loop bodies can contain multiple instructions matching
+"Verb the ingredient" pattern (like "Clean", "Liquefy") which could be
+mistaken for loop starts but are actually regular instructions.
+
+This exercises the parser fix for handling loop-like patterns in loop bodies
+that don't have matching "until" statements.
+
+Ingredients.
+3 g counter
+5 g first
+10 g second
+1 g temp
+
+Method.
+Beat the counter.
+Clean the mixing bowl.
+Put first into mixing bowl.
+Fold temp into mixing bowl.
+Put temp into mixing bowl.
+Put second into mixing bowl.
+Add first to mixing bowl.
+Fold temp into mixing bowl.
+Put temp into mixing bowl.
+Beat the counter until beaten.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

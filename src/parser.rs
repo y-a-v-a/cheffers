@@ -95,21 +95,22 @@ impl<'a> Parser<'a> {
 
     fn parse_single_recipe(block: &str) -> ParseResult<Recipe> {
         let title = Self::parse_title(block)?;
-        let ingredients_idx = block
-            .find("Ingredients.")
-            .ok_or_else(|| ParseError::MissingSection("Ingredients".into()))?;
         let method_idx = block
             .find("Method.")
             .ok_or_else(|| ParseError::MissingSection("Method".into()))?;
 
-        if method_idx <= ingredients_idx {
-            return Err(ParseError::MissingSection("Method".into()));
-        }
+        // Ingredients section is optional
+        let ingredients = if let Some(ingredients_idx) = block.find("Ingredients.") {
+            if method_idx <= ingredients_idx {
+                return Err(ParseError::MissingSection("Method".into()));
+            }
+            let ingredients_text = &block[ingredients_idx + "Ingredients.".len()..method_idx];
+            Self::parse_ingredients(ingredients_text)?
+        } else {
+            HashMap::new()
+        };
 
-        let ingredients_text = &block[ingredients_idx + "Ingredients.".len()..method_idx];
         let method_text = &block[method_idx + "Method.".len()..];
-
-        let ingredients = Self::parse_ingredients(ingredients_text)?;
         let instructions = Self::parse_method(method_text)?;
 
         Ok(Recipe {
@@ -135,6 +136,14 @@ impl<'a> Parser<'a> {
         for raw_line in text.lines() {
             let line = raw_line.trim();
             if line.is_empty() {
+                continue;
+            }
+
+            // Skip optional metadata lines (cooking time, oven temperature)
+            let line_lower = line.to_lowercase();
+            if line_lower.starts_with("cooking time:")
+                || line_lower.starts_with("pre-heat oven")
+            {
                 continue;
             }
 

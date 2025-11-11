@@ -209,10 +209,13 @@ impl Interpreter {
                 decrement_var,
             } => {
                 loop {
+                    // Check the ingredient that will be decremented, or the condition_var if no decrement specified
+                    // This fixes the bug where different condition/decrement ingredients cause infinite loops
+                    let check_var = decrement_var.as_ref().unwrap_or(condition_var);
                     let condition_value = self
                         .context
                         .variables
-                        .get(condition_var)
+                        .get(check_var)
                         .ok_or(RuntimeError::UndefinedIngredient)?
                         .amount;
 

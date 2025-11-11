@@ -436,6 +436,12 @@ impl<'a> Parser<'a> {
             ));
         }
 
+        // Check add_dry_regex BEFORE add_regex since "Add dry ingredients" matches both
+        // More specific patterns must be checked first
+        if let Some(caps) = add_dry_regex().captures(sentence) {
+            return Ok(Instruction::AddDry(ordinal_to_index(caps.name("bowl"))));
+        }
+
         if let Some(caps) = add_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
             return Ok(Instruction::Add(
@@ -466,10 +472,6 @@ impl<'a> Parser<'a> {
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
             ));
-        }
-
-        if let Some(caps) = add_dry_regex().captures(sentence) {
-            return Ok(Instruction::AddDry(ordinal_to_index(caps.name("bowl"))));
         }
 
         if let Some(caps) = liquefy_bowl_regex().captures(sentence) {

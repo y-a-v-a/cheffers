@@ -176,6 +176,7 @@ spec_parse_only_test!(spec_oven_temperature_gas_mark, "oven-temperature-gas-mark
 // ============================================================================
 
 spec_test!(spec_simple_auxiliary, "simple-auxiliary-test.chef");
+spec_test!(spec_auxiliary_fold, "auxiliary-fold-test.chef");
 
 // ============================================================================
 // ERROR HANDLING TESTS - PARSE ERRORS

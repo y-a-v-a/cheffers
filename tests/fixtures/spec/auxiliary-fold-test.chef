@@ -1,0 +1,26 @@
+Auxiliary Fold Test.
+
+This recipe tests that auxiliary recipes can fold values from the mixing bowl that were put there by the caller.
+
+Ingredients.
+10 g base
+20 g multiplier
+
+Method.
+Put base into mixing bowl.
+Put multiplier into mixing bowl.
+Serve with Helper.
+Fold result into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+
+Helper.
+
+Ingredients.
+0 g result
+
+Method.
+Fold result into mixing bowl.
+Put result into mixing bowl.
+Refrigerate.

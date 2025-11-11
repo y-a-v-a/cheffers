@@ -1,0 +1,27 @@
+# Cargo configuration with custom aliases for test commands
+# Similar to "scripts" in package.json for Node.js projects
+
+[alias]
+# Run all tests
+test-all = "test --all"
+
+# Run only the spec fixture tests
+test-spec = "test --test spec_fixtures"
+
+# Run only the recipe integration tests
+test-recipes = "test --test recipes"
+
+# Run spec tests with output visible
+test-spec-verbose = "test --test spec_fixtures -- --nocapture"
+
+# Run all tests with output visible
+test-verbose = "test -- --nocapture"
+
+# Run a specific spec test by name (usage: cargo test-spec-one addition)
+test-spec-one = "test --test spec_fixtures"
+
+# Run tests and show only failures
+test-quiet = "test --quiet"
+
+# Build and run all tests
+check-all = "test --all --all-features"

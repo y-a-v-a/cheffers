@@ -182,9 +182,7 @@ impl<'a> Parser<'a> {
 
             // Skip optional metadata lines (cooking time, oven temperature)
             let line_lower = line.to_lowercase();
-            if line_lower.starts_with("cooking time:")
-                || line_lower.starts_with("pre-heat oven")
-            {
+            if line_lower.starts_with("cooking time:") || line_lower.starts_with("pre-heat oven") {
                 continue;
             }
 
@@ -317,9 +315,25 @@ impl<'a> Parser<'a> {
         // Check if there are invalid measurement-like words
         // Common invalid units that people might try to use
         let invalid_units = [
-            "ton", "tons", "metric ton", "tonne", "tonnes",
-            "stone", "stones", "yard", "yards", "meter", "meters", "metre", "metres",
-            "inch", "inches", "foot", "feet", "mile", "miles",
+            "ton",
+            "tons",
+            "metric ton",
+            "tonne",
+            "tonnes",
+            "stone",
+            "stones",
+            "yard",
+            "yards",
+            "meter",
+            "meters",
+            "metre",
+            "metres",
+            "inch",
+            "inches",
+            "foot",
+            "feet",
+            "mile",
+            "miles",
         ];
 
         let words: Vec<&str> = ingredient_line.split_whitespace().collect();

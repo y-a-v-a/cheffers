@@ -52,7 +52,11 @@ macro_rules! spec_parse_error_test {
         fn $test_name() -> TestResult<()> {
             let source = read_fixture(concat!("tests/fixtures/spec/", $fixture_path))?;
             let result = parse_recipe(&source);
-            assert!(result.is_err(), "Expected parse error for {}", $fixture_path);
+            assert!(
+                result.is_err(),
+                "Expected parse error for {}",
+                $fixture_path
+            );
             Ok(())
         }
     };
@@ -70,7 +74,11 @@ macro_rules! spec_runtime_error_test {
             interpreter.add_recipe(recipe);
             let result = interpreter.run();
 
-            assert!(result.is_err(), "Expected runtime error for {}", $fixture_path);
+            assert!(
+                result.is_err(),
+                "Expected runtime error for {}",
+                $fixture_path
+            );
             Ok(())
         }
     };
@@ -80,24 +88,72 @@ macro_rules! spec_runtime_error_test {
 // INGREDIENT & MEASUREMENT TESTS
 // ============================================================================
 
-spec_parse_only_test!(spec_single_dry_ingredient_g, "single-dry-ingredient-g-test.chef");
-spec_parse_only_test!(spec_single_dry_ingredient_kg, "single-dry-ingredient-kg-test.chef");
-spec_parse_only_test!(spec_single_dry_ingredient_pinch, "single-dry-ingredient-pinch-test.chef");
-spec_parse_only_test!(spec_single_dry_ingredient_pinches, "single-dry-ingredient-pinches-test.chef");
+spec_parse_only_test!(
+    spec_single_dry_ingredient_g,
+    "single-dry-ingredient-g-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_dry_ingredient_kg,
+    "single-dry-ingredient-kg-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_dry_ingredient_pinch,
+    "single-dry-ingredient-pinch-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_dry_ingredient_pinches,
+    "single-dry-ingredient-pinches-test.chef"
+);
 
-spec_parse_only_test!(spec_single_liquid_ingredient_ml, "single-liquid-ingredient-ml-test.chef");
-spec_parse_only_test!(spec_single_liquid_ingredient_l, "single-liquid-ingredient-l-test.chef");
-spec_parse_only_test!(spec_single_liquid_ingredient_dash, "single-liquid-ingredient-dash-test.chef");
-spec_parse_only_test!(spec_single_liquid_ingredient_dashes, "single-liquid-ingredient-dashes-test.chef");
+spec_parse_only_test!(
+    spec_single_liquid_ingredient_ml,
+    "single-liquid-ingredient-ml-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_liquid_ingredient_l,
+    "single-liquid-ingredient-l-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_liquid_ingredient_dash,
+    "single-liquid-ingredient-dash-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_liquid_ingredient_dashes,
+    "single-liquid-ingredient-dashes-test.chef"
+);
 
-spec_parse_only_test!(spec_single_either_ingredient_cup, "single-either-ingredient-cup-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_cups, "single-either-ingredient-cups-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_tablespoon, "single-either-ingredient-tablespoon-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_tablespoons, "single-either-ingredient-tablespoons-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_teaspoon, "single-either-ingredient-teaspoon-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_teaspoons, "single-either-ingredient-teaspoons-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_heaped, "single-either-ingredient-heaped-test.chef");
-spec_parse_only_test!(spec_single_either_ingredient_level, "single-either-ingredient-level-test.chef");
+spec_parse_only_test!(
+    spec_single_either_ingredient_cup,
+    "single-either-ingredient-cup-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_cups,
+    "single-either-ingredient-cups-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_tablespoon,
+    "single-either-ingredient-tablespoon-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_tablespoons,
+    "single-either-ingredient-tablespoons-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_teaspoon,
+    "single-either-ingredient-teaspoon-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_teaspoons,
+    "single-either-ingredient-teaspoons-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_heaped,
+    "single-either-ingredient-heaped-test.chef"
+);
+spec_parse_only_test!(
+    spec_single_either_ingredient_level,
+    "single-either-ingredient-level-test.chef"
+);
 
 spec_parse_only_test!(spec_fractional_quantity, "fractional-quantity-test.chef");
 spec_parse_only_test!(spec_zero_ingredient, "zero-ingredient-test.chef");
@@ -151,11 +207,20 @@ spec_parse_only_test!(spec_stdin_echo, "stdin-echo-test.chef");
 
 spec_test!(spec_loop, "loop-test.chef");
 spec_test!(spec_loop_same_ingredient, "loop-same-ingredient-test.chef");
-spec_test!(spec_loop_different_ingredients, "loop-different-ingredients-test.chef");
+spec_test!(
+    spec_loop_different_ingredients,
+    "loop-different-ingredients-test.chef"
+);
 spec_test!(spec_nested_loops, "nested-loops-test.chef");
 spec_test!(spec_empty_loop_body, "empty-loop-body-test.chef");
-spec_test!(spec_loop_with_clean_instruction, "loop-with-clean-instruction-test.chef");
-spec_test!(spec_loop_with_verb_pattern_instructions, "loop-with-verb-pattern-instructions-test.chef");
+spec_test!(
+    spec_loop_with_clean_instruction,
+    "loop-with-clean-instruction-test.chef"
+);
+spec_test!(
+    spec_loop_with_verb_pattern_instructions,
+    "loop-with-verb-pattern-instructions-test.chef"
+);
 spec_test!(spec_set_aside, "set-aside-test.chef");
 
 // ============================================================================
@@ -171,7 +236,10 @@ spec_test!(spec_serves_two, "serves-two-test.chef");
 spec_parse_only_test!(spec_cooking_time, "cooking-time-test.chef");
 spec_parse_only_test!(spec_refrigerate_hours, "refrigerate-hours-test.chef");
 spec_parse_only_test!(spec_oven_temperature, "oven-temperature-test.chef");
-spec_parse_only_test!(spec_oven_temperature_gas_mark, "oven-temperature-gas-mark-test.chef");
+spec_parse_only_test!(
+    spec_oven_temperature_gas_mark,
+    "oven-temperature-gas-mark-test.chef"
+);
 
 // ============================================================================
 // AUXILIARY RECIPES
@@ -185,15 +253,33 @@ spec_test!(spec_auxiliary_fold, "auxiliary-fold-test.chef");
 // ============================================================================
 
 spec_parse_error_test!(spec_wrong_title, "wrong-title-test.chef");
-spec_parse_error_test!(spec_wrong_title_line_start, "wrong-title-line-start-test.chef");
-spec_parse_error_test!(spec_wrong_single_dry_ingredient, "wrong-single-dry-ingredient-test.chef");
-spec_parse_error_test!(spec_wrong_ingredients_definition, "wrong-ingredients-definition-test.chef");
-spec_parse_error_test!(spec_redeclared_ingredient, "redeclared-ingredient-test.chef");
+spec_parse_error_test!(
+    spec_wrong_title_line_start,
+    "wrong-title-line-start-test.chef"
+);
+spec_parse_error_test!(
+    spec_wrong_single_dry_ingredient,
+    "wrong-single-dry-ingredient-test.chef"
+);
+spec_parse_error_test!(
+    spec_wrong_ingredients_definition,
+    "wrong-ingredients-definition-test.chef"
+);
+spec_parse_error_test!(
+    spec_redeclared_ingredient,
+    "redeclared-ingredient-test.chef"
+);
 
 // ============================================================================
 // ERROR HANDLING TESTS - RUNTIME ERRORS
 // ============================================================================
 
-spec_runtime_error_test!(spec_division_by_zero_error, "division-by-zero-error-test.chef");
+spec_runtime_error_test!(
+    spec_division_by_zero_error,
+    "division-by-zero-error-test.chef"
+);
 spec_runtime_error_test!(spec_empty_bowl_error, "empty-bowl-error-test.chef");
-spec_runtime_error_test!(spec_undefined_ingredient_error, "undefined-ingredient-error-test.chef");
+spec_runtime_error_test!(
+    spec_undefined_ingredient_error,
+    "undefined-ingredient-error-test.chef"
+);

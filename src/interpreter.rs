@@ -426,7 +426,7 @@ mod tests {
         let bowl = interpreter
             .context
             .mixing_bowls
-            .get(0)
+            .first()
             .expect("mixing bowl should exist");
         let value = bowl.front().expect("mixing bowl should contain a value");
         assert_eq!(value.amount, 1);
@@ -717,7 +717,7 @@ mod tests {
         let bowl = interpreter
             .context
             .mixing_bowls
-            .get(0)
+            .first()
             .expect("bowl created by add dry");
         let value = bowl.front().expect("value pushed");
         assert_eq!(value.amount, 5);

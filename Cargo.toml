@@ -1,8 +1,27 @@
 [package]
 name = "cheffers"
-version = "0.1.0"
+version = "0.2.0"
+authors = ["Vincent Bruijn <vebruijn@gmail.com>", "Claude (Anthropic AI)"]
 edition = "2021"
+rust-version = "1.70"
+license = "WTFPL"
+description = "A Rust interpreter for the Chef esoteric programming language"
+repository = "https://github.com/y-a-v-a/cheffers"
+homepage = "https://github.com/y-a-v-a/cheffers"
+readme = "README.md"
+keywords = ["chef", "esoteric-languages", "interpreter", "esolang", "parser"]
+categories = ["development-tools", "parser-implementations"]
+exclude = [
+    ".git*",
+    ".github/",
+    "tests/fixtures/",
+]
 
 [dependencies]
 regex = "1"
 thiserror = "1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

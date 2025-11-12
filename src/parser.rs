@@ -438,8 +438,7 @@ impl<'a> Parser<'a> {
                     let after_until = &lower[until_pos + 7..]; // " until " = 7 chars
                                                                // Check if the verb stem appears in the verbed form
                                                                // Simple heuristic: check if after_until starts with the verb stem
-                    let matches = after_until.starts_with(&verb.to_lowercase());
-                    matches
+                    after_until.starts_with(&verb.to_lowercase())
                 } else {
                     false
                 }

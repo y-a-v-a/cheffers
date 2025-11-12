@@ -1,38 +1,101 @@
-# Chef Interpreter
+# Cheffers - Chef Interpreter
 
-This project implements a partial interpreter for the [Chef programming language](https://www.dangermouse.net/esoteric/chef.html) in Rust. Chef is an esoteric language where programs are written to resemble cooking recipes. Ingredients represent variables, mixing bowls are stacks, and instructions such as “Put sugar into the mixing bowl” or “Pour contents of the mixing bowl into the baking dish” map to mutations of program state. When everything succeeds, the finished “dish” doubles as the program’s output.
+A complete interpreter for the [Chef programming language](https://www.dangermouse.net/esoteric/chef.html) written in Rust. Chef is an esoteric language where programs are written to resemble cooking recipes. Ingredients represent variables, mixing bowls are stacks, and instructions such as "Put sugar into the mixing bowl" or "Pour contents of the mixing bowl into the baking dish" map to mutations of program state. When everything succeeds, the finished "dish" doubles as the program's output.
 
-## Project Overview
+## Features
 
-- `src/lib.rs` exposes reusable modules for parsing Chef recipes (`parser`), interpreting the resulting instruction stream (`interpreter`), the instruction enum itself (`instruction`), and shared type definitions (`types`).
-- `src/main.rs` contains the binary entry point. It wires command-line input to the parser and interpreter.
-- `tests/recipes.rs` provides integration tests that exercise real Chef recipes stored under `tests/fixtures/`.
+- **Complete Chef language support** - All language constructs including loops, auxiliary recipes, and metadata parsing
+- **62/62 specification tests passing** - Fully compliant with the Chef language specification
+- **Fast and efficient** - Built with Rust for optimal performance
+- **Easy to use CLI** - Simple command-line interface for running Chef recipes
 
-Current interpreter support covers a subset of Chef instructions (put, fold, add, serve with auxiliary recipes, etc.). Loop constructs are parsed but not yet fully executed, which is why the Fibonacci fixture currently fails during parsing—this is codified in the tests to capture the existing limitation.
+## Installation
+
+### From Source
+
+```bash
+git clone https://github.com/y-a-v-a/cheffers.git
+cd cheffers
+cargo install --path .
+```
+
+### From GitHub (requires Rust/Cargo)
+
+```bash
+cargo install --git https://github.com/y-a-v-a/cheffers
+```
 
 ## Usage
 
 ### Running a Recipe
 
-1. Place a `.chef` file somewhere accessible (you can use the supplied fixtures under `tests/fixtures/`).
-2. Run the interpreter with Cargo, optionally passing the recipe path:
+Once installed, run any Chef recipe file:
 
 ```bash
-cargo run -- tests/fixtures/hello-world.chef
+cheffers path/to/recipe.chef
 ```
 
-If no path is provided, the interpreter defaults to `hello.chef` in the project root.
+Try it with the included example recipes:
+
+```bash
+cheffers tests/fixtures/hello-world.chef
+cheffers tests/fixtures/fibonacci.chef
+```
+
+If no path is provided, the interpreter defaults to `hello.chef` in the current directory.
+
+### Development Usage
+
+For development, you can run recipes directly with Cargo:
+
+```bash
+cargo run --release -- tests/fixtures/hello-world.chef
+```
 
 ### Running the Test Suite
 
 ```bash
+# Format code
 cargo fmt
+
+# Run linter
 cargo clippy
+
+# Run all tests (unit + integration)
 cargo test
+
+# Run just the spec tests
+cargo test --test spec_fixtures
 ```
 
-`cargo test` runs both the unit tests found alongside the source files and the integration tests in `tests/recipes.rs`.
+The test suite includes 62 specification tests that validate compliance with the Chef language specification.
+
+## Project Structure
+
+- `src/lib.rs` - Library entry point exposing the parser, interpreter, instructions, and types
+- `src/main.rs` - CLI binary implementation
+- `src/parser.rs` - Chef recipe parser
+- `src/interpreter.rs` - Chef instruction interpreter
+- `src/instruction.rs` - Instruction enum definitions
+- `src/types.rs` - Shared type definitions
+- `tests/spec_fixtures.rs` - 62 specification compliance tests
+- `tests/recipes.rs` - Integration tests for example recipes
+- `tests/fixtures/` - Example Chef recipes
+
+## Continuous Integration
+
+The project uses GitHub Actions to automatically:
+- Check code formatting with `rustfmt`
+- Run `clippy` linting (treating warnings as errors)
+- Build the project
+- Run the complete test suite
+
+All checks run on every push and pull request.
+
+## License
+
+This project is licensed under the WTFPL (Do What The Fuck You Want To Public License). See the `LICENSE` file for details.
 
 ## Learning More About Chef
 
-The original language specification, examples, and additional background information are available at [dangermouse.net/esoteric/chef](https://www.dangermouse.net/esoteric/chef.html). It is an excellent starting point if you want to write new recipes to feed into this interpreter or improve the runtime to support more of the language.
+The original language specification, examples, and additional background information are available at [dangermouse.net/esoteric/chef](https://www.dangermouse.net/esoteric/chef.html). The specification document is also included in this repository at `language-spec/Chef.md`.

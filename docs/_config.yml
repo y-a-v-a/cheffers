@@ -1,0 +1,15 @@
+title: Cheffers
+description: A complete Rust interpreter for the Chef esoteric programming language
+theme: jekyll-theme-cayman
+baseurl: "/cheffers"
+url: "https://y-a-v-a.github.io"
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+
+# Ensure links work properly
+relative_links:
+  enabled: true
+  collections: true

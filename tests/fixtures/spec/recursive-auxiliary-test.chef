@@ -1,0 +1,33 @@
+Recursive Auxiliary Test.
+
+This tests recursive auxiliary recipe calls.
+Computes sum from 5 down to 1 (should output 15).
+
+Ingredients.
+5 g input
+
+Method.
+Put input into mixing bowl.
+Serve with Summer.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+
+Summer.
+
+Ingredients.
+1 g decrement
+
+Method.
+Fold decrement into mixing bowl.
+Put decrement into mixing bowl.
+Remove decrement.
+Fold decrement into mixing bowl.
+Check the decrement.
+Put decrement into mixing bowl.
+Refrigerate.
+Check the decrement until checked.
+Put decrement into mixing bowl.
+Add decrement.
+Serve with Summer.
+Add decrement.

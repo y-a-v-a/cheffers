@@ -706,7 +706,7 @@ fn add_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Add (?P<ingredient>.+) to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Add (?P<ingredient>.+?)(?:\s+to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -716,7 +716,7 @@ fn remove_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Remove (?P<ingredient>.+) from(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Remove (?P<ingredient>.+?)(?:\s+from(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -726,7 +726,7 @@ fn combine_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Combine (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Combine (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -736,7 +736,7 @@ fn divide_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Divide (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Divide (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })

@@ -48,6 +48,7 @@ cheffers tests/fixtures/fibonacci.chef
 ### Guides
 
 - **[Understanding Stack-Based Programming in Chef](stack-based-programming.md)** - Learn how Chef's stack-based paradigm works and how to think in stacks instead of variables. Perfect for developers coming from JavaScript, Python, or other imperative languages.
+- **[Fibonacci Program - Spec Analysis](fibonacci-spec-analysis.md)** - Deep dive into the canonical Fibonacci implementation, clarifying advanced patterns like recursive auxiliary calls, Refrigerate as conditional exit, and other spec ambiguities.
 
 ### Reference Materials
 

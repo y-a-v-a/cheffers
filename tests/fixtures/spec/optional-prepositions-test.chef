@@ -1,0 +1,19 @@
+Optional Bowl Ordinal Test.
+
+Tests that bowl ordinal can be omitted for default mixing bowl.
+Should output 14: (10-3)*2.
+
+Ingredients.
+10 g value
+3 g subtractor
+2 g multiplier
+
+Method.
+Put value into mixing bowl.
+Remove subtractor from mixing bowl.
+Fold value into mixing bowl.
+Put value into mixing bowl.
+Combine multiplier into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

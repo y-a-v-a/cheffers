@@ -1,0 +1,19 @@
+Unreachable After Refrigerate Test.
+
+Tests that code after Refrigerate in a loop is unreachable when loop executes.
+Should output 42, not 99.
+
+Ingredients.
+1 g condition
+42 g good
+99 g bad
+
+Method.
+Put good into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+Test the condition.
+Put bad into mixing bowl.
+Refrigerate for 1 hours.
+Test the condition until tested.
+
+Serves 1.

@@ -1,0 +1,12 @@
+Method Single Line Test.
+
+Tests that method statements can be on single line (line breaks ignored).
+Should output 5.
+
+Ingredients.
+5 g value
+
+Method.
+Put value into mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

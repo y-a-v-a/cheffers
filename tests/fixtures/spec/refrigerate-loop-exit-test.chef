@@ -1,0 +1,19 @@
+Refrigerate Loop Exit Test.
+
+This tests using Refrigerate as a conditional early exit inside a loop.
+If the condition is non-zero, Refrigerate exits immediately with output.
+If zero, execution continues past the loop.
+
+Ingredients.
+3 g counter
+5 g result
+
+Method.
+Put result into mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+Check the counter.
+Put counter into mixing bowl.
+Refrigerate for 1 hours.
+Check the counter until checked.
+
+Serves 1.

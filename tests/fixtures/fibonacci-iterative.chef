@@ -1,0 +1,31 @@
+Fibonacci Numbers Iterative.
+
+This recipe prints the first 20 Fibonacci numbers using iteration, one per line in reverse order (20th to 1st). Unlike the recursive version, this computes each number by adding the previous two values in sequence. Due to the stack-based nature of Chef's mixing bowls, the numbers are naturally output in descending order.
+
+Ingredients.
+1 g fib_a
+1 g fib_b
+18 g counter
+0 g next_fib
+10 ml newline
+
+Method.
+Put newline into the mixing bowl.
+Put fib_b into the mixing bowl.
+Put newline into the mixing bowl.
+Put fib_a into the mixing bowl.
+Beat the counter.
+Clean 2nd mixing bowl.
+Put fib_a into 2nd mixing bowl.
+Add fib_b to 2nd mixing bowl.
+Fold next_fib into 2nd mixing bowl.
+Put newline into the mixing bowl.
+Put next_fib into the mixing bowl.
+Put fib_b into 2nd mixing bowl.
+Fold fib_a into 2nd mixing bowl.
+Put next_fib into 2nd mixing bowl.
+Fold fib_b into 2nd mixing bowl.
+Beat the counter until beaten.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

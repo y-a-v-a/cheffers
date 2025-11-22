@@ -28,14 +28,33 @@ fn hello_world_fixture_parses() -> TestResult<()> {
 }
 
 #[test]
-fn fibonacci_fixture_parses_with_aux_recipe() -> TestResult<()> {
-    let source = read_fixture("tests/fixtures/fibonacci.chef")?;
+fn fibonacci_iterative_fixture_parses_and_executes() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/fibonacci-iterative.chef")?;
     let recipe = parse_recipe(&source)?;
+
+    assert_eq!(recipe.title, "Fibonacci Numbers Iterative.");
+
+    // Verify loop was parsed
     assert!(
-        recipe.auxiliary_recipes.contains_key("Caramel Sauce."),
-        "expected auxiliary recipe named 'Caramel Sauce.'; available: {:?}",
-        recipe.auxiliary_recipes.keys().collect::<Vec<_>>()
+        recipe
+            .instructions
+            .iter()
+            .any(|inst| matches!(inst, cheffers::instruction::Instruction::Loop { .. })),
+        "expected loop instruction to be parsed for Fibonacci iteration"
     );
+
+    // Verify it has no auxiliary recipes (unlike the recursive version)
+    assert!(
+        recipe.auxiliary_recipes.is_empty(),
+        "iterative fibonacci should not include auxiliary recipes"
+    );
+
+    // Execute and verify it completes without error
+    // Expected output: First 20 Fibonacci numbers in reverse order with newlines
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
     Ok(())
 }
 

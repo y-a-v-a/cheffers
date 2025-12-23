@@ -39,11 +39,52 @@ impl ErrorFormatter {
 
     fn format_runtime_error(error: &RuntimeError) -> String {
         match error {
-            RuntimeError::UndefinedIngredient => Self::format_undefined_ingredient_error(None),
-            RuntimeError::EmptyBowl => Self::format_empty_bowl_error(None),
-            RuntimeError::DivisionByZero => Self::format_division_by_zero_error(None),
-            RuntimeError::RecursionLimit => Self::format_recursion_limit_error(None),
-            RuntimeError::UnknownRecipe(name) => Self::format_unknown_recipe_error(name, None),
+            RuntimeError::UndefinedIngredient { ingredient } => {
+                let context = RuntimeContext::UndefinedIngredient {
+                    ingredient: ingredient.clone(),
+                    instruction: String::new(),
+                };
+                Self::format_undefined_ingredient_error(Some(&context))
+            }
+            RuntimeError::EmptyBowl {
+                bowl_index,
+                operation,
+            } => {
+                let context = RuntimeContext::EmptyBowl {
+                    bowl_index: *bowl_index,
+                    operation: operation.clone(),
+                };
+                Self::format_empty_bowl_error(Some(&context))
+            }
+            RuntimeError::DivisionByZero {
+                ingredient,
+                bowl_index,
+            } => {
+                let context = RuntimeContext::DivisionByZero {
+                    divisor_ingredient: ingredient.clone(),
+                    bowl_index: *bowl_index,
+                };
+                Self::format_division_by_zero_error(Some(&context))
+            }
+            RuntimeError::RecursionLimit {
+                recipe_name,
+                depth,
+                max_depth,
+            } => {
+                let context = RuntimeContext::RecursionLimit {
+                    recipe_name: recipe_name.clone(),
+                    depth: *depth,
+                    max_depth: *max_depth,
+                };
+                Self::format_recursion_limit_error(Some(&context))
+            }
+            RuntimeError::UnknownRecipe { recipe_name } => {
+                let context = RuntimeContext::UnknownRecipe {
+                    recipe_name: recipe_name.clone(),
+                    available_recipes: Vec::new(),
+                };
+                Self::format_unknown_recipe_error(recipe_name, Some(&context))
+            }
             RuntimeError::NoRecipe => Self::format_no_recipe_error(),
             RuntimeError::EarlyTermination => {
                 // This is not really an error, just a control flow signal

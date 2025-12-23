@@ -66,68 +66,83 @@ impl Interpreter {
         match inst {
             Instruction::Put(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let value = *self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let value = *self.context.variables.get(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 self.context.mixing_bowls[*bowl_idx].push_front(value);
             }
             Instruction::Fold(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
                 let value = self.context.mixing_bowls[*bowl_idx]
                     .pop_front()
-                    .ok_or(RuntimeError::EmptyBowl)?;
+                    .ok_or_else(|| RuntimeError::EmptyBowl {
+                        bowl_index: *bowl_idx,
+                        operation: format!("Fold {} into mixing bowl", ingredient),
+                    })?;
                 self.context.variables.insert(ingredient.clone(), value);
             }
             Instruction::Add(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 if let Some(top) = self.context.mixing_bowls[*bowl_idx].front_mut() {
                     top.amount += ing_val.amount;
                 }
             }
             Instruction::Remove(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 let top = self.context.mixing_bowls[*bowl_idx]
                     .front_mut()
-                    .ok_or(RuntimeError::EmptyBowl)?;
+                    .ok_or_else(|| RuntimeError::EmptyBowl {
+                        bowl_index: *bowl_idx,
+                        operation: format!("Remove {} from mixing bowl", ingredient),
+                    })?;
                 top.amount -= ing_val.amount;
             }
             Instruction::Combine(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 let top = self.context.mixing_bowls[*bowl_idx]
                     .front_mut()
-                    .ok_or(RuntimeError::EmptyBowl)?;
+                    .ok_or_else(|| RuntimeError::EmptyBowl {
+                        bowl_index: *bowl_idx,
+                        operation: format!("Combine {} into mixing bowl", ingredient),
+                    })?;
                 top.amount *= ing_val.amount;
             }
             Instruction::Divide(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 if ing_val.amount == 0 {
-                    return Err(RuntimeError::DivisionByZero);
+                    return Err(RuntimeError::DivisionByZero {
+                        ingredient: ingredient.clone(),
+                        bowl_index: *bowl_idx,
+                    });
                 }
                 let top = self.context.mixing_bowls[*bowl_idx]
                     .front_mut()
-                    .ok_or(RuntimeError::EmptyBowl)?;
+                    .ok_or_else(|| RuntimeError::EmptyBowl {
+                        bowl_index: *bowl_idx,
+                        operation: format!("Divide {} into mixing bowl", ingredient),
+                    })?;
                 top.amount /= ing_val.amount;
             }
             Instruction::AddDry(bowl_idx) => {
@@ -153,7 +168,9 @@ impl Interpreter {
                     .context
                     .variables
                     .get(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?
+                    .ok_or_else(|| RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    })?
                     .amount;
                 if depth > 0 {
                     self.stir_bowl(*bowl_idx, depth as usize);
@@ -174,11 +191,11 @@ impl Interpreter {
                 self.call_auxiliary(recipe_name)?;
             }
             Instruction::Liquefy(ingredient) => {
-                let value = self
-                    .context
-                    .variables
-                    .get_mut(ingredient)
-                    .ok_or(RuntimeError::UndefinedIngredient)?;
+                let value = self.context.variables.get_mut(ingredient).ok_or_else(|| {
+                    RuntimeError::UndefinedIngredient {
+                        ingredient: ingredient.clone(),
+                    }
+                })?;
                 value.measure = Measure::Liquid;
             }
             Instruction::LiquefyBowl(bowl_idx) => {
@@ -216,7 +233,9 @@ impl Interpreter {
                         .context
                         .variables
                         .get(check_var)
-                        .ok_or(RuntimeError::UndefinedIngredient)?
+                        .ok_or_else(|| RuntimeError::UndefinedIngredient {
+                            ingredient: check_var.clone(),
+                        })?
                         .amount;
 
                     if condition_value == 0 {
@@ -233,11 +252,11 @@ impl Interpreter {
 
                     // Decrement the ingredient if specified in the until statement
                     if let Some(ref decr_var) = decrement_var {
-                        let value = self
-                            .context
-                            .variables
-                            .get_mut(decr_var)
-                            .ok_or(RuntimeError::UndefinedIngredient)?;
+                        let value = self.context.variables.get_mut(decr_var).ok_or_else(|| {
+                            RuntimeError::UndefinedIngredient {
+                                ingredient: decr_var.clone(),
+                            }
+                        })?;
                         value.amount -= 1;
                     }
                 }
@@ -260,14 +279,20 @@ impl Interpreter {
 
     fn call_auxiliary(&mut self, recipe_name: &str) -> RuntimeResult<()> {
         let key = normalize_recipe_name(recipe_name);
-        let aux_recipe = self
-            .recipes
-            .get(&key)
-            .cloned()
-            .ok_or_else(|| RuntimeError::UnknownRecipe(recipe_name.to_string()))?;
+        let aux_recipe =
+            self.recipes
+                .get(&key)
+                .cloned()
+                .ok_or_else(|| RuntimeError::UnknownRecipe {
+                    recipe_name: recipe_name.to_string(),
+                })?;
 
         if self.context.call_stack.len() >= MAX_CALL_DEPTH {
-            return Err(RuntimeError::RecursionLimit);
+            return Err(RuntimeError::RecursionLimit {
+                recipe_name: recipe_name.to_string(),
+                depth: self.context.call_stack.len(),
+                max_depth: MAX_CALL_DEPTH,
+            });
         }
 
         let frame = CallFrame {
@@ -682,7 +707,13 @@ mod tests {
         let err = interpreter
             .execute_instruction(&Instruction::Divide("zero".to_string(), 0))
             .expect_err("division by zero should error");
-        assert!(matches!(err, RuntimeError::DivisionByZero));
+        assert!(matches!(
+            err,
+            RuntimeError::DivisionByZero {
+                ingredient: _,
+                bowl_index: _
+            }
+        ));
     }
 
     #[test]

@@ -82,18 +82,28 @@ pub enum ParseError {
 
 #[derive(Debug, Error)]
 pub enum RuntimeError {
-    #[error("ingredient is not defined")]
-    UndefinedIngredient,
-    #[error("mixing bowl is empty")]
-    EmptyBowl,
-    #[error("recipe '{0}' is not known")]
-    UnknownRecipe(String),
+    #[error("ingredient '{ingredient}' is not defined")]
+    UndefinedIngredient { ingredient: String },
+    #[error("mixing bowl {bowl_index} is empty (attempted {operation})")]
+    EmptyBowl {
+        bowl_index: usize,
+        operation: String,
+    },
+    #[error("recipe '{recipe_name}' is not known")]
+    UnknownRecipe { recipe_name: String },
     #[error("no recipe available to execute")]
     NoRecipe,
-    #[error("call stack limit reached")]
-    RecursionLimit,
-    #[error("division by zero")]
-    DivisionByZero,
+    #[error("recursion limit ({max_depth}) exceeded for recipe '{recipe_name}'")]
+    RecursionLimit {
+        recipe_name: String,
+        depth: usize,
+        max_depth: usize,
+    },
+    #[error("division by zero (ingredient '{ingredient}')")]
+    DivisionByZero {
+        ingredient: String,
+        bowl_index: usize,
+    },
     #[error("early termination")]
     EarlyTermination,
     #[error("break loop")]

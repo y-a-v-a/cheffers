@@ -1,8 +1,17 @@
-use cheffers::{Interpreter, Parser, Result};
+use cheffers::error_formatter::ErrorFormatter;
+use cheffers::{Interpreter, Parser};
 
-use std::{env, fs};
+use std::{env, fs, process};
 
-fn main() -> Result<()> {
+fn main() {
+    let result = run();
+    if let Err(error) = result {
+        eprintln!("{}", ErrorFormatter::format(&error));
+        process::exit(1);
+    }
+}
+
+fn run() -> cheffers::Result<()> {
     let path = recipe_path_from_args(env::args());
     let source = fs::read_to_string(&path)?;
     let parser = Parser::new(&source);

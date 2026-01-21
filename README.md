@@ -6,8 +6,10 @@ A complete interpreter for the [Chef programming language](https://www.dangermou
 
 - **Complete Chef language support** - All language constructs including loops, auxiliary recipes, and metadata parsing
 - **62/62 specification tests passing** - Fully compliant with the Chef language specification
+- **Rich error messages** - Rust-style error output with helpful suggestions and language spec references
 - **Fast and efficient** - Built with Rust for optimal performance
 - **Easy to use CLI** - Simple command-line interface for running Chef recipes
+- **Development environment** - Tmux-based split-pane workflow for rapid iteration
 
 ## Installation
 
@@ -44,9 +46,35 @@ cheffers tests/fixtures/fibonacci.chef
 
 If no path is provided, the interpreter defaults to `hello.chef` in the current directory.
 
+### Development Environment (Tmux)
+
+For an interactive development experience with instant feedback, use the tmux-based development environment:
+
+```bash
+# Start the development environment
+./scripts/chef-dev.sh myrecipe.chef
+
+# Or let it create a template for you
+./scripts/chef-dev.sh
+```
+
+This creates a split-pane interface:
+- **Left pane:** Text editor (uses `$EDITOR`, defaults to vim)
+- **Right pane:** Auto-runner that watches your file and shows output on save
+
+**Features:**
+- Instant feedback - save your file to see results
+- Rich error messages with helpful suggestions
+- No need to manually rerun the interpreter
+- Uses your preferred editor
+
+See `scripts/README.md` for detailed usage instructions, keybindings, and tips.
+
+**Prerequisites:** `tmux` (required), `entr` (optional, for better performance)
+
 ### Development Usage
 
-For development, you can run recipes directly with Cargo:
+For development, you can also run recipes directly with Cargo:
 
 ```bash
 cargo run --release -- tests/fixtures/hello-world.chef
@@ -78,9 +106,14 @@ The test suite includes 62 specification tests that validate compliance with the
 - `src/interpreter.rs` - Chef instruction interpreter
 - `src/instruction.rs` - Instruction enum definitions
 - `src/types.rs` - Shared type definitions
+- `src/error_formatter.rs` - Rich error message formatting
+- `src/error_context.rs` - Error context and language spec references
 - `tests/spec_fixtures.rs` - 62 specification compliance tests
 - `tests/recipes.rs` - Integration tests for example recipes
 - `tests/fixtures/` - Example Chef recipes
+- `tests/errors/` - Error test fixtures
+- `scripts/chef-dev.sh` - Tmux-based development environment
+- `scripts/README.md` - Development environment documentation
 
 ## Continuous Integration
 

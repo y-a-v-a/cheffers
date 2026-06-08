@@ -52,7 +52,7 @@ jobs:
         run: cargo test --test spec_fixtures --verbose
 
       - name: Run all tests
-        run: cargo test --verbose
+        run: cargo test --workspace --verbose
 
   wasm:
     name: WebAssembly Build

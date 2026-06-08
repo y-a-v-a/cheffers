@@ -46,6 +46,30 @@ python3 -m http.server 8000
 # open http://localhost:8000/editor/
 ```
 
+## Testing
+
+The playground is tested at several layers (see the repo's `TESTING.md` for the
+full picture). The ones rooted here:
+
+```bash
+cd docs/editor
+npm install
+
+npm test            # Node unit tests for the ANSI->HTML helpers (ansi.js)
+npm run test:browser   # Playwright e2e (expects a server; use the script below)
+```
+
+The browser test is normally driven by the repo-root helper, which builds the
+bundle, serves `docs/`, and runs the Playwright checks:
+
+```bash
+./scripts/test-browser.sh
+```
+
+The wasm binding itself is tested from the Rust side (`cargo test --workspace`
+for the host logic, `./scripts/test-wasm.sh` for the real-wasm integration
+tests). Run the whole suite across all layers with `./scripts/test-all.sh`.
+
 ## Files
 
 | Path                | Purpose                                              |

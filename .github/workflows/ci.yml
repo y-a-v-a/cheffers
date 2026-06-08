@@ -53,3 +53,31 @@ jobs:
 
       - name: Run all tests
         run: cargo test --verbose
+
+  wasm:
+    name: WebAssembly Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry/index
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Clippy (wasm wrapper)
+        run: cargo clippy -p cheffers-wasm --all-features -- -D warnings
+
+      - name: Build wasm32 target
+        run: cargo build --release --target wasm32-unknown-unknown -p cheffers-wasm

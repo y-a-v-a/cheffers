@@ -7,6 +7,12 @@ title: Home
 
 Welcome to the **Cheffers** documentation! Cheffers is a complete Rust interpreter for the Chef esoteric programming language, where programs are written as cooking recipes.
 
+## 🍳 Try it in your browser
+
+Write and run Chef recipes instantly in the **[Cheffers Playground](editor/)** — a
+JsBin-style editor powered by the Rust interpreter compiled to WebAssembly. It runs
+entirely in your browser; nothing is sent to a server.
+
 ## What is Chef?
 
 Chef is an esoteric programming language created by David Morgan-Mar in 2002. Programs in Chef look like cooking recipes - ingredients represent variables, mixing bowls are stacks, and cooking instructions translate to program operations. When executed, your recipe doesn't just cook a dish - it computes!

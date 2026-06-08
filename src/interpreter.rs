@@ -1,4 +1,5 @@
 use std::collections::{HashMap, VecDeque};
+use std::fmt::Write as _;
 
 use crate::instruction::Instruction;
 use crate::types::{
@@ -11,6 +12,7 @@ pub struct Interpreter {
     context: ExecutionContext,
     recipes: HashMap<String, Recipe>,
     main_recipe_key: Option<String>,
+    output: String,
 }
 
 impl Interpreter {
@@ -19,7 +21,17 @@ impl Interpreter {
             context: ExecutionContext::new(),
             recipes: HashMap::new(),
             main_recipe_key: None,
+            output: String::new(),
         }
+    }
+
+    /// Returns the output produced so far by `run`.
+    ///
+    /// The interpreter accumulates everything that a recipe "serves" into an
+    /// internal buffer instead of writing straight to stdout. The CLI prints
+    /// this buffer; the WASM bindings hand it back to JavaScript.
+    pub fn output(&self) -> &str {
+        &self.output
     }
 
     pub fn add_recipe(&mut self, recipe: Recipe) {
@@ -217,7 +229,7 @@ impl Interpreter {
                 }
             }
             Instruction::Serves(count) => {
-                self.output(*count)?;
+                self.write_output(*count)?;
             }
             Instruction::Loop {
                 condition_var,
@@ -268,7 +280,7 @@ impl Interpreter {
             Instruction::NoOp(_) => {}
             Instruction::Refrigerate(hours) => {
                 if let Some(dish_count) = hours {
-                    self.output(*dish_count)?;
+                    self.write_output(*dish_count)?;
                 }
                 return Err(RuntimeError::EarlyTermination);
             }
@@ -344,16 +356,19 @@ impl Interpreter {
         Ok(())
     }
 
-    fn output(&mut self, dish_count: usize) -> RuntimeResult<()> {
+    fn write_output(&mut self, dish_count: usize) -> RuntimeResult<()> {
         for dish in self.context.baking_dishes.iter_mut().take(dish_count) {
             while let Some(value) = dish.pop_front() {
                 match value.measure {
                     Measure::Liquid => {
                         if let Some(c) = char::from_u32(value.amount as u32) {
-                            print!("{}", c);
+                            self.output.push(c);
                         }
                     }
-                    _ => print!("{}", value.amount),
+                    _ => {
+                        // Writing to a String is infallible.
+                        let _ = write!(self.output, "{}", value.amount);
+                    }
                 }
             }
         }

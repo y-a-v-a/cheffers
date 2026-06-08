@@ -7,6 +7,9 @@
 ## Dependency lockfile (keep if this is a binary crate)
 Cargo.lock
 
+## Web playground JS dependencies (the bundle is committed; deps are not)
+docs/editor/node_modules/
+
 .claude
 
 .vscode

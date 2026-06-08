@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cheffers — Chef Playground</title>
+  <meta name="description" content="Write and run Chef recipes in your browser. A JsBin-style playground powered by the Cheffers Rust interpreter compiled to WebAssembly." />
+  <link rel="stylesheet" href="./editor.css" />
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">🍳</span>
+      <span class="title">Cheffers Playground</span>
+    </div>
+    <div class="controls">
+      <label class="examples">
+        Example:
+        <select id="examples" aria-label="Load an example recipe"></select>
+      </label>
+      <label class="autorun">
+        <input type="checkbox" id="autorun" checked />
+        Auto-run
+      </label>
+      <button id="run" type="button">Run ▶</button>
+    </div>
+  </header>
+
+  <main class="panes">
+    <section class="pane editor-pane">
+      <div class="pane-header">Recipe</div>
+      <div id="editor" class="editor-host"></div>
+    </section>
+    <section class="pane output-pane">
+      <div class="pane-header">
+        Output
+        <span id="status" class="status" role="status"></span>
+      </div>
+      <pre id="output" class="output" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Runs entirely in your browser via WebAssembly — nothing is sent to a server.
+    <a href="https://github.com/y-a-v-a/cheffers">Source on GitHub</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">About the Chef language</a>
+  </footer>
+
+  <script type="module" src="./editor.bundle.js"></script>
+</body>
+</html>

@@ -11,6 +11,16 @@ A complete interpreter for the [Chef programming language](https://www.dangermou
 - **Easy to use CLI** - Simple command-line interface for running Chef recipes
 - **Development environment** - Tmux-based split-pane workflow for rapid iteration
 
+## Web Playground
+
+Prefer not to install anything? Write and run Chef recipes right in your browser
+with the **[Cheffers Playground](https://y-a-v-a.github.io/cheffers/editor/)** — a
+JsBin-style editor with instant evaluation, powered by this interpreter compiled to
+WebAssembly. It runs entirely client-side; nothing is sent to a server.
+
+The playground lives in `docs/editor/` and is built from the `cheffers-wasm` crate.
+See `docs/editor/README.md` for how to rebuild it.
+
 ## Installation
 
 ### From Source
@@ -102,6 +112,9 @@ The test suite includes 62 specification tests that validate compliance with the
 
 - `src/lib.rs` - Library entry point exposing the parser, interpreter, instructions, and types
 - `src/main.rs` - CLI binary implementation
+- `crates/cheffers-wasm/` - WebAssembly bindings for the browser playground
+- `docs/editor/` - The web playground (HTML/CSS/JS + generated wasm)
+- `scripts/build-web.sh` - Builds the wasm module and editor bundle for the playground
 - `src/parser.rs` - Chef recipe parser
 - `src/interpreter.rs` - Chef instruction interpreter
 - `src/instruction.rs` - Instruction enum definitions

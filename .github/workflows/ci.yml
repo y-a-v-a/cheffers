@@ -93,3 +93,39 @@ jobs:
       # the runner image), exercising wasm-bindgen end to end.
       - name: Run wasm integration tests
         run: cargo test -p cheffers-wasm --target wasm32-unknown-unknown --test web
+
+  web:
+    name: Web Playground Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs/editor/package-lock.json
+
+      - name: Install playground dependencies
+        working-directory: docs/editor
+        run: npm ci
+
+      - name: Build editor bundle
+        working-directory: docs/editor
+        run: npm run build
+
+      - name: Run JS unit tests
+        working-directory: docs/editor
+        run: npm test
+
+      - name: Install Playwright Chromium
+        working-directory: docs/editor
+        run: npx playwright install --with-deps chromium
+
+      # Serves docs/ and drives the page in headless Chromium. The committed
+      # wasm artifacts in docs/editor/pkg/ are used as-is.
+      - name: Run browser end-to-end test
+        run: ./scripts/test-browser.sh

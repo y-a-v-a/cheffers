@@ -21,6 +21,9 @@ exclude = [
 regex = "1"
 thiserror = "1.0"
 
+[workspace]
+members = ["crates/cheffers-wasm"]
+
 [profile.release]
 lto = true
 codegen-units = 1

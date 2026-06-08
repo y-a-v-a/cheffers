@@ -1,6 +1,7 @@
 use cheffers::error_formatter::ErrorFormatter;
 use cheffers::{Interpreter, Parser};
 
+use std::io::Write;
 use std::{env, fs, process};
 
 fn main() {
@@ -20,6 +21,10 @@ fn run() -> cheffers::Result<()> {
     let mut interpreter = Interpreter::new();
     interpreter.add_recipe(recipe);
     interpreter.run()?;
+
+    // The interpreter accumulates output in a buffer; flush it to stdout.
+    print!("{}", interpreter.output());
+    let _ = std::io::stdout().flush();
 
     Ok(())
 }

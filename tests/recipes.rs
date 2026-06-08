@@ -28,6 +28,19 @@ fn hello_world_fixture_parses() -> TestResult<()> {
 }
 
 #[test]
+fn hello_world_fixture_captures_output() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/hello-world.chef")?;
+    let recipe = parse_recipe(&source)?;
+
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
+    assert_eq!(interpreter.output(), "Hello world!");
+    Ok(())
+}
+
+#[test]
 fn fibonacci_iterative_fixture_parses_and_executes() -> TestResult<()> {
     let source = read_fixture("tests/fixtures/fibonacci-iterative.chef")?;
     let recipe = parse_recipe(&source)?;

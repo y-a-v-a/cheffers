@@ -72,7 +72,7 @@ fn execute(source: &str) -> RunResult {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, not(target_arch = "wasm32")))]
 mod tests {
     //! Host-target unit tests for the wrapper's pure logic. These exercise
     //! [`execute`] directly (no JS runtime needed) and run under `cargo test`.

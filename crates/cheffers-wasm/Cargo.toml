@@ -18,3 +18,7 @@ cheffers = { path = "../.." }
 wasm-bindgen = "=0.2.100"
 serde = { version = "1", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
+
+[dev-dependencies]
+# Must track the pinned wasm-bindgen version above.
+wasm-bindgen-test = "=0.3.50"

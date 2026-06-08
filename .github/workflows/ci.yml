@@ -55,7 +55,7 @@ jobs:
         run: cargo test --workspace --verbose
 
   wasm:
-    name: WebAssembly Build
+    name: WebAssembly Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -76,8 +76,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
 
+      # Provides both `wasm-bindgen` (build) and `wasm-bindgen-test-runner`
+      # (tests). Must match the version pinned in crates/cheffers-wasm/Cargo.toml.
+      - name: Install wasm-bindgen-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.100
+
       - name: Clippy (wasm wrapper)
         run: cargo clippy -p cheffers-wasm --all-features -- -D warnings
 
       - name: Build wasm32 target
         run: cargo build --release --target wasm32-unknown-unknown -p cheffers-wasm
+
+      # Runs the run_chef binding in a real wasm runtime via Node (provided by
+      # the runner image), exercising wasm-bindgen end to end.
+      - name: Run wasm integration tests
+        run: cargo test -p cheffers-wasm --target wasm32-unknown-unknown --test web

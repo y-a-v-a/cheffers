@@ -5,7 +5,8 @@
   "description": "Browser playground for the Cheffers Chef interpreter",
   "type": "module",
   "scripts": {
-    "build": "esbuild editor.js --bundle --format=esm --minify --external:./pkg/* --outfile=editor.bundle.js"
+    "build": "esbuild editor.js --bundle --format=esm --minify --external:./pkg/* --outfile=editor.bundle.js",
+    "test": "node --test"
   },
   "devDependencies": {
     "codemirror": "^6.0.1",

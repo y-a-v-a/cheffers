@@ -1,11 +1,12 @@
 // Cheffers Playground — wires a CodeMirror editor to the Chef interpreter
 // compiled to WebAssembly. Everything runs client-side; no server involved.
 //
-// CodeMirror 6 is loaded as an ES module from a CDN, and the interpreter is
-// the locally-built wasm-bindgen output in ./pkg/.
+// CodeMirror is bundled into editor.bundle.js at build time (see package.json),
+// and the interpreter is the locally-built wasm-bindgen output in ./pkg/.
 
 import { EditorView, basicSetup } from "codemirror";
 import init, { run_chef } from "./pkg/cheffers_wasm.js";
+import { escapeHtml, ansiToHtml } from "./ansi.js";
 
 const EXAMPLES = {
   "hello-world": {
@@ -63,73 +64,6 @@ let debounceTimer = null;
 function setStatus(text, kind) {
   statusEl.textContent = text;
   statusEl.className = "status" + (kind ? " " + kind : "");
-}
-
-const ANSI_COLORS = {
-  31: "#ff6b6b", // red
-  32: "#5ad19a", // green
-  33: "#ffd166", // yellow
-  34: "#6ea8ff", // blue
-  35: "#c792ea", // magenta
-  36: "#56d4dd", // cyan
-  37: "#e6e6ef", // white
-};
-
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-// Convert the interpreter's ANSI-colored error output into safe HTML so the
-// browser shows the same rich diagnostics the CLI prints. Text is escaped
-// before being wrapped in spans, so recipe content echoed in errors is inert.
-function ansiToHtml(text) {
-  let html = "";
-  let open = false;
-  let bold = false;
-  let color = null;
-  const pattern = /\x1b\[([0-9;]*)m/g;
-  let last = 0;
-  let match;
-
-  const flushSpan = () => {
-    if (open) {
-      html += "</span>";
-      open = false;
-    }
-  };
-  const openSpan = () => {
-    const styles = [];
-    if (bold) styles.push("font-weight:600");
-    if (color) styles.push("color:" + color);
-    if (styles.length) {
-      html += '<span style="' + styles.join(";") + '">';
-      open = true;
-    }
-  };
-
-  while ((match = pattern.exec(text)) !== null) {
-    html += escapeHtml(text.slice(last, match.index));
-    last = pattern.lastIndex;
-    flushSpan();
-    for (const codeStr of match[1].split(";")) {
-      const code = Number(codeStr || "0");
-      if (code === 0) {
-        bold = false;
-        color = null;
-      } else if (code === 1) {
-        bold = true;
-      } else if (ANSI_COLORS[code]) {
-        color = ANSI_COLORS[code];
-      }
-    }
-    openSpan();
-  }
-  html += escapeHtml(text.slice(last));
-  flushSpan();
-  return html;
 }
 
 function render(result) {

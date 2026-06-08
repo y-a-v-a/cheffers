@@ -117,6 +117,12 @@ jobs:
         working-directory: docs/editor
         run: npm run build
 
+      # The bundle is committed so GitHub Pages can serve it. Fail if a rebuild
+      # diverges from what's checked in (i.e. someone edited the source but
+      # forgot to rebuild).
+      - name: Verify committed bundle is up to date
+        run: git diff --exit-code -- docs/editor/editor.bundle.js
+
       - name: Run JS unit tests
         working-directory: docs/editor
         run: npm test

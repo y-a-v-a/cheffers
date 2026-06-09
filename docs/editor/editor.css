@@ -107,9 +107,29 @@ button#run:active { transform: translateY(1px); }
   background: var(--panel);
 }
 
-/* CodeMirror fills its host */
-.cm-editor { height: 100%; }
+/* CodeMirror fills its host, themed for dark mode (basicSetup ships a light
+   theme, so the editor surface and gutter are overridden here). */
+.cm-editor { height: 100%; background: var(--panel); color: var(--text); }
+.cm-editor.cm-focused { outline: none; }
 .cm-scroller { font-family: var(--mono); font-size: 14px; }
+.cm-content { caret-color: var(--accent); }
+.cm-cursor, .cm-dropCursor { border-left-color: var(--accent); }
+
+.cm-gutters {
+  background: var(--panel-header);
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+}
+.cm-lineNumbers .cm-gutterElement { color: var(--muted); }
+.cm-activeLine { background: rgba(255, 255, 255, 0.04); }
+.cm-activeLineGutter { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+
+/* Text selection within the editor */
+.cm-editor .cm-selectionBackground,
+.cm-editor.cm-focused .cm-selectionBackground,
+.cm-content ::selection {
+  background: rgba(255, 122, 89, 0.25);
+}
 
 .output {
   flex: 1;

@@ -28,7 +28,6 @@ pub enum Instruction {
     ServeWith(String), // auxiliary recipe name
     Refrigerate(Option<usize>),
     Serves(usize),
-    NoOp(String),
 }
 
 #[cfg(test)]
@@ -67,15 +66,6 @@ mod tests {
                 assert!(decrement_var.is_none());
             }
             _ => panic!("expected Loop variant"),
-        }
-    }
-
-    #[test]
-    fn noop_variant_stores_reason() {
-        let instruction = Instruction::NoOp("Sift the flour.".to_string());
-        match instruction {
-            Instruction::NoOp(text) => assert_eq!(text, "Sift the flour."),
-            _ => panic!("expected NoOp variant"),
         }
     }
 }

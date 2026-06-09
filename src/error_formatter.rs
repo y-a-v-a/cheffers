@@ -86,6 +86,20 @@ impl ErrorFormatter {
                 Self::format_unknown_recipe_error(recipe_name, Some(&context))
             }
             RuntimeError::NoRecipe => Self::format_no_recipe_error(),
+            RuntimeError::IngredientWithoutValue { ingredient } => {
+                Self::format_ingredient_without_value_error(ingredient)
+            }
+            RuntimeError::InputUnavailable { ingredient, reason } => {
+                Self::format_input_unavailable_error(ingredient, reason)
+            }
+            RuntimeError::InvalidCharacter { amount } => {
+                Self::format_invalid_character_error(*amount)
+            }
+            RuntimeError::SetAsideOutsideLoop => Self::format_set_aside_outside_loop_error(),
+            RuntimeError::LoopLimit {
+                ingredient,
+                max_iterations,
+            } => Self::format_loop_limit_error(ingredient, *max_iterations),
             RuntimeError::EarlyTermination => {
                 // This is not really an error, just a control flow signal
                 String::from("Recipe terminated early (Refrigerate instruction)")
@@ -95,6 +109,214 @@ impl ErrorFormatter {
                 String::from("Loop break (Set aside instruction)")
             }
         }
+    }
+
+    fn format_ingredient_without_value_error(ingredient: &str) -> String {
+        let mut output = String::new();
+
+        output.push_str(&colorize("error", Colors::RED, true));
+        output.push_str(": ");
+        output.push_str(&colorize("ingredient has no value", Colors::WHITE, true));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("ingredient:", Colors::CYAN, false),
+            colorize(ingredient, Colors::WHITE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} The ingredient was declared without an initial value\n",
+            colorize("=", Colors::BLUE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize(
+                "According to the Chef language specification:",
+                Colors::CYAN,
+                true
+            )
+        ));
+        output.push_str(&format!("  {}\n", SpecReference::INGREDIENTS.excerpt));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize("suggestion:", Colors::CYAN, true)
+        ));
+        output
+            .push_str("  Give the ingredient an initial value, or read one from input first:\n\n");
+        output.push_str(&format!("    Ingredients.\n    100 g {}\n\n", ingredient));
+        output.push_str(&format!("    Take {} from refrigerator.\n", ingredient));
+
+        output
+    }
+
+    fn format_input_unavailable_error(ingredient: &str, reason: &str) -> String {
+        let mut output = String::new();
+
+        output.push_str(&colorize("error", Colors::RED, true));
+        output.push_str(": ");
+        output.push_str(&colorize("cannot read input", Colors::WHITE, true));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("ingredient:", Colors::CYAN, false),
+            colorize(ingredient, Colors::WHITE, true)
+        ));
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("reason:", Colors::CYAN, false),
+            reason
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} 'Take ... from refrigerator' reads a numeric value from input\n",
+            colorize("=", Colors::BLUE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize("suggestion:", Colors::CYAN, true)
+        ));
+        output.push_str("  Provide one number per 'Take' instruction on standard input:\n\n");
+        output.push_str("    echo \"42\" | cheffers recipe.chef\n");
+
+        output
+    }
+
+    fn format_invalid_character_error(amount: i64) -> String {
+        let mut output = String::new();
+
+        output.push_str(&colorize("error", Colors::RED, true));
+        output.push_str(": ");
+        output.push_str(&colorize(
+            "invalid Unicode code point in liquid output",
+            Colors::WHITE,
+            true,
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("value:", Colors::CYAN, false),
+            colorize(&amount.to_string(), Colors::WHITE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} Liquid ingredients are output as Unicode characters, and this value\n  is not a valid code point\n",
+            colorize("=", Colors::BLUE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize("suggestion:", Colors::CYAN, true)
+        ));
+        output.push_str(
+            "  Keep liquefied values within the Unicode range (0 to 1114111, excluding\n",
+        );
+        output.push_str("  surrogates), or leave the ingredient dry to print it as a number.\n");
+
+        output
+    }
+
+    fn format_set_aside_outside_loop_error() -> String {
+        let mut output = String::new();
+
+        output.push_str(&colorize("error", Colors::RED, true));
+        output.push_str(": ");
+        output.push_str(&colorize(
+            "'Set aside' outside of a loop",
+            Colors::WHITE,
+            true,
+        ));
+        output.push('\n');
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} 'Set aside' ends the innermost loop, so it must appear inside one\n",
+            colorize("=", Colors::BLUE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize(
+                "According to the Chef language specification:",
+                Colors::CYAN,
+                true
+            )
+        ));
+        output.push_str(&format!("  {}\n", SpecReference::LOOPS.excerpt));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize("suggestion:", Colors::CYAN, true)
+        ));
+        output
+            .push_str("  Move the 'Set aside.' statement between a loop's start and 'until':\n\n");
+        output.push_str("    Verb the counter.\n");
+        output.push_str("    Set aside.\n");
+        output.push_str("    Verb the counter until verbed.\n");
+
+        output
+    }
+
+    fn format_loop_limit_error(ingredient: &str, max_iterations: usize) -> String {
+        let mut output = String::new();
+
+        output.push_str(&colorize("error", Colors::RED, true));
+        output.push_str(": ");
+        output.push_str(&colorize(
+            "loop iteration limit exceeded",
+            Colors::WHITE,
+            true,
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("loop ingredient:", Colors::CYAN, false),
+            colorize(ingredient, Colors::WHITE, true)
+        ));
+        output.push_str(&format!(
+            "  {} {}\n",
+            colorize("maximum iterations:", Colors::CYAN, false),
+            max_iterations
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} The loop never terminated; its condition ingredient never reached zero\n",
+            colorize("=", Colors::BLUE, true)
+        ));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize(
+                "According to the Chef language specification:",
+                Colors::CYAN,
+                true
+            )
+        ));
+        output.push_str(&format!("  {}\n", SpecReference::LOOPS.excerpt));
+        output.push('\n');
+        output.push_str(&format!(
+            "  {} The loop checks the ingredient named in its START statement. Naming a\n",
+            colorize("note:", Colors::YELLOW, true)
+        ));
+        output.push_str(
+            "  different ingredient in the 'until' statement only decrements that other\n",
+        );
+        output.push_str("  ingredient; it does not affect the loop condition.\n");
+        output.push('\n');
+        output.push_str(&format!(
+            "  {}\n",
+            colorize("suggestion:", Colors::CYAN, true)
+        ));
+        output.push_str(
+            "  Make sure the loop body (or the 'until' statement) eventually brings the\n",
+        );
+        output.push_str(&format!(
+            "  condition ingredient '{}' to zero.\n",
+            ingredient
+        ));
+
+        output
     }
 
     fn format_undefined_ingredient_error(context: Option<&RuntimeContext>) -> String {

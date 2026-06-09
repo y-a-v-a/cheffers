@@ -8,11 +8,26 @@ use crate::types::{
 
 const MAX_CALL_DEPTH: usize = 64;
 
+/// Safety net for non-terminating loops (the spec loop condition can simply
+/// never reach zero). Reported as a runtime error instead of hanging the CLI
+/// or the browser.
+const MAX_LOOP_ITERATIONS: usize = 10_000_000;
+
+/// Where `Take _ingredient_ from refrigerator` reads its numbers from.
+enum InputSource {
+    /// Read a line from stdin per `Take` (the spec behavior for the CLI).
+    Stdin,
+    /// Pop pre-supplied values (used by tests and embedders without stdin).
+    Buffer(VecDeque<i64>),
+}
+
 pub struct Interpreter {
     context: ExecutionContext,
     recipes: HashMap<String, Recipe>,
     main_recipe_key: Option<String>,
     output: String,
+    input: InputSource,
+    rng_state: u64,
 }
 
 impl Interpreter {
@@ -22,7 +37,27 @@ impl Interpreter {
             recipes: HashMap::new(),
             main_recipe_key: None,
             output: String::new(),
+            input: InputSource::Stdin,
+            rng_state: default_rng_seed(),
         }
+    }
+
+    /// Supplies the values that `Take _ingredient_ from refrigerator` will
+    /// read, instead of reading stdin. Each `Take` consumes one value; a
+    /// `Take` beyond the last value is a runtime error.
+    pub fn set_input_values(&mut self, values: Vec<i64>) {
+        self.input = InputSource::Buffer(values.into());
+    }
+
+    /// Seeds the pseudo-random generator behind `Mix [the bowl] well` so a
+    /// shuffle can be made reproducible.
+    pub fn set_mix_seed(&mut self, seed: u64) {
+        // xorshift cannot leave the all-zero state, so nudge a zero seed.
+        self.rng_state = if seed == 0 {
+            0x9E37_79B9_7F4A_7C15
+        } else {
+            seed
+        };
     }
 
     /// Returns the output produced so far by `run`.
@@ -58,6 +93,7 @@ impl Interpreter {
 
     fn execute(&mut self, recipe: &Recipe) -> RuntimeResult<()> {
         self.context.variables = recipe.ingredients.clone();
+        self.context.unset_ingredients = recipe.unset_ingredients.clone();
         self.context.mixing_bowls.clear();
         self.context.mixing_bowls.push(VecDeque::new());
         self.context.baking_dishes.clear();
@@ -66,6 +102,9 @@ impl Interpreter {
         for instruction in &recipe.instructions {
             match self.execute_instruction(instruction) {
                 Err(RuntimeError::EarlyTermination) => break,
+                // "Set aside" ends the innermost loop; outside of any loop the
+                // signal would otherwise leak to the caller as a phantom error.
+                Err(RuntimeError::BreakLoop) => return Err(RuntimeError::SetAsideOutsideLoop),
                 Err(e) => return Err(e),
                 Ok(()) => {}
             }
@@ -74,15 +113,74 @@ impl Interpreter {
         Ok(())
     }
 
+    /// Looks up an ingredient's current value, distinguishing "never
+    /// declared" from "declared without a value" in the resulting error.
+    fn get_variable(&self, ingredient: &str) -> RuntimeResult<Value> {
+        if let Some(value) = self.context.variables.get(ingredient) {
+            return Ok(*value);
+        }
+        if self.context.unset_ingredients.contains_key(ingredient) {
+            Err(RuntimeError::IngredientWithoutValue {
+                ingredient: ingredient.to_string(),
+            })
+        } else {
+            Err(RuntimeError::UndefinedIngredient {
+                ingredient: ingredient.to_string(),
+            })
+        }
+    }
+
+    /// Reads one numeric value for `Take _ingredient_ from refrigerator`.
+    fn read_input(&mut self, ingredient: &str) -> RuntimeResult<i64> {
+        match &mut self.input {
+            InputSource::Buffer(values) => {
+                values
+                    .pop_front()
+                    .ok_or_else(|| RuntimeError::InputUnavailable {
+                        ingredient: ingredient.to_string(),
+                        reason: "no more input values are available".to_string(),
+                    })
+            }
+            InputSource::Stdin => {
+                let mut line = String::new();
+                let read = std::io::stdin().read_line(&mut line).map_err(|error| {
+                    RuntimeError::InputUnavailable {
+                        ingredient: ingredient.to_string(),
+                        reason: format!("failed to read from stdin: {}", error),
+                    }
+                })?;
+                if read == 0 {
+                    return Err(RuntimeError::InputUnavailable {
+                        ingredient: ingredient.to_string(),
+                        reason: "end of input reached (stdin is empty)".to_string(),
+                    });
+                }
+                let trimmed = line.trim();
+                trimmed
+                    .parse::<i64>()
+                    .map_err(|_| RuntimeError::InputUnavailable {
+                        ingredient: ingredient.to_string(),
+                        reason: format!("'{}' is not a numeric value", trimmed),
+                    })
+            }
+        }
+    }
+
+    /// xorshift64*: small, deterministic-per-seed PRNG for `Mix well`.
+    fn next_random(&mut self) -> u64 {
+        let mut x = self.rng_state;
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        self.rng_state = x;
+        x.wrapping_mul(0x2545_F491_4F6C_DD1D)
+    }
+
     fn execute_instruction(&mut self, inst: &Instruction) -> RuntimeResult<()> {
         match inst {
             Instruction::Put(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let value = *self.context.variables.get(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
+                let value = self.get_variable(ingredient)?;
                 self.context.mixing_bowls[*bowl_idx].push_front(value);
             }
             Instruction::Fold(ingredient, bowl_idx) => {
@@ -97,22 +195,18 @@ impl Interpreter {
             }
             Instruction::Add(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
-                if let Some(top) = self.context.mixing_bowls[*bowl_idx].front_mut() {
-                    top.amount += ing_val.amount;
-                }
+                let ing_val = self.get_variable(ingredient)?;
+                let top = self.context.mixing_bowls[*bowl_idx]
+                    .front_mut()
+                    .ok_or_else(|| RuntimeError::EmptyBowl {
+                        bowl_index: *bowl_idx,
+                        operation: format!("Add {} to mixing bowl", ingredient),
+                    })?;
+                top.amount += ing_val.amount;
             }
             Instruction::Remove(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
+                let ing_val = self.get_variable(ingredient)?;
                 let top = self.context.mixing_bowls[*bowl_idx]
                     .front_mut()
                     .ok_or_else(|| RuntimeError::EmptyBowl {
@@ -123,11 +217,7 @@ impl Interpreter {
             }
             Instruction::Combine(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
+                let ing_val = self.get_variable(ingredient)?;
                 let top = self.context.mixing_bowls[*bowl_idx]
                     .front_mut()
                     .ok_or_else(|| RuntimeError::EmptyBowl {
@@ -138,11 +228,7 @@ impl Interpreter {
             }
             Instruction::Divide(ingredient, bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
-                let ing_val = self.context.variables.get(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
+                let ing_val = self.get_variable(ingredient)?;
                 if ing_val.amount == 0 {
                     return Err(RuntimeError::DivisionByZero {
                         ingredient: ingredient.clone(),
@@ -155,6 +241,8 @@ impl Interpreter {
                         bowl_index: *bowl_idx,
                         operation: format!("Divide {} into mixing bowl", ingredient),
                     })?;
+                // All Chef values are integers, so division truncates toward
+                // zero (the spec is silent on fractional results).
                 top.amount /= ing_val.amount;
             }
             Instruction::AddDry(bowl_idx) => {
@@ -176,23 +264,19 @@ impl Interpreter {
                 self.stir_bowl(*bowl_idx, *minutes);
             }
             Instruction::StirIngredient(ingredient, bowl_idx) => {
-                let depth = self
-                    .context
-                    .variables
-                    .get(ingredient)
-                    .ok_or_else(|| RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    })?
-                    .amount;
+                let depth = self.get_variable(ingredient)?.amount;
                 if depth > 0 {
                     self.stir_bowl(*bowl_idx, depth as usize);
                 }
             }
             Instruction::Mix(bowl_idx) => {
+                // Spec: "This randomises the order of the ingredients."
+                // Fisher-Yates with the interpreter's seedable PRNG.
                 self.ensure_bowl(*bowl_idx);
-                let bowl = &mut self.context.mixing_bowls[*bowl_idx];
-                if bowl.len() > 1 {
-                    bowl.make_contiguous().reverse();
+                let len = self.context.mixing_bowls[*bowl_idx].len();
+                for i in (1..len).rev() {
+                    let j = (self.next_random() % (i as u64 + 1)) as usize;
+                    self.context.mixing_bowls[*bowl_idx].swap(i, j);
                 }
             }
             Instruction::Clean(bowl_idx) => {
@@ -203,12 +287,11 @@ impl Interpreter {
                 self.call_auxiliary(recipe_name)?;
             }
             Instruction::Liquefy(ingredient) => {
-                let value = self.context.variables.get_mut(ingredient).ok_or_else(|| {
-                    RuntimeError::UndefinedIngredient {
-                        ingredient: ingredient.clone(),
-                    }
-                })?;
-                value.measure = Measure::Liquid;
+                // Reuse the lookup for its declared-without-value diagnostics.
+                self.get_variable(ingredient)?;
+                if let Some(value) = self.context.variables.get_mut(ingredient) {
+                    value.measure = Measure::Liquid;
+                }
             }
             Instruction::LiquefyBowl(bowl_idx) => {
                 self.ensure_bowl(*bowl_idx);
@@ -217,15 +300,18 @@ impl Interpreter {
                 }
             }
             Instruction::Pour(from_idx, to_idx) => {
+                // Spec: "This copies all the ingredients from the nth mixing
+                // bowl to the pth baking dish, retaining the order and putting
+                // them on top of anything already in the baking dish." The
+                // bowl keeps its contents.
                 self.ensure_bowl(*from_idx);
                 self.ensure_dish(*to_idx);
-                let drained: Vec<_> = {
-                    let bowl = &mut self.context.mixing_bowls[*from_idx];
-                    bowl.drain(..).collect()
-                };
+                let copied = self.context.mixing_bowls[*from_idx].clone();
                 let dish = &mut self.context.baking_dishes[*to_idx];
-                for value in drained {
-                    dish.push_back(value);
+                // Front is the top: push bottom-most first so the copy lands
+                // on top of the dish in its original order.
+                for value in copied.iter().rev() {
+                    dish.push_front(*value);
                 }
             }
             Instruction::Serves(count) => {
@@ -237,21 +323,22 @@ impl Interpreter {
                 body,
                 decrement_var,
             } => {
+                let mut iterations = 0usize;
                 loop {
-                    // Check the ingredient that will be decremented, or the condition_var if no decrement specified
-                    // This fixes the bug where different condition/decrement ingredients cause infinite loops
-                    let check_var = decrement_var.as_ref().unwrap_or(condition_var);
-                    let condition_value = self
-                        .context
-                        .variables
-                        .get(check_var)
-                        .ok_or_else(|| RuntimeError::UndefinedIngredient {
-                            ingredient: check_var.clone(),
-                        })?
-                        .amount;
-
+                    // Spec: the ingredient named in the loop START statement is
+                    // checked before every pass; the (possibly different)
+                    // ingredient in the "until" statement is only decremented.
+                    let condition_value = self.get_variable(condition_var)?.amount;
                     if condition_value == 0 {
                         break;
+                    }
+
+                    iterations += 1;
+                    if iterations > MAX_LOOP_ITERATIONS {
+                        return Err(RuntimeError::LoopLimit {
+                            ingredient: condition_var.clone(),
+                            max_iterations: MAX_LOOP_ITERATIONS,
+                        });
                     }
 
                     for instruction in body {
@@ -264,20 +351,33 @@ impl Interpreter {
 
                     // Decrement the ingredient if specified in the until statement
                     if let Some(ref decr_var) = decrement_var {
-                        let value = self.context.variables.get_mut(decr_var).ok_or_else(|| {
-                            RuntimeError::UndefinedIngredient {
-                                ingredient: decr_var.clone(),
-                            }
-                        })?;
-                        value.amount -= 1;
+                        // Validate first for declared-without-value diagnostics.
+                        self.get_variable(decr_var)?;
+                        if let Some(value) = self.context.variables.get_mut(decr_var) {
+                            value.amount -= 1;
+                        }
                     }
                 }
             }
             Instruction::SetAside => {
                 return Err(RuntimeError::BreakLoop);
             }
-            Instruction::Take(_) => {}
-            Instruction::NoOp(_) => {}
+            Instruction::Take(ingredient) => {
+                // Spec: reads a numeric value from STDIN into the ingredient,
+                // overwriting any previous value. The declared measure (if
+                // any) is kept; an undeclared ingredient becomes unspecified.
+                let amount = self.read_input(ingredient)?;
+                let measure = self
+                    .context
+                    .variables
+                    .get(ingredient)
+                    .map(|value| value.measure)
+                    .or_else(|| self.context.unset_ingredients.get(ingredient).copied())
+                    .unwrap_or(Measure::Unspecified);
+                self.context
+                    .variables
+                    .insert(ingredient.clone(), Value { amount, measure });
+            }
             Instruction::Refrigerate(hours) => {
                 if let Some(dish_count) = hours {
                     self.write_output(*dish_count)?;
@@ -309,16 +409,18 @@ impl Interpreter {
 
         let frame = CallFrame {
             variables: self.context.variables.clone(),
+            unset_ingredients: self.context.unset_ingredients.clone(),
             mixing_bowls: self.context.mixing_bowls.clone(),
             baking_dishes: self.context.baking_dishes.clone(),
             return_address: 0,
         };
         self.context.call_stack.push(frame);
 
-        // Add auxiliary recipe's ingredients to variables (don't clear mixing bowls)
-        for (name, value) in &aux_recipe.ingredients {
-            self.context.variables.insert(name.clone(), *value);
-        }
+        // The sous-chef gets copies of the caller's bowls and dishes (the
+        // current ones are restored from the frame afterwards), but only the
+        // auxiliary recipe's own ingredient list.
+        self.context.variables = aux_recipe.ingredients.clone();
+        self.context.unset_ingredients = aux_recipe.unset_ingredients.clone();
 
         // Execute auxiliary recipe's instructions without clearing mixing bowls
         for instruction in &aux_recipe.instructions {
@@ -326,8 +428,13 @@ impl Interpreter {
                 Err(RuntimeError::EarlyTermination) => break,
                 Err(e) => {
                     // Clean up call stack before propagating error
+                    let error = if matches!(e, RuntimeError::BreakLoop) {
+                        RuntimeError::SetAsideOutsideLoop
+                    } else {
+                        e
+                    };
                     self.context.call_stack.pop();
-                    return Err(e);
+                    return Err(error);
                 }
                 Ok(()) => {}
             }
@@ -342,6 +449,7 @@ impl Interpreter {
 
         if let Some(frame) = self.context.call_stack.pop() {
             self.context.variables = frame.variables;
+            self.context.unset_ingredients = frame.unset_ingredients;
             self.context.mixing_bowls = frame.mixing_bowls;
             self.context.baking_dishes = frame.baking_dishes;
 
@@ -361,9 +469,13 @@ impl Interpreter {
             while let Some(value) = dish.pop_front() {
                 match value.measure {
                     Measure::Liquid => {
-                        if let Some(c) = char::from_u32(value.amount as u32) {
-                            self.output.push(c);
-                        }
+                        let c = u32::try_from(value.amount)
+                            .ok()
+                            .and_then(char::from_u32)
+                            .ok_or(RuntimeError::InvalidCharacter {
+                                amount: value.amount,
+                            })?;
+                        self.output.push(c);
                     }
                     _ => {
                         // Writing to a String is infallible.
@@ -419,6 +531,24 @@ fn normalize_recipe_name(name: &str) -> String {
     name.trim().trim_end_matches('.').to_lowercase()
 }
 
+/// Default seed for the `Mix well` shuffle. Natively this is taken from the
+/// system clock so each run shuffles differently; on wasm32 (where
+/// `SystemTime::now` is unavailable) a fixed seed is used, making playground
+/// shuffles deterministic per page load.
+fn default_rng_seed() -> u64 {
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        if let Ok(elapsed) = SystemTime::now().duration_since(UNIX_EPOCH) {
+            let nanos = elapsed.as_nanos() as u64;
+            if nanos != 0 {
+                return nanos;
+            }
+        }
+    }
+    0x9E37_79B9_7F4A_7C15
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -438,6 +568,7 @@ mod tests {
         Recipe {
             title: "Test Recipe".to_string(),
             ingredients,
+            unset_ingredients: HashMap::new(),
             instructions: vec![
                 Instruction::Put("sugar".to_string(), 0),
                 Instruction::Serves(0),
@@ -573,31 +704,71 @@ mod tests {
     }
 
     #[test]
-    fn mix_reverses_bowl_contents() {
+    fn mix_randomises_bowl_preserving_contents() {
+        // Spec: "Mix well" randomises the order of the ingredients. With a
+        // fixed seed the shuffle is reproducible; the multiset of values must
+        // always be preserved.
         let mut interpreter = Interpreter::new();
+        interpreter.set_mix_seed(42);
         interpreter.ensure_bowl(0);
-        interpreter.context.mixing_bowls[0].push_front(Value {
-            amount: 3,
-            measure: Measure::Dry,
-        });
-        interpreter.context.mixing_bowls[0].push_front(Value {
-            amount: 2,
-            measure: Measure::Dry,
-        });
-        interpreter.context.mixing_bowls[0].push_front(Value {
-            amount: 1,
-            measure: Measure::Dry,
-        });
+        for amount in (1..=8).rev() {
+            interpreter.context.mixing_bowls[0].push_front(Value {
+                amount,
+                measure: Measure::Dry,
+            });
+        }
 
         interpreter
             .execute_instruction(&Instruction::Mix(0))
             .expect("mix should succeed");
 
-        let amounts: Vec<_> = interpreter.context.mixing_bowls[0]
+        let mut amounts: Vec<_> = interpreter.context.mixing_bowls[0]
             .iter()
             .map(|value| value.amount)
             .collect();
-        assert_eq!(amounts, vec![3, 2, 1]);
+        let shuffled = amounts.clone();
+        amounts.sort_unstable();
+        assert_eq!(amounts, (1..=8).collect::<Vec<_>>(), "values must survive");
+
+        // Same seed, same shuffle.
+        let mut second = Interpreter::new();
+        second.set_mix_seed(42);
+        second.ensure_bowl(0);
+        for amount in (1..=8).rev() {
+            second.context.mixing_bowls[0].push_front(Value {
+                amount,
+                measure: Measure::Dry,
+            });
+        }
+        second
+            .execute_instruction(&Instruction::Mix(0))
+            .expect("mix should succeed");
+        let shuffled_again: Vec<_> = second.context.mixing_bowls[0]
+            .iter()
+            .map(|value| value.amount)
+            .collect();
+        assert_eq!(shuffled, shuffled_again, "same seed must shuffle the same");
+
+        // A different seed should give a different order for 8 elements (the
+        // chance of an identical permutation is 1/40320 per seed; these two
+        // seeds are fixed, so this stays deterministic).
+        let mut third = Interpreter::new();
+        third.set_mix_seed(43);
+        third.ensure_bowl(0);
+        for amount in (1..=8).rev() {
+            third.context.mixing_bowls[0].push_front(Value {
+                amount,
+                measure: Measure::Dry,
+            });
+        }
+        third
+            .execute_instruction(&Instruction::Mix(0))
+            .expect("mix should succeed");
+        let other: Vec<_> = third.context.mixing_bowls[0]
+            .iter()
+            .map(|value| value.amount)
+            .collect();
+        assert_ne!(shuffled, other, "different seeds should differ");
     }
 
     #[test]
@@ -774,6 +945,7 @@ mod tests {
         let aux_recipe = Recipe {
             title: "Auxiliary Sauce.".to_string(),
             ingredients: HashMap::new(),
+            unset_ingredients: HashMap::new(),
             instructions: vec![Instruction::Serves(0)],
             auxiliary_recipes: HashMap::new(),
         };
@@ -784,6 +956,7 @@ mod tests {
         Recipe {
             title: "Main Dish.".to_string(),
             ingredients: HashMap::new(),
+            unset_ingredients: HashMap::new(),
             instructions: vec![
                 Instruction::ServeWith("auxiliary sauce".to_string()),
                 Instruction::Serves(0),
@@ -840,7 +1013,9 @@ mod tests {
     }
 
     #[test]
-    fn pour_moves_values_to_dish_in_order() {
+    fn pour_copies_values_to_dish_in_order() {
+        // Spec: pour COPIES the bowl into the dish, retaining the order; the
+        // bowl keeps its contents.
         let mut interpreter = Interpreter::new();
         interpreter.ensure_bowl(0);
         interpreter.context.mixing_bowls[0].push_front(Value {
@@ -856,9 +1031,43 @@ mod tests {
             .execute_instruction(&Instruction::Pour(0, 0))
             .expect("pour should succeed");
 
-        assert!(interpreter.context.mixing_bowls[0].is_empty());
+        let bowl: Vec<_> = interpreter.context.mixing_bowls[0]
+            .iter()
+            .map(|value| value.amount)
+            .collect();
+        assert_eq!(bowl, vec![1, 2], "the bowl must keep its contents");
         let dish = &interpreter.context.baking_dishes[0];
         let amounts: Vec<_> = dish.iter().map(|value| value.amount).collect();
         assert_eq!(amounts, vec![1, 2]);
+    }
+
+    #[test]
+    fn pour_stacks_on_top_of_existing_dish_contents() {
+        // Spec: poured values go ON TOP of anything already in the dish.
+        let mut interpreter = Interpreter::new();
+        interpreter.ensure_bowl(0);
+        interpreter.ensure_dish(0);
+        interpreter.context.baking_dishes[0].push_front(Value {
+            amount: 9,
+            measure: Measure::Dry,
+        });
+        interpreter.context.mixing_bowls[0].push_front(Value {
+            amount: 2,
+            measure: Measure::Dry,
+        });
+        interpreter.context.mixing_bowls[0].push_front(Value {
+            amount: 1,
+            measure: Measure::Dry,
+        });
+
+        interpreter
+            .execute_instruction(&Instruction::Pour(0, 0))
+            .expect("pour should succeed");
+
+        let dish: Vec<_> = interpreter.context.baking_dishes[0]
+            .iter()
+            .map(|value| value.amount)
+            .collect();
+        assert_eq!(dish, vec![1, 2, 9], "copy lands on top of the 9");
     }
 }

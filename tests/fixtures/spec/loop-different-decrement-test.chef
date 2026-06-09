@@ -1,19 +1,23 @@
 Loop Different Decrement Test.
 
-Tests that the ingredient decremented in 'until' can differ from loop condition.
-Loops while 'condition' is non-zero, but decrements 'counter' instead.
+Tests that the ingredient decremented in 'until' can differ from the loop
+condition. The loop runs while 'condition' is non-zero (the body decrements
+it through the 2nd mixing bowl); each pass the 'until' statement decrements
+'counter' instead. Three passes leave counter at 67, served as the letter C.
 
 Ingredients.
 3 g condition
-3 g counter
-48 g offset
+70 g counter
+1 g unit
 
 Method.
 Loop the condition.
-Put counter into mixing bowl.
-Add offset to mixing bowl.
+Put condition into 2nd mixing bowl.
+Remove unit from 2nd mixing bowl.
+Fold condition into 2nd mixing bowl.
 Loop the counter until looped.
-Liquefy contents of the mixing bowl.
+Liquefy counter.
+Put counter into mixing bowl.
 Pour contents of the mixing bowl into the baking dish.
 
 Serves 1.

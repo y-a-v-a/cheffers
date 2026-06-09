@@ -26,6 +26,10 @@ pub type BakingDish = VecDeque<Value>;
 pub struct Recipe {
     pub title: String,
     pub ingredients: HashMap<Ingredient, Value>,
+    /// Ingredients declared without an initial value. Per the spec the value
+    /// is optional and using such an ingredient is a run-time error; the
+    /// declared measure is kept so `Take` can fill the value in later.
+    pub unset_ingredients: HashMap<Ingredient, Measure>,
     pub instructions: Vec<Instruction>,
     pub auxiliary_recipes: HashMap<String, Recipe>,
 }
@@ -33,6 +37,8 @@ pub struct Recipe {
 #[derive(Clone, Debug, Default)]
 pub struct ExecutionContext {
     pub variables: HashMap<Ingredient, Value>,
+    /// Ingredients declared without a value in the current recipe.
+    pub unset_ingredients: HashMap<Ingredient, Measure>,
     pub mixing_bowls: Vec<MixingBowl>,
     pub baking_dishes: Vec<BakingDish>,
     pub call_stack: Vec<CallFrame>,
@@ -42,6 +48,7 @@ impl ExecutionContext {
     pub fn new() -> Self {
         Self {
             variables: HashMap::new(),
+            unset_ingredients: HashMap::new(),
             mixing_bowls: vec![VecDeque::new()],
             baking_dishes: vec![VecDeque::new()],
             call_stack: Vec::new(),
@@ -52,6 +59,7 @@ impl ExecutionContext {
 #[derive(Clone, Debug, Default)]
 pub struct CallFrame {
     pub variables: HashMap<Ingredient, Value>,
+    pub unset_ingredients: HashMap<Ingredient, Measure>,
     pub mixing_bowls: Vec<MixingBowl>,
     pub baking_dishes: Vec<BakingDish>,
     #[allow(dead_code)]
@@ -70,20 +78,31 @@ pub enum ParseError {
     UnknownInstruction(String),
     #[error("invalid loop structure")]
     InvalidLoop,
-    #[error("unmatched loop markers")]
-    UnmatchedLoop,
+    #[error("unrecognized instruction or loop without a matching 'until' statement: {0}")]
+    UnmatchedLoop(String),
     #[error("invalid title: {0}")]
     InvalidTitle(String),
     #[error("invalid measure: {0}")]
     InvalidMeasure(String),
-    #[error("duplicate ingredient: {0}")]
-    DuplicateIngredient(String),
 }
 
 #[derive(Debug, Error)]
 pub enum RuntimeError {
     #[error("ingredient '{ingredient}' is not defined")]
     UndefinedIngredient { ingredient: String },
+    #[error("ingredient '{ingredient}' was declared without a value")]
+    IngredientWithoutValue { ingredient: String },
+    #[error("cannot read input for ingredient '{ingredient}': {reason}")]
+    InputUnavailable { ingredient: String, reason: String },
+    #[error("value {amount} is not a valid Unicode code point for liquid output")]
+    InvalidCharacter { amount: i64 },
+    #[error("'Set aside' executed outside of a loop")]
+    SetAsideOutsideLoop,
+    #[error("loop on ingredient '{ingredient}' exceeded {max_iterations} iterations")]
+    LoopLimit {
+        ingredient: String,
+        max_iterations: usize,
+    },
     #[error("mixing bowl {bowl_index} is empty (attempted {operation})")]
     EmptyBowl {
         bowl_index: usize,

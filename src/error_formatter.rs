@@ -772,4 +772,70 @@ mod tests {
         assert!(output.contains("mixing bowl is empty"));
         assert!(output.contains("suggestion"));
     }
+
+    #[test]
+    fn format_ingredient_without_value() {
+        let output =
+            ErrorFormatter::format(&ChefError::Runtime(RuntimeError::IngredientWithoutValue {
+                ingredient: "flour".to_string(),
+            }));
+        assert!(output.contains("ingredient has no value"));
+        assert!(output.contains("flour"));
+        assert!(output.contains("Take flour from refrigerator"));
+        assert!(output.contains("suggestion"));
+    }
+
+    #[test]
+    fn format_input_unavailable() {
+        let output = ErrorFormatter::format(&ChefError::Runtime(RuntimeError::InputUnavailable {
+            ingredient: "sugar".to_string(),
+            reason: "stdin is empty".to_string(),
+        }));
+        assert!(output.contains("cannot read input"));
+        assert!(output.contains("sugar"));
+        assert!(output.contains("stdin is empty"));
+        assert!(output.contains("suggestion"));
+    }
+
+    #[test]
+    fn format_invalid_character() {
+        let output = ErrorFormatter::format(&ChefError::Runtime(RuntimeError::InvalidCharacter {
+            amount: -1,
+        }));
+        assert!(output.contains("invalid Unicode code point"));
+        assert!(output.contains("-1"));
+        assert!(output.contains("suggestion"));
+    }
+
+    #[test]
+    fn format_set_aside_outside_loop() {
+        let output = ErrorFormatter::format(&ChefError::Runtime(RuntimeError::SetAsideOutsideLoop));
+        assert!(output.contains("'Set aside' outside of a loop"));
+        assert!(output.contains("Chef language specification"));
+        assert!(output.contains("suggestion"));
+    }
+
+    #[test]
+    fn format_loop_limit() {
+        let output = ErrorFormatter::format(&ChefError::Runtime(RuntimeError::LoopLimit {
+            ingredient: "condition".to_string(),
+            max_iterations: 10_000_000,
+        }));
+        assert!(output.contains("loop iteration limit exceeded"));
+        assert!(output.contains("condition"));
+        assert!(output.contains("10000000"));
+        // The note must explain the condition-vs-decrement spec rule, since a
+        // mismatched 'until' ingredient is the most likely cause.
+        assert!(output.contains("START statement"));
+        assert!(output.contains("suggestion"));
+    }
+
+    #[test]
+    fn format_unmatched_loop_parse_error_includes_sentence() {
+        let output = ErrorFormatter::format(&ChefError::Parse(ParseError::UnmatchedLoop(
+            "Beat the batter".to_string(),
+        )));
+        assert!(output.contains("Beat the batter"));
+        assert!(output.contains("until"));
+    }
 }

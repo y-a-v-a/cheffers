@@ -41,6 +41,43 @@ fn hello_world_fixture_captures_output() -> TestResult<()> {
 }
 
 #[test]
+fn countdown_cake_fixture_counts_down() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/countdown-cake.chef")?;
+    let recipe = parse_recipe(&source)?;
+
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
+    assert_eq!(interpreter.output(), "54321");
+    Ok(())
+}
+
+#[test]
+fn serves_prints_baking_dish_from_the_top() -> TestResult<()> {
+    // Per the Chef spec, mixing bowls and baking dishes are stacks: "Put"
+    // pushes onto the top, "Pour" copies the bowl into the dish retaining
+    // order, and "Serves" removes values from the top one by one. So a loop
+    // that pushes a decrementing counter (5, 4, ..., 1) leaves 1 on top and
+    // prints "12345" - the original countdown-cake bug.
+    let source = "Stack Order Probe.\n\n\
+        Ingredients.\n\
+        5 g flour\n\n\
+        Method.\n\
+        Bake the flour. Put flour into the mixing bowl. Bake the flour until baked. \
+        Pour contents of the mixing bowl into the baking dish.\n\n\
+        Serves 1.\n";
+    let recipe = parse_recipe(source)?;
+
+    let mut interpreter = Interpreter::new();
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
+    assert_eq!(interpreter.output(), "12345");
+    Ok(())
+}
+
+#[test]
 fn fibonacci_iterative_fixture_parses_and_executes() -> TestResult<()> {
     let source = read_fixture("tests/fixtures/fibonacci-iterative.chef")?;
     let recipe = parse_recipe(&source)?;

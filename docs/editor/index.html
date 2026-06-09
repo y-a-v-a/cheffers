@@ -7,6 +7,16 @@
   <meta name="description" content="Write and run Chef recipes in your browser. A JsBin-style playground powered by the Cheffers Rust interpreter compiled to WebAssembly." />
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍳</text></svg>' />
   <link rel="stylesheet" href="./editor.css" />
+  <!-- Apply the saved theme before first paint to avoid a flash of the
+       default palette. The header toggle (editor.js) keeps this in sync. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <header class="toolbar">
@@ -24,6 +34,7 @@
         Auto-run
       </label>
       <button id="run" type="button">Run ▶</button>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
     </div>
   </header>
 

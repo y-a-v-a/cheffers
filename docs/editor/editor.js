@@ -56,10 +56,78 @@ const statusEl = document.getElementById("status");
 const runBtn = document.getElementById("run");
 const autorunEl = document.getElementById("autorun");
 const examplesEl = document.getElementById("examples");
+const themeBtn = document.getElementById("theme");
 
 let editor;
 let ready = false;
 let debounceTimer = null;
+
+// CodeMirror theme wired entirely to the page's --cm-* custom properties, so
+// it follows whichever palette is active. A real EditorView.theme() is needed
+// to beat CodeMirror's default light theme (its generated `.ͼ2` classes
+// otherwise win on specificity).
+const cookTheme = EditorView.theme({
+  "&": { backgroundColor: "var(--cm-bg)", color: "var(--cm-text)", height: "100%" },
+  "&.cm-focused": { outline: "none" },
+  ".cm-scroller": { fontFamily: "var(--mono)", fontSize: "14px" },
+  ".cm-content": { caretColor: "var(--cm-cursor)" },
+  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--cm-cursor)" },
+  ".cm-gutters": {
+    backgroundColor: "var(--cm-gutter-bg)",
+    color: "var(--cm-gutter-text)",
+    border: "none",
+    borderRight: "1px solid var(--border)",
+  },
+  ".cm-lineNumbers .cm-gutterElement": { color: "var(--cm-gutter-text)" },
+  ".cm-activeLine": { backgroundColor: "var(--cm-active-line)" },
+  ".cm-activeLineGutter": {
+    backgroundColor: "var(--cm-active-gutter)",
+    color: "var(--cm-text)",
+  },
+  "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
+    { backgroundColor: "var(--cm-selection)" },
+});
+
+// Available themes, in cycle order. "system" follows prefers-color-scheme.
+const THEMES = [
+  { id: "system", label: "System", icon: "🖥️" },
+  { id: "parchment", label: "Parchment", icon: "📜" },
+  { id: "cast-iron", label: "Cast Iron", icon: "🍳" },
+  { id: "espresso", label: "Espresso", icon: "☕" },
+];
+const THEME_STORAGE_KEY = "cheffers-theme";
+
+function storedThemeId() {
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY) || "system";
+  } catch {
+    return "system";
+  }
+}
+
+function applyTheme(id) {
+  const root = document.documentElement;
+  if (id === "system") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", id);
+
+  const theme = THEMES.find((t) => t.id === id) ?? THEMES[0];
+  if (themeBtn) {
+    themeBtn.textContent = theme.icon;
+    themeBtn.title = `Theme: ${theme.label} — click to change`;
+    themeBtn.setAttribute("aria-label", `Theme: ${theme.label}. Click to change.`);
+  }
+}
+
+function cycleTheme() {
+  const index = THEMES.findIndex((t) => t.id === storedThemeId());
+  const next = THEMES[(index + 1) % THEMES.length].id;
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, next);
+  } catch {
+    /* storage may be unavailable; theme still applies for this session */
+  }
+  applyTheme(next);
+}
 
 function setStatus(text, kind) {
   statusEl.textContent = text;
@@ -112,6 +180,7 @@ function buildEditor(initialDoc) {
     doc: initialDoc,
     extensions: [
       basicSetup,
+      cookTheme,
       EditorView.updateListener.of((update) => {
         if (update.docChanged) scheduleRun();
       }),
@@ -137,6 +206,9 @@ function populateExamples() {
 }
 
 async function main() {
+  applyTheme(storedThemeId());
+  themeBtn.addEventListener("click", cycleTheme);
+
   populateExamples();
   buildEditor(EXAMPLES[DEFAULT_EXAMPLE].source);
 

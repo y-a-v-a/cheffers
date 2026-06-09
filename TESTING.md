@@ -12,7 +12,7 @@ The project includes custom cargo aliases defined in `.cargo/config.toml` for co
 # Run all tests
 cargo test-all
 
-# Run only the spec fixture tests (59 tests)
+# Run only the spec fixture tests (64 tests)
 cargo test-spec
 
 # Run only the recipe integration tests
@@ -93,25 +93,30 @@ these automatically (see `.github/workflows/ci.yml`).
 ### Test Fixtures
 
 - **`tests/fixtures/`** - Example Chef recipes (hello-world, fibonacci, etc.)
-- **`tests/fixtures/spec/`** - Language specification test files (59 .chef files)
+- **`tests/fixtures/spec/`** - Language specification test files (68 .chef files)
 
 ## Test Categories in spec_fixtures.rs
 
 The spec fixture tests are organized by feature:
 
-- **Ingredient & Measurement Tests** (17 tests) - dry, liquid, and either-type measurements
-- **Basic Arithmetic Operations** (4 tests) - addition, subtraction, multiplication, division
-- **Bowl Operations** (7 tests) - clean, add, combine, divide, remove operations
-- **Fold & Stir Operations** (6 tests) - folding, stirring, mixing
-- **Output & I/O Operations** (4 tests) - liquefy, unicode output, stdin
-- **Loop Tests** (6 tests) - basic loops, nested loops, break (set aside)
-- **Metadata Parsing** (4 tests) - cooking time, temperature, gas mark
-- **Auxiliary Recipes** (1 test)
-- **Error Handling Tests** (8 tests) - parse errors and runtime errors
+- **Ingredient & Measurement Tests** - dry, liquid, and either-type measurements
+- **Basic Arithmetic Operations** - addition, subtraction, multiplication, division
+- **Bowl Operations** - clean, add (incl. "Add dry ingredients"), combine, divide, remove
+- **Fold & Stir Operations** - folding, stirring, mixing (seeded shuffle)
+- **Output & I/O Operations** - liquefy, unicode output, stdin (via `set_input_values`)
+- **Loop Tests** - basic loops, nested loops, condition-vs-decrement ingredients, break (set aside)
+- **Metadata Parsing** - cooking time, temperature, gas mark
+- **Auxiliary Recipes** - simple, fold-based, and recursive sous-chefs
+- **Ingredient Redeclaration** - the newest declaration wins
+- **Error Handling Tests** - parse errors and runtime errors
+
+Spec-conformance regression tests (one per deviation found and fixed in the
+spec audit: stdin input, loop condition semantics, pour-copies semantics,
+liquid dashes, optional ingredient values, and more) live in
+`tests/recipes.rs`.
 
 ## Notes
 
-- This is a work in progress - not all tests are expected to pass yet
 - Some tests are parse-only tests (they verify the recipe parses correctly but don't execute)
 - Error tests verify that appropriate errors are raised for invalid recipes
 

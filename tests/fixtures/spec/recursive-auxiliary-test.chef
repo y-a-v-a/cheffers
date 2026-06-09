@@ -1,14 +1,20 @@
 Recursive Auxiliary Test.
 
-This tests recursive auxiliary recipe calls.
-Computes sum from 5 down to 1 (should output 15).
+This tests recursive auxiliary recipe calls. Computes the sum from 5 down to
+1 (should output 15). The Summer sous-chef receives N on top of the first
+mixing bowl, uses a loop as an if together with Set aside, recurses with
+N minus 1, and leaves sum(N) as the only value in its first mixing bowl.
 
 Ingredients.
 5 g input
+0 g sum
 
 Method.
 Put input into mixing bowl.
 Serve with Summer.
+Fold sum into mixing bowl.
+Clean mixing bowl.
+Put sum into mixing bowl.
 Pour contents of the mixing bowl into the baking dish.
 
 Serves 1.
@@ -16,18 +22,26 @@ Serves 1.
 Summer.
 
 Ingredients.
-1 g decrement
+0 g n
+0 g m
+0 g zero
+1 g unit
 
 Method.
-Fold decrement into mixing bowl.
-Put decrement into mixing bowl.
-Remove decrement.
-Fold decrement into mixing bowl.
-Check the decrement.
-Put decrement into mixing bowl.
-Refrigerate.
-Check the decrement until checked.
-Put decrement into mixing bowl.
-Add decrement.
+Fold n into mixing bowl.
+Clean mixing bowl.
+Put zero into mixing bowl.
+Check the n.
+Put n into 2nd mixing bowl.
+Remove unit from 2nd mixing bowl.
+Fold m into 2nd mixing bowl.
+Clean mixing bowl.
+Put m into mixing bowl.
 Serve with Summer.
-Add decrement.
+Add n.
+Fold m into mixing bowl.
+Clean mixing bowl.
+Put m into mixing bowl.
+Set aside.
+Check the n until checked.
+Refrigerate.

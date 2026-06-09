@@ -30,13 +30,15 @@ Put potatoes into the mixing bowl. Put dijon mustard into the mixing bowl. Put l
 Serves 1.
 `},"countdown-cake":{label:"Countdown Cake",source:`Countdown Cake.
 
-A festive countdown recipe that counts from 5 down to 1. Perfect for New Year's Eve celebrations!
+A festive countdown recipe that counts from 5 down to 1. Perfect for New Year's Eve celebrations! The sugar rises from 1 to 5 as it is stacked into the mixing bowl, so the bowl pours out 5 4 3 2 1 when served.
 
 Ingredients.
 5 g flour
+0 g sugar
+1 g salt
 
 Method.
-Bake the flour. Put flour into the mixing bowl. Bake the flour until baked. Pour contents of the mixing bowl into the baking dish.
+Bake the flour. Put salt into the mixing bowl. Add sugar to the mixing bowl. Fold sugar into the mixing bowl. Put sugar into the mixing bowl. Bake the flour until baked. Pour contents of the mixing bowl into the baking dish.
 
 Serves 1.
 `}},Mu="hello-world",Ct=document.getElementById("output"),Cu=document.getElementById("status"),my=document.getElementById("run"),gy=document.getElementById("autorun"),Qs=document.getElementById("examples"),dn=document.getElementById("theme"),Zs,Tu=!1,Au=null,yy=M.theme({"&":{backgroundColor:"var(--cm-bg)",color:"var(--cm-text)",height:"100%"},"&.cm-focused":{outline:"none"},".cm-scroller":{fontFamily:"var(--mono)",fontSize:"14px"},".cm-content":{caretColor:"var(--cm-cursor)"},".cm-cursor, .cm-dropCursor":{borderLeftColor:"var(--cm-cursor)"},".cm-gutters":{backgroundColor:"var(--cm-gutter-bg)",color:"var(--cm-gutter-text)",border:"none",borderRight:"1px solid var(--border)"},".cm-lineNumbers .cm-gutterElement":{color:"var(--cm-gutter-text)"},".cm-activeLine":{backgroundColor:"var(--cm-active-line)"},".cm-activeLineGutter":{backgroundColor:"var(--cm-active-gutter)",color:"var(--cm-text)"},"&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":{backgroundColor:"var(--cm-selection)"}}),pn=[{id:"system",label:"System",icon:"\u{1F5A5}\uFE0F"},{id:"parchment",label:"Parchment",icon:"\u{1F4DC}"},{id:"cast-iron",label:"Cast Iron",icon:"\u{1F373}"},{id:"espresso",label:"Espresso",icon:"\u2615"}],Du="cheffers-theme";function Ou(){try{return localStorage.getItem(Du)||"system"}catch{return"system"}}function Bu(n){let e=document.documentElement;n==="system"?e.removeAttribute("data-theme"):e.setAttribute("data-theme",n);let t=pn.find(i=>i.id===n)??pn[0];dn&&(dn.textContent=t.icon,dn.title=`Theme: ${t.label} \u2014 click to change`,dn.setAttribute("aria-label",`Theme: ${t.label}. Click to change.`))}function by(){let n=pn.findIndex(t=>t.id===Ou()),e=pn[(n+1)%pn.length].id;try{localStorage.setItem(Du,e)}catch{}Bu(e)}function bi(n,e){Cu.textContent=n,Cu.className="status"+(e?" "+e:"")}function xy(n){if(n==null){Ct.textContent="Internal error: no result returned.",Ct.classList.add("error"),bi("error","err");return}if(n.ok)Ct.textContent=n.output.length?n.output:"(no output)",Ct.classList.remove("error"),bi("ok","ok");else{let e="";n.output.length&&(e+=Xs(n.output)+`

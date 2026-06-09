@@ -56,6 +56,30 @@ cheffers tests/fixtures/fibonacci.chef
 
 If no path is provided, the interpreter defaults to `hello.chef` in the current directory.
 
+Recipes that use `Take _ingredient_ from refrigerator` read one number per
+`Take` from standard input:
+
+```bash
+echo "21" | cheffers tests/fixtures/doubler-delight.chef   # prints 42
+```
+
+### Spec Conformance Notes
+
+The interpreter follows the [Chef specification](language-spec/Chef.md), with
+these documented choices where the spec is silent or impractical:
+
+- **Division** truncates toward zero — all Chef values are integers and the
+  spec does not define fractional results.
+- **`Mix well`** shuffles with a seedable pseudo-random generator
+  (`Interpreter::set_mix_seed`). Native runs seed from the clock; the wasm
+  playground uses a fixed seed since `SystemTime` is unavailable there.
+- **Loops** are capped at 10 million iterations per loop as a safety net; a
+  loop whose condition ingredient never reaches zero reports a runtime error
+  instead of hanging the CLI or the browser.
+- **Auxiliary recipe calls** are limited to a depth of 64.
+- Embedders without stdin (tests, wasm) can supply `Take` input with
+  `Interpreter::set_input_values`.
+
 ### Development Environment (Tmux)
 
 For an interactive development experience with instant feedback, use the tmux-based development environment:

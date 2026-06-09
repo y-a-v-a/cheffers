@@ -51,10 +51,10 @@ try {
     assert.equal(status.trim(), "ok");
   });
 
-  await step("switching to the Countdown example outputs '12345'", async () => {
+  await step("switching to the Countdown example outputs '54321'", async () => {
     await page.selectOption("#examples", "countdown-cake");
     await page.waitForFunction(
-      () => document.getElementById("output")?.textContent.trim() === "12345",
+      () => document.getElementById("output")?.textContent.trim() === "54321",
       { timeout: 10000 },
     );
   });

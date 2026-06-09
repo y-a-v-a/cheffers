@@ -1,18 +1,23 @@
 Loop Different Ingredients for Condition vs Decrement.
 
-This recipe uses different ingredients for loop condition and decrement.
+Per the Chef spec, a loop checks the ingredient named in its START statement
+before every pass; the ingredient named in the "until" statement is only
+decremented. Here the body lowers 'condition' from 3 to 0 through the 2nd
+mixing bowl, while the until statement decrements 'tally' from 9. After the
+loop, tally is 6 and is served.
 
 Ingredients.
 3 g condition
-2 g step
-49 g base
+9 g tally
+1 g unit
 
 Method.
 Beat the condition.
-Put step into mixing bowl.
-Add base to mixing bowl.
-Beat the step until beaten.
-Put condition into mixing bowl.
+Put condition into 2nd mixing bowl.
+Remove unit from 2nd mixing bowl.
+Fold condition into 2nd mixing bowl.
+Beat the tally until beaten.
+Put tally into mixing bowl.
 Pour contents of the mixing bowl into the baking dish.
 
 Serves 1.

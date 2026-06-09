@@ -84,6 +84,24 @@ macro_rules! spec_runtime_error_test {
     };
 }
 
+// Macro to generate a test that executes a fixture and checks its output
+macro_rules! spec_output_test {
+    ($test_name:ident, $fixture_path:literal, $expected:literal) => {
+        #[test]
+        fn $test_name() -> TestResult<()> {
+            let source = read_fixture(concat!("tests/fixtures/spec/", $fixture_path))?;
+            let recipe = parse_recipe(&source)?;
+
+            let mut interpreter = Interpreter::new();
+            interpreter.add_recipe(recipe);
+            interpreter.run()?;
+
+            assert_eq!(interpreter.output(), $expected);
+            Ok(())
+        }
+    };
+}
+
 // ============================================================================
 // INGREDIENT & MEASUREMENT TESTS
 // ============================================================================
@@ -113,13 +131,16 @@ spec_parse_only_test!(
     spec_single_liquid_ingredient_l,
     "single-liquid-ingredient-l-test.chef"
 );
-spec_parse_only_test!(
+// Per the spec dash[es] are liquid measures, so the value 67 prints as 'C'.
+spec_output_test!(
     spec_single_liquid_ingredient_dash,
-    "single-liquid-ingredient-dash-test.chef"
+    "single-liquid-ingredient-dash-test.chef",
+    "C"
 );
-spec_parse_only_test!(
+spec_output_test!(
     spec_single_liquid_ingredient_dashes,
-    "single-liquid-ingredient-dashes-test.chef"
+    "single-liquid-ingredient-dashes-test.chef",
+    "C"
 );
 
 spec_parse_only_test!(
@@ -173,7 +194,11 @@ spec_test!(spec_division, "division-test.chef");
 
 spec_test!(spec_clean_bowl, "clean-bowl-test.chef");
 spec_test!(spec_clean_two_bowls, "clean-two-bowls-test.chef");
-spec_test!(spec_add_dry_ingredients, "add-dry-ingredients-test.chef");
+spec_output_test!(
+    spec_add_dry_ingredients,
+    "add-dry-ingredients-test.chef",
+    "10"
+);
 spec_test!(spec_add_second_bowl, "add-second-bowl-test.chef");
 spec_test!(spec_combine_second_bowl, "combine-second-bowl-test.chef");
 spec_test!(spec_divide_second_bowl, "divide-second-bowl-test.chef");
@@ -198,8 +223,19 @@ spec_test!(spec_liquefy_second_bowl, "liquefy-second-bowl-test.chef");
 spec_test!(spec_to_unicode_singular, "to-unicode-singular-test.chef");
 spec_test!(spec_to_unicode_pair, "to-unicode-pair-test.chef");
 
-// Note: stdin-echo-test requires stdin input, skipping execution for now
-spec_parse_only_test!(spec_stdin_echo, "stdin-echo-test.chef");
+#[test]
+fn spec_stdin_echo() -> TestResult<()> {
+    let source = read_fixture("tests/fixtures/spec/stdin-echo-test.chef")?;
+    let recipe = parse_recipe(&source)?;
+
+    let mut interpreter = Interpreter::new();
+    interpreter.set_input_values(vec![42]);
+    interpreter.add_recipe(recipe);
+    interpreter.run()?;
+
+    assert_eq!(interpreter.output(), "42");
+    Ok(())
+}
 
 // ============================================================================
 // LOOP TESTS
@@ -207,9 +243,17 @@ spec_parse_only_test!(spec_stdin_echo, "stdin-echo-test.chef");
 
 spec_test!(spec_loop, "loop-test.chef");
 spec_test!(spec_loop_same_ingredient, "loop-same-ingredient-test.chef");
-spec_test!(
+// The loop checks the START-statement ingredient; "until" only decrements
+// its (different) ingredient. See the fixtures for the full walk-through.
+spec_output_test!(
     spec_loop_different_ingredients,
-    "loop-different-ingredients-test.chef"
+    "loop-different-ingredients-test.chef",
+    "6"
+);
+spec_output_test!(
+    spec_loop_different_decrement,
+    "loop-different-decrement-test.chef",
+    "C"
 );
 spec_test!(spec_nested_loops, "nested-loops-test.chef");
 spec_test!(spec_empty_loop_body, "empty-loop-body-test.chef");
@@ -230,6 +274,19 @@ spec_test!(spec_set_aside, "set-aside-test.chef");
 spec_test!(spec_serves_two, "serves-two-test.chef");
 
 // ============================================================================
+// INGREDIENT REDECLARATION
+// ============================================================================
+
+// Spec: "If an ingredient is repeated, the new value is used and previous
+// values for that ingredient are ignored." The fixture declares value as 5
+// and then as 0; the recipe must serve 0.
+spec_output_test!(
+    spec_redeclared_ingredient,
+    "redeclared-ingredient-test.chef",
+    "0"
+);
+
+// ============================================================================
 // METADATA PARSING (COOKING TIME, TEMPERATURE, ETC.)
 // ============================================================================
 
@@ -247,6 +304,12 @@ spec_parse_only_test!(
 
 spec_test!(spec_simple_auxiliary, "simple-auxiliary-test.chef");
 spec_test!(spec_auxiliary_fold, "auxiliary-fold-test.chef");
+// Sum 5+4+3+2+1 computed by a recursive sous-chef.
+spec_output_test!(
+    spec_recursive_auxiliary,
+    "recursive-auxiliary-test.chef",
+    "15"
+);
 
 // ============================================================================
 // ERROR HANDLING TESTS - PARSE ERRORS
@@ -264,10 +327,6 @@ spec_parse_error_test!(
 spec_parse_error_test!(
     spec_wrong_ingredients_definition,
     "wrong-ingredients-definition-test.chef"
-);
-spec_parse_error_test!(
-    spec_redeclared_ingredient,
-    "redeclared-ingredient-test.chef"
 );
 
 // ============================================================================

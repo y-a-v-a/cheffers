@@ -127,21 +127,22 @@ impl<'a> Parser<'a> {
             .ok_or_else(|| ParseError::MissingSection("Method".into()))?;
 
         // Ingredients section is optional
-        let ingredients = if let Some(ingredients_idx) = block.find("Ingredients.") {
-            if method_idx <= ingredients_idx {
-                return Err(ParseError::MissingSection("Method".into()));
-            }
-            let ingredients_text = &block[ingredients_idx + "Ingredients.".len()..method_idx];
-            Self::parse_ingredients(ingredients_text)?
-        } else {
-            // Check if "Ingredients" (without period) exists - this is an error
-            if block.contains("Ingredients\n") || block.contains("Ingredients ") {
-                return Err(ParseError::MissingSection(
-                    "Ingredients section must end with a period: 'Ingredients.'".into(),
-                ));
-            }
-            HashMap::new()
-        };
+        let (ingredients, unset_ingredients) =
+            if let Some(ingredients_idx) = block.find("Ingredients.") {
+                if method_idx <= ingredients_idx {
+                    return Err(ParseError::MissingSection("Method".into()));
+                }
+                let ingredients_text = &block[ingredients_idx + "Ingredients.".len()..method_idx];
+                Self::parse_ingredients(ingredients_text)?
+            } else {
+                // Check if "Ingredients" (without period) exists - this is an error
+                if block.contains("Ingredients\n") || block.contains("Ingredients ") {
+                    return Err(ParseError::MissingSection(
+                        "Ingredients section must end with a period: 'Ingredients.'".into(),
+                    ));
+                }
+                (HashMap::new(), HashMap::new())
+            };
 
         let method_text = &block[method_idx + "Method.".len()..];
         let instructions = Self::parse_method(method_text)?;
@@ -149,6 +150,7 @@ impl<'a> Parser<'a> {
         Ok(Recipe {
             title,
             ingredients,
+            unset_ingredients,
             instructions,
             auxiliary_recipes: HashMap::new(),
         })
@@ -171,8 +173,17 @@ impl<'a> Parser<'a> {
         Ok(first_line.to_string())
     }
 
-    fn parse_ingredients(text: &str) -> ParseResult<HashMap<Ingredient, Value>> {
+    /// Parses the ingredient list into ingredients with values and ingredients
+    /// declared without an initial value (the spec makes the value optional;
+    /// using a valueless ingredient is a run-time error). If an ingredient is
+    /// repeated, the new declaration replaces earlier ones, as the spec
+    /// requires.
+    #[allow(clippy::type_complexity)]
+    fn parse_ingredients(
+        text: &str,
+    ) -> ParseResult<(HashMap<Ingredient, Value>, HashMap<Ingredient, Measure>)> {
         let mut ingredients = HashMap::new();
+        let mut unset_ingredients = HashMap::new();
 
         for raw_line in text.lines() {
             let line = raw_line.trim();
@@ -186,40 +197,39 @@ impl<'a> Parser<'a> {
                 continue;
             }
 
-            let caps = ingredient_regex()
-                .captures(line)
-                .ok_or_else(|| ParseError::InvalidIngredient(line.to_string()))?;
-
-            let quantity = Self::parse_quantity(caps.name("amount").unwrap().as_str())?;
-            let rest = caps.name("rest").unwrap().as_str().trim();
+            let (quantity, rest) = match ingredient_regex().captures(line) {
+                Some(caps) => (
+                    Some(Self::parse_quantity(caps.name("amount").unwrap().as_str())?),
+                    caps.name("rest").unwrap().as_str().trim(),
+                ),
+                // No initial value: the whole line is "[[measure-type] measure] name"
+                None => (None, line),
+            };
 
             let (measure_kind, ingredient) = Self::split_measure_and_ingredient(rest);
-            if ingredient.is_empty() {
+            if ingredient.is_empty() || !is_reasonable_ingredient_name(&ingredient) {
                 return Err(ParseError::InvalidIngredient(line.to_string()));
-            }
-
-            // Check for duplicate ingredient declaration
-            if ingredients.contains_key(&ingredient) {
-                return Err(ParseError::DuplicateIngredient(format!(
-                    "Ingredient '{}' is declared multiple times",
-                    ingredient
-                )));
             }
 
             // Always validate measurement units, even if no valid unit was found
             // This catches invalid units like "tons", "meters", etc.
             Self::validate_measure_line(rest)?;
 
-            ingredients.insert(
-                ingredient,
-                Value {
-                    amount: quantity,
-                    measure: measure_kind.unwrap_or(Measure::Unspecified),
-                },
-            );
+            let measure = measure_kind.unwrap_or(Measure::Unspecified);
+            // A repeated declaration replaces the previous one in either map.
+            ingredients.remove(&ingredient);
+            unset_ingredients.remove(&ingredient);
+            match quantity {
+                Some(amount) => {
+                    ingredients.insert(ingredient, Value { amount, measure });
+                }
+                None => {
+                    unset_ingredients.insert(ingredient, measure);
+                }
+            }
         }
 
-        Ok(ingredients)
+        Ok((ingredients, unset_ingredients))
     }
 
     fn parse_quantity(raw: &str) -> ParseResult<i64> {
@@ -278,24 +288,36 @@ impl<'a> Parser<'a> {
             .collect::<Vec<_>>()
             .join(" ");
 
-        let measure_kind = measure_tokens
+        let mut measure_kind = measure_tokens
             .iter()
             .rev()
             .find_map(|token| Self::measure_from_word(normalize_word(token).as_str()));
+
+        // Per the spec, the "heaped" and "level" measure-types indicate that
+        // the measure is dry, even for measures that may be either.
+        let has_dry_modifier = measure_tokens
+            .iter()
+            .any(|token| matches!(normalize_word(token).as_str(), "heaped" | "level"));
+        if has_dry_modifier {
+            measure_kind = Some(Measure::Dry);
+        }
 
         (measure_kind, ingredient.trim().to_string())
     }
 
     fn measure_from_word(word: &str) -> Option<Measure> {
         match word {
+            // Spec: g | kg | pinch[es] always indicate dry measures.
+            "g" | "kg" | "pinch" | "pinches" | "gram" | "grams" | "kilogram" | "kilograms"
+            | "oz" | "ounce" | "ounces" | "lb" | "pound" | "pounds" => Some(Measure::Dry),
+            // Spec: ml | l | dash[es] always indicate liquid measures.
+            "ml" | "l" | "dash" | "dashes" | "liter" | "liters" | "litre" | "litres" | "cl"
+            | "dl" => Some(Measure::Liquid),
+            // Spec: cup[s] | teaspoon[s] | tablespoon[s] may be either dry or
+            // liquid; they stay unspecified (output as numbers) unless a
+            // heaped/level modifier marks them dry.
             "cup" | "cups" | "teaspoon" | "teaspoons" | "tablespoon" | "tablespoons" | "tbsp"
-            | "tsp" | "pinch" | "pinches" | "dash" | "dashes" | "g" | "kg" | "gram" | "grams"
-            | "kilogram" | "kilograms" | "oz" | "ounce" | "ounces" | "lb" | "pound" | "pounds" => {
-                Some(Measure::Dry)
-            }
-            "ml" | "l" | "liter" | "liters" | "litre" | "litres" | "cl" | "dl" => {
-                Some(Measure::Liquid)
-            }
+            | "tsp" => Some(Measure::Unspecified),
             _ => None,
         }
     }
@@ -356,28 +378,28 @@ impl<'a> Parser<'a> {
         let mut idx = 0;
 
         while idx < sentences.len() {
-            let sentence = sentences[idx].as_str();
-            if Self::is_loop_start(sentence) {
-                // Try to parse as a loop
-                match Self::parse_loop(&sentences[idx..]) {
-                    Ok((loop_inst, consumed)) => {
-                        instructions.push(loop_inst);
-                        idx += consumed;
-                    }
-                    Err(ParseError::UnmatchedLoop) => {
-                        // Not a valid loop, treat as regular instruction
-                        instructions.push(Self::parse_instruction(sentence)?);
-                        idx += 1;
-                    }
-                    Err(e) => return Err(e),
-                }
-            } else {
-                instructions.push(Self::parse_instruction(sentence)?);
-                idx += 1;
-            }
+            let (instruction, consumed) = Self::parse_statement(&sentences[idx..])?;
+            instructions.push(instruction);
+            idx += consumed;
         }
 
         Ok(instructions)
+    }
+
+    /// Parses the next method statement, returning the instruction and the
+    /// number of sentences consumed. Known instructions take precedence; any
+    /// other sentence of the shape "Verb [the] ingredient" starts a loop, and
+    /// everything else is a parse error (the spec has no comments inside the
+    /// method, so a typo'd instruction must not be silently dropped).
+    fn parse_statement(sentences: &[String]) -> ParseResult<(Instruction, usize)> {
+        let sentence = sentences[0].as_str();
+        if let Some(instruction) = Self::parse_known_instruction(sentence)? {
+            return Ok((instruction, 1));
+        }
+        if loop_start_regex().is_match(sentence) {
+            return Self::parse_loop(sentences);
+        }
+        Err(ParseError::UnknownInstruction(sentence.to_string()))
     }
 
     fn split_sentences(text: &str) -> Vec<String> {
@@ -408,193 +430,176 @@ impl<'a> Parser<'a> {
         sentences
     }
 
-    fn is_loop_start(sentence: &str) -> bool {
-        // Check if this sentence contains "until" - if so, it's a single-line loop
-        if sentence.to_lowercase().contains("until") {
-            return loop_start_regex().is_match(sentence);
+    /// Returns true if the sentence is an "until" statement closing a loop
+    /// opened with `verb`: "AnyVerb [the ingredient] until verbed". The spec
+    /// says _verbed_ must match the loop verb; we use a prefix heuristic so
+    /// "Bake ... until baked" matches without conjugation tables.
+    fn until_matches_verb(sentence: &str, verb: &str) -> bool {
+        let lower = sentence.to_lowercase();
+        if let Some(until_pos) = lower.find(" until ") {
+            let after_until = lower[until_pos + " until ".len()..].trim_start();
+            after_until.starts_with(&verb.to_lowercase())
+        } else {
+            false
         }
-        // Otherwise, we'll determine if it's a loop start when we try to parse it
-        loop_start_regex().is_match(sentence)
     }
 
+    /// Extracts the optional decrement ingredient from an "until" statement:
+    /// "AnyVerb [the ingredient] until verbed". The leading verb is arbitrary
+    /// and ignored; the ingredient between it and "until", if present, is
+    /// decremented each time the statement executes.
+    fn decrement_var_from_until(until_stmt: &str) -> Option<String> {
+        let lower_stmt = until_stmt.to_lowercase();
+        let until_pos = lower_stmt.find(" until")?;
+        let before_until = &until_stmt[..until_pos];
+
+        let parts: Vec<&str> = before_until.split_whitespace().collect();
+        if parts.len() < 2 {
+            return None;
+        }
+
+        // Skip the first word (the verb), join the rest
+        let ingredient_with_the = parts[1..].join(" ");
+        let ingredient = ingredient_with_the
+            .strip_prefix("the ")
+            .or_else(|| ingredient_with_the.strip_prefix("The "))
+            .unwrap_or(ingredient_with_the.as_str())
+            .trim();
+
+        if ingredient.is_empty() {
+            None
+        } else {
+            Some(ingredient.to_string())
+        }
+    }
+
+    /// Parses a loop opened by `sentences[0]` ("Verb [the] ingredient"). Body
+    /// statements are parsed sequentially, so nested loops consume their own
+    /// "until" statements before this loop looks for its own; this makes
+    /// nested loops using the same verb pair up correctly.
     fn parse_loop(sentences: &[String]) -> ParseResult<(Instruction, usize)> {
+        let start = sentences[0].as_str();
         let caps = loop_start_regex()
-            .captures(&sentences[0])
+            .captures(start)
             .ok_or(ParseError::InvalidLoop)?;
         let verb = caps.name("verb").unwrap().as_str().to_string();
         let condition_var = caps.name("ingredient").unwrap().as_str().to_string();
 
-        // Find the matching "until verbed" statement
-        // The spec says: "verbed must match the Verb in the matching loop start statement"
-        // We need to find sentences containing "until" followed by a form of the verb
-        // For simplicity, we check if "until <something>" contains the verb stem
-        let end_idx = sentences
-            .iter()
-            .enumerate()
-            .position(|(_i, s)| {
-                let lower = s.to_lowercase();
-                if let Some(until_pos) = lower.find(" until ") {
-                    // Get the word after "until"
-                    let after_until = &lower[until_pos + 7..]; // " until " = 7 chars
-                                                               // Check if the verb stem appears in the verbed form
-                                                               // Simple heuristic: check if after_until starts with the verb stem
-                    after_until.starts_with(&verb.to_lowercase())
-                } else {
-                    false
-                }
-            })
-            .ok_or(ParseError::UnmatchedLoop)?;
-
-        // Parse the until statement to extract optional decrement ingredient
-        // Pattern: "AnyVerb [the ingredient] until verbed."
-        // The verb at the start can be arbitrary and is ignored
-        // We need to extract the ingredient between ANY verb and "until"
-        let until_stmt = &sentences[end_idx];
-
-        let decrement_var = {
-            let lower_stmt = until_stmt.to_lowercase();
-
-            // Find "until" position
-            if let Some(until_pos) = lower_stmt.find(" until") {
-                // Extract everything before " until"
-                let before_until = &until_stmt[..until_pos];
-
-                // The pattern is "Verb [the] ingredient"
-                // Skip the first word (the verb) and extract the rest
-                let parts: Vec<&str> = before_until.split_whitespace().collect();
-                if parts.len() >= 2 {
-                    // Skip first word (verb), join the rest
-                    let ingredient_parts = &parts[1..];
-                    let ingredient_with_the = ingredient_parts.join(" ");
-
-                    // Remove optional "the" prefix
-                    let ingredient = if ingredient_with_the.to_lowercase().starts_with("the ") {
-                        &ingredient_with_the[4..]
-                    } else {
-                        ingredient_with_the.as_str()
-                    }
-                    .trim();
-
-                    if !ingredient.is_empty() {
-                        Some(ingredient.to_string())
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        };
-
-        // If end_idx == 0, this is a single-line loop with empty body
-        let mut body = Vec::new();
-        let mut idx = 1;
-        while idx < end_idx {
-            let sentence = sentences[idx].as_str();
-            if Self::is_loop_start(sentence) {
-                // Try to parse as a nested loop
-                match Self::parse_loop(&sentences[idx..]) {
-                    Ok((nested, consumed)) => {
-                        body.push(nested);
-                        idx += consumed;
-                    }
-                    Err(ParseError::UnmatchedLoop) => {
-                        // Not a valid loop, treat as regular instruction
-                        body.push(Self::parse_instruction(sentence)?);
-                        idx += 1;
-                    }
-                    Err(e) => return Err(e),
-                }
-            } else {
-                body.push(Self::parse_instruction(sentence)?);
-                idx += 1;
-            }
+        // Single-sentence loop with an empty body: "Verb the x until verbed."
+        if Self::until_matches_verb(start, &verb) {
+            let decrement_var = Self::decrement_var_from_until(start);
+            return Ok((
+                Instruction::Loop {
+                    condition_var,
+                    verb,
+                    body: Vec::new(),
+                    decrement_var,
+                },
+                1,
+            ));
         }
 
-        Ok((
-            Instruction::Loop {
-                condition_var,
-                verb,
-                body,
-                decrement_var,
-            },
-            end_idx + 1,
-        ))
+        let mut body = Vec::new();
+        let mut idx = 1;
+        loop {
+            if idx >= sentences.len() {
+                return Err(ParseError::UnmatchedLoop(start.to_string()));
+            }
+            let sentence = sentences[idx].as_str();
+            if Self::until_matches_verb(sentence, &verb) {
+                let decrement_var = Self::decrement_var_from_until(sentence);
+                return Ok((
+                    Instruction::Loop {
+                        condition_var,
+                        verb,
+                        body,
+                        decrement_var,
+                    },
+                    idx + 1,
+                ));
+            }
+            let (instruction, consumed) = Self::parse_statement(&sentences[idx..])?;
+            body.push(instruction);
+            idx += consumed;
+        }
     }
 
-    fn parse_instruction(sentence: &str) -> ParseResult<Instruction> {
+    /// Parses a sentence as one of the spec's named instructions. Returns
+    /// `Ok(None)` when the sentence matches no known instruction form (it may
+    /// still be a loop start or end, which the caller handles).
+    fn parse_known_instruction(sentence: &str) -> ParseResult<Option<Instruction>> {
         if let Some(caps) = take_regex().captures(sentence) {
-            return Ok(Instruction::Take(
+            return Ok(Some(Instruction::Take(
                 caps.name("ingredient").unwrap().as_str().to_string(),
-            ));
+            )));
         }
 
         if let Some(caps) = put_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Put(
+            return Ok(Some(Instruction::Put(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         if let Some(caps) = fold_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Fold(
+            return Ok(Some(Instruction::Fold(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         // Check add_dry_regex BEFORE add_regex since "Add dry ingredients" matches both
         // More specific patterns must be checked first
         if let Some(caps) = add_dry_regex().captures(sentence) {
-            return Ok(Instruction::AddDry(ordinal_to_index(caps.name("bowl"))));
+            return Ok(Some(Instruction::AddDry(ordinal_to_index(
+                caps.name("bowl"),
+            ))));
         }
 
         if let Some(caps) = add_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Add(
+            return Ok(Some(Instruction::Add(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         if let Some(caps) = remove_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Remove(
+            return Ok(Some(Instruction::Remove(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         if let Some(caps) = combine_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Combine(
+            return Ok(Some(Instruction::Combine(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         if let Some(caps) = divide_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::Divide(
+            return Ok(Some(Instruction::Divide(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
-        }
-
-        if let Some(caps) = liquefy_bowl_regex().captures(sentence) {
-            return Ok(Instruction::LiquefyBowl(ordinal_to_index(
-                caps.name("bowl"),
             )));
         }
 
+        if let Some(caps) = liquefy_bowl_regex().captures(sentence) {
+            return Ok(Some(Instruction::LiquefyBowl(ordinal_to_index(
+                caps.name("bowl"),
+            ))));
+        }
+
         if let Some(caps) = liquefy_regex().captures(sentence) {
-            return Ok(Instruction::Liquefy(
+            return Ok(Some(Instruction::Liquefy(
                 caps.name("ingredient").unwrap().as_str().to_string(),
-            ));
+            )));
         }
 
         if let Some(caps) = stir_regex().captures(sentence) {
@@ -605,39 +610,41 @@ impl<'a> Parser<'a> {
                 .as_str()
                 .parse()
                 .map_err(|_| ParseError::UnknownInstruction(sentence.to_string()))?;
-            return Ok(Instruction::Stir(bowl, minutes));
+            return Ok(Some(Instruction::Stir(bowl, minutes)));
         }
 
         if let Some(caps) = stir_ingredient_regex().captures(sentence) {
             let bowl = ordinal_to_index(caps.name("bowl"));
-            return Ok(Instruction::StirIngredient(
+            return Ok(Some(Instruction::StirIngredient(
                 caps.name("ingredient").unwrap().as_str().to_string(),
                 bowl,
-            ));
+            )));
         }
 
         if let Some(caps) = mix_regex().captures(sentence) {
-            return Ok(Instruction::Mix(ordinal_to_index(caps.name("bowl"))));
+            return Ok(Some(Instruction::Mix(ordinal_to_index(caps.name("bowl")))));
         }
 
         if let Some(caps) = clean_regex().captures(sentence) {
-            return Ok(Instruction::Clean(ordinal_to_index(caps.name("bowl"))));
+            return Ok(Some(Instruction::Clean(ordinal_to_index(
+                caps.name("bowl"),
+            ))));
         }
 
         if let Some(caps) = pour_regex().captures(sentence) {
             let from = ordinal_to_index(caps.name("from"));
             let to = ordinal_to_index(caps.name("to"));
-            return Ok(Instruction::Pour(from, to));
+            return Ok(Some(Instruction::Pour(from, to)));
         }
 
         if set_aside_regex().is_match(sentence) {
-            return Ok(Instruction::SetAside);
+            return Ok(Some(Instruction::SetAside));
         }
 
         if let Some(caps) = serve_with_regex().captures(sentence) {
-            return Ok(Instruction::ServeWith(
+            return Ok(Some(Instruction::ServeWith(
                 caps.name("recipe").unwrap().as_str().trim().to_string(),
-            ));
+            )));
         }
 
         if let Some(caps) = refrigerate_regex().captures(sentence) {
@@ -646,7 +653,7 @@ impl<'a> Parser<'a> {
                 .map(|m| m.as_str().parse::<usize>())
                 .transpose()
                 .map_err(|_| ParseError::UnknownInstruction(sentence.to_string()))?;
-            return Ok(Instruction::Refrigerate(time));
+            return Ok(Some(Instruction::Refrigerate(time)));
         }
 
         if let Some(caps) = serves_regex().captures(sentence) {
@@ -656,10 +663,10 @@ impl<'a> Parser<'a> {
                 .as_str()
                 .parse()
                 .map_err(|_| ParseError::UnknownInstruction(sentence.to_string()))?;
-            return Ok(Instruction::Serves(count));
+            return Ok(Some(Instruction::Serves(count)));
         }
 
-        Ok(Instruction::NoOp(sentence.to_string()))
+        Ok(None)
     }
 }
 
@@ -671,14 +678,14 @@ fn ingredient_regex() -> &'static Regex {
 fn loop_start_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"^(?P<verb>[A-Za-z]+) the (?P<ingredient>.+?)(?:\s+until\s|$)").unwrap()
+        Regex::new(r"^(?P<verb>[A-Za-z]+)(?: the)? (?P<ingredient>.+?)(?:\s+until\s|$)").unwrap()
     })
 }
 
 fn take_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"(?i)^Take (?P<ingredient>.+) from(?: the)? refrigerator$").unwrap()
+        Regex::new(r"(?i)^Take(?: the)? (?P<ingredient>.+) from(?: the)? refrigerator$").unwrap()
     })
 }
 
@@ -686,7 +693,7 @@ fn put_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Put (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Put(?: the)? (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
         )
         .unwrap()
     })
@@ -696,7 +703,7 @@ fn fold_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Fold (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Fold(?: the)? (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
         )
         .unwrap()
     })
@@ -706,7 +713,7 @@ fn add_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Add (?P<ingredient>.+?)(?:\s+to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
+            r"(?i)^Add(?: the)? (?P<ingredient>.+?)(?:\s+to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -716,7 +723,7 @@ fn remove_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Remove (?P<ingredient>.+?)(?:\s+from(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
+            r"(?i)^Remove(?: the)? (?P<ingredient>.+?)(?:\s+from(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -726,7 +733,7 @@ fn combine_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Combine (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
+            r"(?i)^Combine(?: the)? (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -736,7 +743,7 @@ fn divide_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Divide (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
+            r"(?i)^Divide(?: the)? (?P<ingredient>.+?)(?:\s+into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -746,7 +753,7 @@ fn add_dry_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Add dry ingredients to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Add dry ingredients(?: to(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)?$",
         )
         .unwrap()
     })
@@ -754,14 +761,14 @@ fn add_dry_regex() -> &'static Regex {
 
 fn liquefy_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"(?i)^Liquefy(?: the)? (?P<ingredient>.+)$").unwrap())
+    RE.get_or_init(|| Regex::new(r"(?i)^Liqu[ei]fy(?: the)? (?P<ingredient>.+)$").unwrap())
 }
 
 fn liquefy_bowl_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Liquefy(?: the)? contents of(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Liqu[ei]fy(?: the)? contents of(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
         )
         .unwrap()
     })
@@ -771,7 +778,7 @@ fn stir_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Stir(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl for (?P<minutes>\d+) minutes$",
+            r"(?i)^Stir(?:(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl)? for (?P<minutes>\d+) minutes?$",
         )
         .unwrap()
     })
@@ -781,7 +788,7 @@ fn stir_ingredient_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(
-            r"(?i)^Stir (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
+            r"(?i)^Stir(?: the)? (?P<ingredient>.+) into(?: the)?(?: (?P<bowl>\d+)(?:st|nd|rd|th))? mixing bowl$",
         )
         .unwrap()
     })
@@ -841,6 +848,15 @@ fn ordinal_to_index(value: Option<regex::Match<'_>>) -> usize {
         .unwrap_or(0)
 }
 
+/// A valueless ingredient line is just a name (with optional measure), so
+/// almost anything matches; require a sane shape so that garbage in the
+/// ingredient list is still reported instead of becoming an "ingredient".
+fn is_reasonable_ingredient_name(name: &str) -> bool {
+    let mut chars = name.chars();
+    matches!(chars.next(), Some(c) if c.is_alphabetic())
+        && chars.all(|c| c.is_alphanumeric() || c == ' ' || c == '_' || c == '-' || c == '\'')
+}
+
 fn normalize_word(word: &str) -> String {
     word.trim_matches(|c: char| !c.is_alphanumeric())
         .to_lowercase()
@@ -871,7 +887,7 @@ Serves 1.";
     }
 
     #[test]
-    fn loop_like_sentence_without_until_is_noop() {
+    fn loop_start_without_until_is_a_parse_error() {
         let source = "\
 Loop Dish.
 
@@ -882,14 +898,38 @@ Method.
 Beat the batter.
 Serves 1.";
 
-        let recipe = Parser::new(source)
+        let error = Parser::new(source)
             .parse_recipe()
-            .expect("sentence without matching 'until' should parse as NoOp");
-        assert_eq!(recipe.instructions.len(), 2);
+            .expect_err("a loop start without a matching 'until' must not parse");
         assert!(
-            matches!(recipe.instructions[0], Instruction::NoOp(_)),
-            "expected NoOp, got: {:?}",
-            recipe.instructions[0]
+            matches!(error, ParseError::UnmatchedLoop(_)),
+            "expected UnmatchedLoop, got: {:?}",
+            error
+        );
+    }
+
+    #[test]
+    fn unknown_sentence_is_a_parse_error() {
+        let source = "\
+Typo Dish.
+
+Ingredients.
+1 g sugar
+
+Method.
+Pur sugar into the mixing bowl.
+Serves 1.";
+
+        let error = Parser::new(source)
+            .parse_recipe()
+            .expect_err("a typo'd instruction must not be silently dropped");
+        assert!(
+            matches!(
+                error,
+                ParseError::UnknownInstruction(_) | ParseError::UnmatchedLoop(_)
+            ),
+            "expected an unknown-instruction error, got: {:?}",
+            error
         );
     }
 

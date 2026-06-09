@@ -1,16 +1,130 @@
+/*
+ * Theming
+ * -------
+ * All colors are CSS custom properties so the three palettes — and the OS
+ * default — share one set of semantic tokens. Palettes lean on a kitchen /
+ * cookbook vocabulary:
+ *
+ *   Parchment  (light) — a cookbook page: cream paper, espresso ink, paprika.
+ *   Cast Iron  (dark)  — a seasoned skillet: charcoal with an ember-copper glow.
+ *   Espresso   (dark)  — a coffee bar: deep roast browns with caramel.
+ *
+ * Default (no data-theme attribute) follows the machine via
+ * prefers-color-scheme; the header toggle sets data-theme to override.
+ */
+
 :root {
-  --bg: #1e1e28;
-  --panel: #252533;
-  --panel-header: #2d2d3d;
-  --border: #3a3a4d;
-  --text: #e6e6ef;
-  --muted: #9a9ab0;
-  --accent: #ff7a59;
-  --accent-hover: #ff9377;
-  --error: #ff6b6b;
-  --ok: #5ad19a;
   --mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Parchment (light) — also the default when the OS prefers light. */
+  color-scheme: light;
+  --bg: #efe6d2;
+  --panel: #faf4e6;
+  --panel-header: #ead9bd;
+  --border: #d9c6a3;
+  --text: #3a2c23;
+  --muted: #8c745b;
+  --accent: #c0402b;
+  --accent-hover: #a5331f;
+  --on-accent: #fff6ec;
+  --error: #b22a1e;
+  --ok: #5b7d3a;
+
+  --cm-bg: var(--panel);
+  --cm-text: var(--text);
+  --cm-gutter-bg: #efe2c6;
+  --cm-gutter-text: #a9906f;
+  --cm-active-line: rgba(122, 90, 60, 0.08);
+  --cm-active-gutter: rgba(122, 90, 60, 0.16);
+  --cm-cursor: var(--accent);
+  --cm-selection: rgba(192, 64, 43, 0.22);
 }
+
+/* Cast Iron palette tokens (reused by the OS-dark default and the explicit
+   choice below). */
+
+/* When the OS prefers dark and the user hasn't chosen, use Cast Iron. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #181715;
+    --panel: #221f1c;
+    --panel-header: #2a2723;
+    --border: #393530;
+    --text: #ece4d6;
+    --muted: #9d9081;
+    --accent: #e8743b;
+    --accent-hover: #f58c54;
+    --on-accent: #1b1815;
+    --error: #ff6f5e;
+    --ok: #93c069;
+
+    --cm-bg: var(--panel);
+    --cm-text: var(--text);
+    --cm-gutter-bg: #1e1b18;
+    --cm-gutter-text: #7c7264;
+    --cm-active-line: rgba(255, 255, 255, 0.04);
+    --cm-active-gutter: rgba(255, 255, 255, 0.07);
+    --cm-cursor: var(--accent);
+    --cm-selection: rgba(232, 116, 59, 0.26);
+  }
+}
+
+/* Explicit Cast Iron selection. */
+:root[data-theme="cast-iron"] {
+  color-scheme: dark;
+  --bg: #181715;
+  --panel: #221f1c;
+  --panel-header: #2a2723;
+  --border: #393530;
+  --text: #ece4d6;
+  --muted: #9d9081;
+  --accent: #e8743b;
+  --accent-hover: #f58c54;
+  --on-accent: #1b1815;
+  --error: #ff6f5e;
+  --ok: #93c069;
+
+  --cm-bg: var(--panel);
+  --cm-text: var(--text);
+  --cm-gutter-bg: #1e1b18;
+  --cm-gutter-text: #7c7264;
+  --cm-active-line: rgba(255, 255, 255, 0.04);
+  --cm-active-gutter: rgba(255, 255, 255, 0.07);
+  --cm-cursor: var(--accent);
+  --cm-selection: rgba(232, 116, 59, 0.26);
+}
+
+/* Espresso (dark) — deep coffee roast with caramel accent. */
+:root[data-theme="espresso"] {
+  color-scheme: dark;
+  --bg: #1f1711;
+  --panel: #281e17;
+  --panel-header: #312419;
+  --border: #443223;
+  --text: #f1e6d4;
+  --muted: #b09a80;
+  --accent: #e0a458;
+  --accent-hover: #f1b96b;
+  --on-accent: #241a10;
+  --error: #ff8068;
+  --ok: #b0c06a;
+
+  --cm-bg: var(--panel);
+  --cm-text: var(--text);
+  --cm-gutter-bg: #221a13;
+  --cm-gutter-text: #8c7a62;
+  --cm-active-line: rgba(224, 164, 88, 0.08);
+  --cm-active-gutter: rgba(224, 164, 88, 0.14);
+  --cm-cursor: var(--accent);
+  --cm-selection: rgba(224, 164, 88, 0.24);
+}
+
+/*
+ * Layout
+ * ------
+ */
 
 * { box-sizing: border-box; }
 
@@ -19,12 +133,25 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--sans);
 }
 
 body {
   display: flex;
   flex-direction: column;
+}
+
+/* Smooth the palette switch (but not the editor, which CodeMirror repaints). */
+body,
+.toolbar,
+.pane-header,
+.footer,
+.editor-host,
+.output,
+button.theme-toggle,
+button#run,
+select {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .toolbar {
@@ -45,6 +172,8 @@ body {
 .controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .controls label { color: var(--muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem; }
 
+input[type="checkbox"] { accent-color: var(--accent); }
+
 select {
   background: var(--panel);
   color: var(--text);
@@ -56,7 +185,7 @@ select {
 
 button#run {
   background: var(--accent);
-  color: #1a1a1a;
+  color: var(--on-accent);
   border: none;
   border-radius: 6px;
   padding: 0.45rem 1rem;
@@ -67,6 +196,22 @@ button#run {
 }
 button#run:hover { background: var(--accent-hover); }
 button#run:active { transform: translateY(1px); }
+
+button.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+button.theme-toggle:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+button.theme-toggle:active { transform: translateY(1px); }
 
 .panes {
   flex: 1;
@@ -104,32 +249,12 @@ button#run:active { transform: translateY(1px); }
   flex: 1;
   min-height: 0;
   overflow: auto;
-  background: var(--panel);
+  background: var(--cm-bg);
 }
 
-/* CodeMirror fills its host, themed for dark mode (basicSetup ships a light
-   theme, so the editor surface and gutter are overridden here). */
-.cm-editor { height: 100%; background: var(--panel); color: var(--text); }
-.cm-editor.cm-focused { outline: none; }
-.cm-scroller { font-family: var(--mono); font-size: 14px; }
-.cm-content { caret-color: var(--accent); }
-.cm-cursor, .cm-dropCursor { border-left-color: var(--accent); }
-
-.cm-gutters {
-  background: var(--panel-header);
-  color: var(--muted);
-  border-right: 1px solid var(--border);
-}
-.cm-lineNumbers .cm-gutterElement { color: var(--muted); }
-.cm-activeLine { background: rgba(255, 255, 255, 0.04); }
-.cm-activeLineGutter { background: rgba(255, 255, 255, 0.06); color: var(--text); }
-
-/* Text selection within the editor */
-.cm-editor .cm-selectionBackground,
-.cm-editor.cm-focused .cm-selectionBackground,
-.cm-content ::selection {
-  background: rgba(255, 122, 89, 0.25);
-}
+/* CodeMirror itself is themed from JS via EditorView.theme(), wired to the
+   same --cm-* custom properties (see editor.js). A real CM theme is required
+   to override its default light theme's high-specificity generated classes. */
 
 .output {
   flex: 1;

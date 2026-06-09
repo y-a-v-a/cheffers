@@ -77,6 +77,29 @@ try {
     assert.equal(status.trim(), "error");
   });
 
+  await step("theme toggle cycles to Cast Iron and darkens the gutter", async () => {
+    const getTheme = () =>
+      page.evaluate(() => document.documentElement.getAttribute("data-theme") || "system");
+    // Cycle (system -> parchment -> cast-iron -> espresso -> ...) until Cast Iron.
+    for (let i = 0; i < 4 && (await getTheme()) !== "cast-iron"; i++) {
+      await page.click("#theme");
+      await page.waitForTimeout(50);
+    }
+    assert.equal(await getTheme(), "cast-iron", "expected Cast Iron after cycling");
+
+    // The original bug: the gutter kept a light background in dark mode.
+    const gutterBg = await page.$eval(
+      ".cm-gutters",
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+    const [r, g, b] = gutterBg.match(/\d+/g).map(Number);
+    assert.ok(r < 80 && g < 80 && b < 80, `gutter background not dark: ${gutterBg}`);
+
+    // Choice is persisted.
+    const saved = await page.evaluate(() => localStorage.getItem("cheffers-theme"));
+    assert.equal(saved, "cast-iron");
+  });
+
   await step("no uncaught console/page errors occurred", async () => {
     assert.deepEqual(consoleErrors, [], `console errors: ${consoleErrors.join("; ")}`);
   });

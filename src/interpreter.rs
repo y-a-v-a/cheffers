@@ -17,8 +17,10 @@ const MAX_LOOP_ITERATIONS: usize = 10_000_000;
 enum InputSource {
     /// Read a line from stdin per `Take` (the spec behavior for the CLI).
     Stdin,
-    /// Pop pre-supplied values (used by tests and embedders without stdin).
-    Buffer(VecDeque<i64>),
+    /// Pop pre-supplied tokens (used by tests and embedders without stdin).
+    /// Tokens are parsed when consumed so a bad value can be reported against
+    /// the ingredient that tried to read it.
+    Buffer(VecDeque<String>),
 }
 
 pub struct Interpreter {
@@ -46,7 +48,15 @@ impl Interpreter {
     /// read, instead of reading stdin. Each `Take` consumes one value; a
     /// `Take` beyond the last value is a runtime error.
     pub fn set_input_values(&mut self, values: Vec<i64>) {
-        self.input = InputSource::Buffer(values.into());
+        self.input = InputSource::Buffer(values.iter().map(i64::to_string).collect());
+    }
+
+    /// Like [`set_input_values`](Self::set_input_values), but takes raw text
+    /// split on whitespace (so both "1 2 3" and one number per line work).
+    /// Tokens are validated when a `Take` consumes them, so a non-numeric
+    /// token is reported against the ingredient that tried to read it.
+    pub fn set_input_text(&mut self, text: &str) {
+        self.input = InputSource::Buffer(text.split_whitespace().map(String::from).collect());
     }
 
     /// Seeds the pseudo-random generator behind `Mix [the bowl] well` so a
@@ -133,12 +143,18 @@ impl Interpreter {
     /// Reads one numeric value for `Take _ingredient_ from refrigerator`.
     fn read_input(&mut self, ingredient: &str) -> RuntimeResult<i64> {
         match &mut self.input {
-            InputSource::Buffer(values) => {
-                values
+            InputSource::Buffer(tokens) => {
+                let token = tokens
                     .pop_front()
                     .ok_or_else(|| RuntimeError::InputUnavailable {
                         ingredient: ingredient.to_string(),
                         reason: "no more input values are available".to_string(),
+                    })?;
+                token
+                    .parse::<i64>()
+                    .map_err(|_| RuntimeError::InputUnavailable {
+                        ingredient: ingredient.to_string(),
+                        reason: format!("'{}' is not a numeric value", token),
                     })
             }
             InputSource::Stdin => {

@@ -5,6 +5,7 @@
 // and the interpreter is the locally-built wasm-bindgen output in ./pkg/.
 
 import { EditorView, basicSetup } from "codemirror";
+import { Compartment } from "@codemirror/state";
 import init, { run_chef } from "./pkg/cheffers_wasm.js";
 import { escapeHtml, ansiToHtml } from "./ansi.js";
 
@@ -49,6 +50,22 @@ Bake the flour. Put salt into the mixing bowl. Add sugar to the mixing bowl. Fol
 Serves 1.
 `,
   },
+  "doubler-delight": {
+    label: "Doubler Delight (input)",
+    source: `Doubler Delight.
+
+A simple dessert that takes any number and doubles it using the magic of addition. Try it with your favorite number!
+
+Ingredients.
+0 g sugar
+
+Method.
+Take sugar from refrigerator. Put sugar into the mixing bowl. Add sugar to the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+    input: "21",
+  },
 };
 
 const DEFAULT_EXAMPLE = "hello-world";
@@ -58,6 +75,8 @@ const statusEl = document.getElementById("status");
 const runBtn = document.getElementById("run");
 const autorunEl = document.getElementById("autorun");
 const examplesEl = document.getElementById("examples");
+const stdinEl = document.getElementById("stdin");
+const wrapEl = document.getElementById("wrap");
 const themeBtn = document.getElementById("theme");
 
 let editor;
@@ -98,6 +117,35 @@ const THEMES = [
   { id: "espresso", label: "Espresso", icon: "☕" },
 ];
 const THEME_STORAGE_KEY = "cheffers-theme";
+const WRAP_STORAGE_KEY = "cheffers-wrap";
+
+// Line wrapping is toggled live by reconfiguring this compartment. Chef
+// methods are traditionally written as one long line, so wrapping is on by
+// default; the choice persists like the theme.
+const wrapCompartment = new Compartment();
+
+function storedWrap() {
+  try {
+    return localStorage.getItem(WRAP_STORAGE_KEY) !== "0";
+  } catch {
+    return true;
+  }
+}
+
+function wrapExtension(enabled) {
+  return enabled ? EditorView.lineWrapping : [];
+}
+
+function applyWrap(enabled) {
+  editor.dispatch({
+    effects: wrapCompartment.reconfigure(wrapExtension(enabled)),
+  });
+  try {
+    localStorage.setItem(WRAP_STORAGE_KEY, enabled ? "1" : "0");
+  } catch {
+    /* storage may be unavailable; the setting still applies this session */
+  }
+}
 
 function storedThemeId() {
   try {
@@ -163,7 +211,9 @@ function runNow() {
   if (!ready) return;
   const source = editor.state.doc.toString();
   try {
-    render(run_chef(source));
+    // The input box stands in for stdin: whitespace-separated numbers, one
+    // consumed per "Take ... from refrigerator" instruction.
+    render(run_chef(source, stdinEl.value));
   } catch (err) {
     outputEl.textContent = "Failed to run interpreter: " + err;
     outputEl.classList.add("error");
@@ -183,6 +233,7 @@ function buildEditor(initialDoc) {
     extensions: [
       basicSetup,
       cookTheme,
+      wrapCompartment.of(wrapExtension(wrapEl.checked)),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) scheduleRun();
       }),
@@ -212,7 +263,9 @@ async function main() {
   themeBtn.addEventListener("click", cycleTheme);
 
   populateExamples();
+  wrapEl.checked = storedWrap();
   buildEditor(EXAMPLES[DEFAULT_EXAMPLE].source);
+  wrapEl.addEventListener("change", () => applyWrap(wrapEl.checked));
 
   setStatus("loading interpreter…");
   await init();
@@ -220,10 +273,12 @@ async function main() {
   setStatus("");
 
   runBtn.addEventListener("click", runNow);
+  stdinEl.addEventListener("input", scheduleRun);
   examplesEl.addEventListener("change", () => {
     const example = EXAMPLES[examplesEl.value];
     if (example) {
       setEditorContent(example.source);
+      stdinEl.value = example.input ?? "";
       runNow();
     }
   });

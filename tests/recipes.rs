@@ -557,3 +557,29 @@ fn canonical_fibonacci_recipe_parses_with_loops() -> TestResult<()> {
     );
     Ok(())
 }
+
+#[test]
+fn input_text_tokens_are_parsed_per_take_with_ingredient_diagnostics() -> TestResult<()> {
+    // set_input_text splits on whitespace, so "40\n2" and "40 2" both work...
+    let source = read_fixture("tests/fixtures/two-number-tart.chef")?;
+    let recipe = parse_recipe(&source)?;
+    let mut interpreter = Interpreter::new();
+    interpreter.set_input_text("40\n2");
+    interpreter.add_recipe(recipe.clone());
+    interpreter.run()?;
+    assert_eq!(interpreter.output(), "42");
+
+    // ...and a non-numeric token is reported against the ingredient whose
+    // Take consumed it (the second one, "berries").
+    let mut interpreter = Interpreter::new();
+    interpreter.set_input_text("40 nope");
+    interpreter.add_recipe(recipe);
+    let error = interpreter.run().expect_err("'nope' is not a number");
+    let message = error.to_string();
+    assert!(
+        message.contains("berries") && message.contains("nope"),
+        "unexpected error: {}",
+        message
+    );
+    Ok(())
+}

@@ -256,6 +256,29 @@ button.theme-toggle:active { transform: translateY(1px); }
    same --cm-* custom properties (see editor.js). A real CM theme is required
    to override its default light theme's high-specificity generated classes. */
 
+.input-header { border-top: 1px solid var(--border); }
+.input-header .hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+}
+
+/* The playground's stand-in for stdin: whitespace-separated numbers consumed
+   one per "Take ... from refrigerator" instruction. */
+.stdin {
+  flex: 0 0 auto;
+  height: 3.2rem;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 0.5rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--cm-bg);
+  color: var(--cm-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 .output {
   flex: 1;
   margin: 0;

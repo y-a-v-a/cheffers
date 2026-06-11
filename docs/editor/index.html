@@ -33,6 +33,10 @@
         <input type="checkbox" id="autorun" checked />
         Auto-run
       </label>
+      <label class="wrap">
+        <input type="checkbox" id="wrap" checked />
+        Wrap
+      </label>
       <button id="run" type="button">Run ▶</button>
       <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
     </div>
@@ -42,6 +46,13 @@
     <section class="pane editor-pane">
       <div class="pane-header">Recipe</div>
       <div id="editor" class="editor-host"></div>
+      <div class="pane-header input-header">
+        Input
+        <span class="hint">numbers for “Take … from refrigerator”</span>
+      </div>
+      <textarea id="stdin" class="stdin" rows="2" spellcheck="false"
+                aria-label="Input values for Take instructions"
+                placeholder="One number per Take instruction, e.g. 21"></textarea>
     </section>
     <section class="pane output-pane">
       <div class="pane-header">

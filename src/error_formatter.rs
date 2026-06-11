@@ -178,7 +178,9 @@ impl ErrorFormatter {
             "  {}\n",
             colorize("suggestion:", Colors::CYAN, true)
         ));
-        output.push_str("  Provide one number per 'Take' instruction on standard input:\n\n");
+        output
+            .push_str("  Provide one number per 'Take' instruction — on standard input for the\n");
+        output.push_str("  CLI, or in the Input panel of the web playground:\n\n");
         output.push_str("    echo \"42\" | cheffers recipe.chef\n");
 
         output

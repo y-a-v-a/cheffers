@@ -59,6 +59,35 @@ try {
     );
   });
 
+  await step("the Doubler example reads its prefilled input and outputs '42'", async () => {
+    await page.selectOption("#examples", "doubler-delight");
+    await page.waitForFunction(
+      () => document.getElementById("output")?.textContent.trim() === "42",
+      { timeout: 10000 },
+    );
+    const stdin = await page.inputValue("#stdin");
+    assert.equal(stdin, "21", "selecting the example should prefill its input");
+  });
+
+  await step("editing the input re-runs the recipe", async () => {
+    await page.fill("#stdin", "100");
+    await page.waitForFunction(
+      () => document.getElementById("output")?.textContent.trim() === "200",
+      { timeout: 10000 },
+    );
+  });
+
+  await step("clearing the input surfaces the cannot-read-input error", async () => {
+    await page.fill("#stdin", "");
+    await page.waitForFunction(
+      () => {
+        const o = document.getElementById("output");
+        return o?.classList.contains("error") && o.textContent.includes("cannot read input");
+      },
+      { timeout: 10000 },
+    );
+  });
+
   await step("an invalid recipe renders a colored, escaped error", async () => {
     await page.locator(".cm-content").click();
     await page.keyboard.press("ControlOrMeta+A");

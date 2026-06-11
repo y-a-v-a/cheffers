@@ -102,18 +102,29 @@ function passStringToWasm0(arg, malloc, realloc) {
     WASM_VECTOR_LEN = offset;
     return ptr;
 }
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
 /**
  * Parses and runs a Chef recipe, returning `{ ok, output, error }`.
+ *
+ * `input` supplies the numbers consumed by `Take _ingredient_ from
+ * refrigerator`, whitespace-separated (there is no stdin in the browser).
+ * Omitting it is fine for recipes that take no input.
  *
  * This never throws: parse and runtime failures are reported through the
  * `error` field so the caller can render them however it likes.
  * @param {string} source
+ * @param {string | null} [input]
  * @returns {any}
  */
-export function run_chef(source) {
+export function run_chef(source, input) {
     const ptr0 = passStringToWasm0(source, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.run_chef(ptr0, len0);
+    var ptr1 = isLikeNone(input) ? 0 : passStringToWasm0(input, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
+    var len1 = WASM_VECTOR_LEN;
+    const ret = wasm.run_chef(ptr0, len0, ptr1, len1);
     return takeObject(ret);
 }
 

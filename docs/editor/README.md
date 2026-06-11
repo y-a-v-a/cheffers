@@ -8,7 +8,8 @@ Live at: <https://y-a-v-a.github.io/cheffers/editor/>
 ## How it works
 
 - `crates/cheffers-wasm` wraps the `cheffers` library with a single
-  `run_chef(source)` binding (parse + interpret, returns `{ ok, output, error }`).
+  `run_chef(source, input?)` binding (parse + interpret, returns `{ ok, output, error }`;
+  `input` is optional whitespace-separated numbers for `Take ... from refrigerator`).
 - `wasm-bindgen` generates the JS glue + `.wasm` into `pkg/`.
 - `editor.js` wires a [CodeMirror 6](https://codemirror.net/) editor to the
   interpreter with debounced auto-run. It is bundled (with CodeMirror) into the

@@ -7,8 +7,12 @@
 //! ```js
 //! import init, { run_chef } from "./pkg/cheffers_wasm.js";
 //! await init();
-//! const { ok, output, error } = run_chef(source);
+//! const { ok, output, error } = run_chef(source, input);
 //! ```
+//!
+//! `input` is optional whitespace-separated numbers consumed one per
+//! `Take _ingredient_ from refrigerator` instruction (the playground's
+//! stand-in for stdin).
 //!
 //! Errors reuse the same [`ErrorFormatter`] the CLI uses, so the web editor
 //! shows the exact same rich, spec-referenced diagnostics.
@@ -33,17 +37,21 @@ struct RunResult {
 
 /// Parses and runs a Chef recipe, returning `{ ok, output, error }`.
 ///
+/// `input` supplies the numbers consumed by `Take _ingredient_ from
+/// refrigerator`, whitespace-separated (there is no stdin in the browser).
+/// Omitting it is fine for recipes that take no input.
+///
 /// This never throws: parse and runtime failures are reported through the
 /// `error` field so the caller can render them however it likes.
 #[wasm_bindgen]
-pub fn run_chef(source: &str) -> JsValue {
-    let result = execute(source);
+pub fn run_chef(source: &str, input: Option<String>) -> JsValue {
+    let result = execute(source, input.as_deref());
     // Serializing a small, owned struct cannot realistically fail; fall back
     // to null so the binding still never throws.
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-fn execute(source: &str) -> RunResult {
+fn execute(source: &str, input: Option<&str>) -> RunResult {
     let recipe = match Parser::new(source).parse_recipe() {
         Ok(recipe) => recipe,
         Err(error) => {
@@ -56,6 +64,9 @@ fn execute(source: &str) -> RunResult {
     };
 
     let mut interpreter = Interpreter::new();
+    // There is no stdin in the browser: always run from a buffer, so a `Take`
+    // without input reports "no more input values" instead of a stdin error.
+    interpreter.set_input_text(input.unwrap_or(""));
     interpreter.add_recipe(recipe);
 
     match interpreter.run() {
@@ -95,7 +106,7 @@ mod tests {
 
     #[test]
     fn valid_recipe_reports_success_and_output() {
-        let result = execute(HELLO_WORLD);
+        let result = execute(HELLO_WORLD, None);
         assert!(result.ok, "expected success, got error: {}", result.error);
         assert_eq!(result.output, "Hello world!");
         assert!(result.error.is_empty());
@@ -108,14 +119,14 @@ mod tests {
         let recipe = "Number Nibble.\n\nIngredients.\n42 g answer\n\n\
             Method.\nPut answer into the mixing bowl. \
             Pour contents of the mixing bowl into the baking dish.\n\nServes 1.\n";
-        let result = execute(recipe);
+        let result = execute(recipe, None);
         assert!(result.ok, "expected success, got error: {}", result.error);
         assert_eq!(result.output, "42");
     }
 
     #[test]
     fn parse_error_reports_failure_with_message() {
-        let result = execute("Totally not a recipe");
+        let result = execute("Totally not a recipe", None);
         assert!(!result.ok);
         assert!(result.output.is_empty());
         assert!(
@@ -130,7 +141,7 @@ mod tests {
         // "pepper" is never declared as an ingredient.
         let recipe = "Bad Soup.\n\nIngredients.\n1 g salt\n\n\
             Method.\nPut pepper into the mixing bowl.\n\nServes 1.\n";
-        let result = execute(recipe);
+        let result = execute(recipe, None);
         assert!(!result.ok);
         assert!(
             result.error.contains("undefined ingredient"),
@@ -139,9 +150,48 @@ mod tests {
         );
     }
 
+    const DOUBLER: &str = "Doubler Delight.\n\nIngredients.\n0 g sugar\n\n\
+        Method.\nTake sugar from refrigerator. Put sugar into the mixing bowl. \
+        Add sugar to the mixing bowl. \
+        Pour contents of the mixing bowl into the baking dish.\n\nServes 1.\n";
+
+    #[test]
+    fn input_values_are_consumed_by_take() {
+        let result = execute(DOUBLER, Some("21"));
+        assert!(result.ok, "expected success, got error: {}", result.error);
+        assert_eq!(result.output, "42");
+    }
+
+    #[test]
+    fn missing_input_reports_a_helpful_error() {
+        let result = execute(DOUBLER, None);
+        assert!(!result.ok);
+        assert!(
+            result.error.contains("cannot read input"),
+            "unexpected error text: {}",
+            result.error
+        );
+        assert!(
+            result.error.contains("Input panel"),
+            "the playground error should point at the Input panel: {}",
+            result.error
+        );
+    }
+
+    #[test]
+    fn non_numeric_input_token_reports_the_ingredient() {
+        let result = execute(DOUBLER, Some("nope"));
+        assert!(!result.ok);
+        assert!(
+            result.error.contains("sugar") && result.error.contains("nope"),
+            "unexpected error text: {}",
+            result.error
+        );
+    }
+
     #[test]
     fn empty_source_is_a_handled_error_not_a_panic() {
-        let result = execute("");
+        let result = execute("", None);
         assert!(!result.ok);
         assert!(!result.error.is_empty());
     }

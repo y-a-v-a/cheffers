@@ -49,6 +49,22 @@ Bake the flour. Put salt into the mixing bowl. Add sugar to the mixing bowl. Fol
 Serves 1.
 `,
   },
+  "doubler-delight": {
+    label: "Doubler Delight (input)",
+    source: `Doubler Delight.
+
+A simple dessert that takes any number and doubles it using the magic of addition. Try it with your favorite number!
+
+Ingredients.
+0 g sugar
+
+Method.
+Take sugar from refrigerator. Put sugar into the mixing bowl. Add sugar to the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+    input: "21",
+  },
 };
 
 const DEFAULT_EXAMPLE = "hello-world";
@@ -58,6 +74,7 @@ const statusEl = document.getElementById("status");
 const runBtn = document.getElementById("run");
 const autorunEl = document.getElementById("autorun");
 const examplesEl = document.getElementById("examples");
+const stdinEl = document.getElementById("stdin");
 const themeBtn = document.getElementById("theme");
 
 let editor;
@@ -163,7 +180,9 @@ function runNow() {
   if (!ready) return;
   const source = editor.state.doc.toString();
   try {
-    render(run_chef(source));
+    // The input box stands in for stdin: whitespace-separated numbers, one
+    // consumed per "Take ... from refrigerator" instruction.
+    render(run_chef(source, stdinEl.value));
   } catch (err) {
     outputEl.textContent = "Failed to run interpreter: " + err;
     outputEl.classList.add("error");
@@ -220,10 +239,12 @@ async function main() {
   setStatus("");
 
   runBtn.addEventListener("click", runNow);
+  stdinEl.addEventListener("input", scheduleRun);
   examplesEl.addEventListener("change", () => {
     const example = EXAMPLES[examplesEl.value];
     if (example) {
       setEditorContent(example.source);
+      stdinEl.value = example.input ?? "";
       runNow();
     }
   });

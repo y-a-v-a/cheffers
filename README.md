@@ -18,6 +18,10 @@ with the **[Cheffers Playground](https://y-a-v-a.github.io/cheffers/editor/)** â
 JsBin-style editor with instant evaluation, powered by this interpreter compiled to
 WebAssembly. It runs entirely client-side; nothing is sent to a server.
 
+Recipes that read input with `Take _ingredient_ from refrigerator` get their
+numbers from the playground's **Input panel** (the browser's stand-in for stdin) â€”
+whitespace-separated, one consumed per `Take`.
+
 The playground lives in `docs/editor/` and is built from the `cheffers-wasm` crate.
 See `docs/editor/README.md` for how to rebuild it.
 
@@ -78,7 +82,8 @@ these documented choices where the spec is silent or impractical:
   instead of hanging the CLI or the browser.
 - **Auxiliary recipe calls** are limited to a depth of 64.
 - Embedders without stdin (tests, wasm) can supply `Take` input with
-  `Interpreter::set_input_values`.
+  `Interpreter::set_input_values` or `Interpreter::set_input_text`; the web
+  playground passes its Input panel through `run_chef(source, input)`.
 
 ### Development Environment (Tmux)
 

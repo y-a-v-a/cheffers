@@ -22,7 +22,11 @@ struct RunResult {
 }
 
 fn run(source: &str) -> RunResult {
-    serde_wasm_bindgen::from_value(run_chef(source)).expect("run_chef must return an object")
+    run_with_input(source, None)
+}
+
+fn run_with_input(source: &str, input: Option<String>) -> RunResult {
+    serde_wasm_bindgen::from_value(run_chef(source, input)).expect("run_chef must return an object")
 }
 
 const HELLO_WORLD: &str = "Hello World Souffle.\n\nIngredients.\n\
@@ -67,4 +71,23 @@ fn binding_never_throws_on_garbage_input() {
     let result = run("\0\u{1}\u{2} not even close to a recipe \u{fffd}");
     assert!(!result.ok);
     assert!(!result.error.is_empty());
+}
+
+const DOUBLER: &str = "Doubler Delight.\n\nIngredients.\n0 g sugar\n\n\
+    Method.\nTake sugar from refrigerator. Put sugar into the mixing bowl. \
+    Add sugar to the mixing bowl. \
+    Pour contents of the mixing bowl into the baking dish.\n\nServes 1.\n";
+
+#[wasm_bindgen_test]
+fn input_round_trips_through_the_binding() {
+    let result = run_with_input(DOUBLER, Some("21".to_string()));
+    assert!(result.ok, "expected success, got error: {}", result.error);
+    assert_eq!(result.output, "42");
+}
+
+#[wasm_bindgen_test]
+fn take_without_input_reports_an_error_object() {
+    let result = run(DOUBLER);
+    assert!(!result.ok);
+    assert!(result.error.contains("cannot read input"));
 }

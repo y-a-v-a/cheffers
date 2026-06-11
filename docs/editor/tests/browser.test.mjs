@@ -88,6 +88,24 @@ try {
     );
   });
 
+  await step("the Wrap toggle switches CodeMirror line wrapping", async () => {
+    // Wrapping is on by default (Chef methods are one long line).
+    const content = page.locator(".cm-content");
+    assert.match(await content.getAttribute("class"), /cm-lineWrapping/);
+
+    await page.uncheck("#wrap");
+    await page.waitForFunction(
+      () => !document.querySelector(".cm-content")?.classList.contains("cm-lineWrapping"),
+      { timeout: 5000 },
+    );
+
+    await page.check("#wrap");
+    await page.waitForFunction(
+      () => document.querySelector(".cm-content")?.classList.contains("cm-lineWrapping"),
+      { timeout: 5000 },
+    );
+  });
+
   await step("an invalid recipe renders a colored, escaped error", async () => {
     await page.locator(".cm-content").click();
     await page.keyboard.press("ControlOrMeta+A");

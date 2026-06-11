@@ -167,6 +167,10 @@ The project uses GitHub Actions to automatically:
 
 All checks run on every push and pull request.
 
+## Credits
+
+Created by [Vincent Bruijn](https://www.vincentbruijn.nl).
+
 ## License
 
 This project is licensed under the WTFPL (Do What The Fuck You Want To Public License). See the `LICENSE` file for details.

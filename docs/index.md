@@ -65,7 +65,7 @@ cheffers tests/fixtures/fibonacci.chef
 
 - **GitHub Repository:** [y-a-v-a/cheffers](https://github.com/y-a-v-a/cheffers)
 - **Version:** 0.2.0
-- **License:** WTFPL (Do What The Fuck You Want To Public License)
+- **License:** MIT
 - **Language:** Rust (2021 edition)
 
 ## Contributing

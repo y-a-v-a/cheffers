@@ -18,6 +18,8 @@ with the **[Cheffers Playground](https://y-a-v-a.github.io/cheffers/editor/)** â
 JsBin-style editor with instant evaluation, powered by this interpreter compiled to
 WebAssembly. It runs entirely client-side; nothing is sent to a server.
 
+![Cheffers Playground showing the Hello World example running in the browser](docs/editor/playground.png)
+
 Recipes that read input with `Take _ingredient_ from refrigerator` get their
 numbers from the playground's **Input panel** (the browser's stand-in for stdin) â€”
 whitespace-separated, one consumed per `Take`.

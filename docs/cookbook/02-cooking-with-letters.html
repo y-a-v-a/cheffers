@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Two: Cooking with Letters — The Cheffers Cookbook</title>
+  <meta name="description" content="How Chef turns numbers into text: dry vs. liquid ingredients, the Liquefy instruction, character codes, and the mixing bowl as a stack." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course two</p>
+      <h1>Cooking with Letters</h1>
+      <p class="tagline">On the menu: how numbers become text, and why the mixing bowl is really a pile of plates.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p>Dry vs. liquid ingredients · character codes · <code>Liquefy</code> · stack order (last in, first out).</p>
+      </div>
+
+      <h2>Numbers wearing costumes</h2>
+      <p>
+        Chef only knows numbers. So how did anyone ever write “Hello world” in it? Simple:
+        every character you can type has an agreed-upon number, its <strong>Unicode code</strong>.
+        Capital <code>A</code> is 65, <code>B</code> is 66, and so on. The letters we need
+        tonight:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Character</th><td><code>Y</code></td><td><code>U</code></td><td><code>M</code></td><td><code>!</code></td></tr>
+          <tr><th>Code</th><td>89</td><td>85</td><td>77</td><td>33</td></tr>
+        </table>
+      </div>
+      <p>
+        Whether a value prints as a <em>number</em> or as a <em>character</em> depends on one
+        thing: is the ingredient <strong>dry</strong> or <strong>liquid</strong>? Dry
+        ingredients print as plain numbers. Liquid ingredients print as characters. An 89 in a
+        bag is just “89”; melt it, and it pours out as a <code>Y</code>.
+      </p>
+
+      <h2>Dry goods and liquids</h2>
+      <p>The measure you write next to an ingredient decides its state:</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Measure</th><th>State</th><th>Prints as</th></tr>
+          <tr><td><code>g</code>, <code>kg</code>, <code>pinch(es)</code></td><td>always dry</td><td>a number</td></tr>
+          <tr><td><code>ml</code>, <code>l</code>, <code>dash(es)</code></td><td>always liquid</td><td>a character</td></tr>
+          <tr><td><code>cup(s)</code>, <code>teaspoon(s)</code>, <code>tablespoon(s)</code></td><td>could be either</td><td>a number, until liquefied</td></tr>
+        </table>
+      </div>
+      <p>
+        You can also write <code>heaped</code> or <code>level</code> before a measure
+        (“3 heaped tablespoons cocoa”) to insist it's dry. And if an ingredient starts dry,
+        it isn't stuck that way — that's what tonight's key instruction is for:
+      </p>
+      <ul>
+        <li><code>Liquefy the sugar.</code> — melts one ingredient, so it prints as a character from now on.</li>
+        <li><code>Liquefy contents of the mixing bowl.</code> — melts everything currently in the bowl in one go. Very efficient. Very dramatic.</li>
+      </ul>
+
+      <h2>The pile of plates</h2>
+      <p>
+        Now for the single most important idea in Chef. The mixing bowl is a
+        <strong>stack</strong>: things pile up in it like plates in a cupboard. You can only
+        put a new plate <em>on top</em>, and you can only take a plate <em>off the top</em>.
+        Programmers call this <em>last in, first out</em>; in the kitchen it's just how plates
+        work.
+      </p>
+      <p>
+        When you <code>Serve</code>, the baking dish is emptied <em>from the top</em>. So the
+        last character you put in is the <em>first</em> one printed — which means you build
+        your message <strong>backwards</strong>, like stacking plates you'll unstack later.
+        To print <code>YUM!</code>, the <code>!</code> goes in first and the <code>Y</code>
+        goes in last.
+      </p>
+
+      <h2>Tonight's recipe: Alphabet Soup</h2>
+      <p>
+        Note the ingredient names: yams, ugli fruit, macaroni. The names are pure decoration —
+        only the numbers matter — but a good chef picks names that spell out the plan.
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Alphabet Soup">
+        <div class="recipe-card-header">
+          <span>Alphabet Soup · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Alphabet Soup.
+
+A light starter that spells out exactly how it tastes. Remember: the last letter into the bowl is the first one onto the plate.
+
+Ingredients.
+89 g yams
+85 g ugli fruit
+77 g macaroni
+33 g peppercorns
+
+Method.
+Put peppercorns into the mixing bowl. Put macaroni into the mixing bowl. Put ugli fruit into the mixing bowl. Put yams into the mixing bowl. Liquefy contents of the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>YUM!</pre>
+      </div>
+
+      <h2>Watching the bowl fill up</h2>
+      <p>
+        Four <code>Put</code>s, in reverse order of the message. Here's the bowl after the
+        last one — read it top-down and you can already see dinner:
+      </p>
+
+      <div class="bowls" aria-hidden="true">
+        <div class="bowl">
+          <div class="stack">
+            <div class="item top">89 → Y</div>
+            <div class="item">85 → U</div>
+            <div class="item">77 → M</div>
+            <div class="item">33 → !</div>
+          </div>
+          <div class="bowl-label">mixing bowl (top plate first)</div>
+        </div>
+      </div>
+
+      <p>
+        Then <code>Liquefy contents of the mixing bowl.</code> melts all four values so they'll
+        print as characters, <code>Pour</code> moves the pile to the baking dish (order intact),
+        and <code>Serves 1.</code> lifts the plates off one by one: <code>Y</code>, <code>U</code>,
+        <code>M</code>, <code>!</code>.
+      </p>
+
+      <div class="callout">
+        <span class="callout-title">The most famous Chef program</span>
+        <p>
+          The playground's example menu includes <em>Hello World Souffle</em>, the original
+          showpiece recipe by Chef's inventor. Load it and check the ingredient list: 72 g
+          haricot beans is <code>H</code>, 101 eggs is <code>e</code>… the entire message is
+          hiding in the pantry. You can now read it like a pro.
+        </p>
+      </div>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Delete the <code>Liquefy</code> sentence and run it. You'll get
+            <code>89857733</code> — the same values, still dry, printed as numbers with no
+            spaces. Costume off.</li>
+          <li>Make the soup say <code>WOW!</code> instead (you'll need 87 for <code>W</code>
+            and 79 for <code>O</code> — and remember: last in, first out).</li>
+          <li>Spell your own initials. Uppercase letters run from 65 (<code>A</code>) to 90
+            (<code>Z</code>); lowercase from 97 to 122; a space is 32.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./01-your-first-dish.html">
+        <span class="nav-label">Course one</span>
+        ← Your First Dish
+      </a>
+      <a class="nav-next" href="./03-kitchen-math.html">
+        <span class="nav-label">Course three</span>
+        Kitchen Math →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

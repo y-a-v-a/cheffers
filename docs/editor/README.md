@@ -16,6 +16,10 @@ Live at: <https://y-a-v-a.github.io/cheffers/editor/>
   committed `editor.bundle.js` so the page has no runtime CDN dependency.
 - Errors reuse the interpreter's rich, ANSI-colored diagnostics, converted to
   safe HTML for display.
+- A recipe can be handed over in the URL fragment as
+  `#recipe=<base64url JSON {c: source, i: input}>` — this is how the
+  [cookbook](../cookbook/)'s "Open in playground" links work (encoder in
+  `../cookbook/cookbook.js`, decoder in `editor.js`).
 
 ## Building
 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Four: Raiding the Refrigerator — The Cheffers Cookbook</title>
+  <meta name="description" content="Reading input in Chef with Take … from refrigerator: the playground's Input panel, valueless ingredients, and a Celsius-to-Fahrenheit converter." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course four</p>
+      <h1>Raiding the Refrigerator</h1>
+      <p class="tagline">On the menu: recipes that ask for input — the same program, a different dinner every time.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p><code>Take … from refrigerator</code> · the playground's Input panel · ingredients declared without a value.</p>
+      </div>
+
+      <h2>The refrigerator is the outside world</h2>
+      <p>
+        So far, every number was baked into the recipe. But real programs take
+        <strong>input</strong>: a game asks for your name, a calculator asks for numbers. In
+        Chef, input lives in the refrigerator:
+      </p>
+      <pre class="snippet">Take porridge from refrigerator.</pre>
+      <p>
+        This pauses the recipe, reads <em>one number</em> from the input, and stores it in the
+        ingredient — overwriting whatever was there. Each <code>Take</code> consumes one number.
+        In the playground, the numbers come from the <strong>Input panel</strong> below the
+        editor (separate several with spaces); on a command line they come from whatever you
+        type or pipe in.
+      </p>
+      <p>
+        And here's a neat trick with the ingredient list: an ingredient may be declared with
+        <em>no number at all</em>. That's perfect for input — the refrigerator will fill it in.
+        Just don't try to <em>use</em> an empty ingredient before filling it, or the recipe
+        fails on the spot (an empty bag pours nothing).
+      </p>
+
+      <h2>Tonight's recipe: Porridge Weather Report</h2>
+      <p>
+        Your grandparents abroad still think in Fahrenheit. This recipe takes the morning
+        temperature in Celsius from the refrigerator and serves it back converted:
+        <em>F = C × 9 ÷ 5 + 32</em>. All course-three math — just with an ingredient the
+        recipe doesn't know yet.
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Porridge Weather Report" data-input="20">
+        <div class="recipe-card-header">
+          <span>Porridge Weather Report · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Porridge Weather Report.
+
+Takes a temperature in Celsius from the refrigerator and serves it back in Fahrenheit, for grandparents abroad. Multiply before you divide, or the crumbs get lost.
+
+Ingredients.
+porridge
+9 g ginger
+5 g sea salt
+32 g maple syrup
+
+Method.
+Take porridge from refrigerator. Put porridge into the mixing bowl. Combine ginger into the mixing bowl. Divide sea salt into the mixing bowl. Add maple syrup to the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box input-box">
+        <div class="output-label">Input panel</div>
+        <pre>20</pre>
+      </div>
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>68</pre>
+      </div>
+
+      <p>Follow the top of the bowl with input <code>20</code>:</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>Top of bowl</th><th>Meaning</th></tr>
+          <tr><td><code>Take porridge…</code></td><td>—</td><td>porridge = 20 (from the fridge)</td></tr>
+          <tr><td><code>Put porridge…</code></td><td>20</td><td>into the bowl it goes</td></tr>
+          <tr><td><code>Combine ginger…</code></td><td>180</td><td>× 9</td></tr>
+          <tr><td><code>Divide sea salt…</code></td><td>36</td><td>÷ 5</td></tr>
+          <tr><td><code>Add maple syrup…</code></td><td>68</td><td>+ 32 — degrees Fahrenheit</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">Multiply before you divide</span>
+        <p>
+          Remember, Chef drops fractions (course three). Try 21&nbsp;°C: multiply first and you
+          get 21 × 9 = 189, ÷ 5 = 37, + 32 = <strong>69&nbsp;°F</strong> — correct. Divide
+          first and you get 21 ÷ 5 = 4 (ouch), × 9 = 36, + 32 = 68. Same ingredients, sloppier
+          technique, wrong dinner. When division is involved, save it for as late as you can.
+        </p>
+      </div>
+
+      <h2>Taking letters from the fridge</h2>
+      <p>
+        The refrigerator only hands out numbers — but you already know that characters
+        <em>are</em> numbers in costume. Declare a liquid ingredient with no value, fill it
+        from the fridge, and the number you type comes out dressed as a character:
+      </p>
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Mystery Ink" data-input="66">
+        <div class="recipe-card-header">
+          <span>Mystery Ink · bonus recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Mystery Ink.
+
+Type a character code into the Input panel and see who comes out of the fridge.
+
+Ingredients.
+ml ink
+
+Method.
+Take ink from refrigerator. Put ink into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+      <p>Type <code>66</code> into the Input panel and this prints <code>B</code>.</p>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Feed the weather report 25, then 100 (that's boiling water: 212&nbsp;°F), then
+            <strong>−40</strong>. Minus forty is the one temperature where both scales agree —
+            the recipe prints −40 right back.</li>
+          <li>Clear the Input panel and run it. The recipe stops with an error the moment
+            <code>Take</code> finds the fridge empty. Good to see once, calmly, on purpose.</li>
+          <li>Write the reverse recipe, Fahrenheit to Celsius: <em>C = (F − 32) × 5 ÷ 9</em>.
+            You have all the ingredients already — <code>Remove</code> first, then
+            <code>Combine</code>, then <code>Divide</code>.</li>
+          <li>Two <code>Take</code>s, one <code>Add</code>: a recipe that reads two numbers
+            (put both in the Input panel, separated by a space) and serves their sum.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./03-kitchen-math.html">
+        <span class="nav-label">Course three</span>
+        ← Kitchen Math
+      </a>
+      <a class="nav-next" href="./05-stir-until-done.html">
+        <span class="nav-label">Course five</span>
+        Stir Until Done →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

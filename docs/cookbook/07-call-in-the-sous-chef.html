@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Seven: Call In the Sous-Chef — The Cheffers Cookbook</title>
+  <meta name="description" content="Auxiliary recipes are Chef's functions: Serve with, copied bowls, the first-bowl handoff, Refrigerate, and a graduation dish that computes the golden ratio." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course seven</p>
+      <h1>Call In the Sous-Chef</h1>
+      <p class="tagline">On the menu: auxiliary recipes — Chef's functions — and your graduation dish.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p>Auxiliary recipes · <code>Serve with …</code> · the first-bowl handoff · <code>Refrigerate</code> · the plating pattern.</p>
+      </div>
+
+      <h2>No chef cooks alone</h2>
+      <p>
+        Once recipes get ambitious, you want helpers: a sauce recipe you can call whenever a
+        dish needs sauce. Programmers call these <em>functions</em>. Chef calls them
+        <strong>auxiliary recipes</strong> — complete little recipes (title, ingredients,
+        method) written <em>below</em> the main one, made on demand by a sous-chef. You call
+        one with a single sentence in your method:
+      </p>
+      <pre class="snippet">Serve with secret sauce.</pre>
+      <p>The head chef pauses, the sous-chef cooks, the head chef continues. Three house rules govern the handoff:</p>
+      <ol>
+        <li><strong>The sous-chef works on photocopies.</strong> They start with an exact copy
+          of all your mixing bowls and baking dishes. Whatever they smash, spill or shuffle at
+          their own station never touches yours.</li>
+        <li><strong>They can't see your pantry.</strong> An auxiliary recipe has its own
+          ingredient list; your ingredient names mean nothing to it. The only things it
+          receives are the values sitting in the copied bowls.</li>
+        <li><strong>They hand back one bowl.</strong> When the sous-chef finishes, the contents
+          of <em>their first mixing bowl</em> are poured on top of <em>your first mixing
+          bowl</em>. That's the entire delivery: whatever they want you to have, they leave in
+          bowl one.</li>
+      </ol>
+      <p>
+        One more staff instruction: <code>Refrigerate.</code> ends a recipe on the spot — in an
+        auxiliary recipe it means “done early, hand back my first bowl now.” (The variant
+        <code>Refrigerate for 2 hours.</code> also prints the first 2 baking dishes before
+        stopping — an early <code>Serves</code> with a dramatic exit.)
+      </p>
+
+      <h2>Tonight's recipe: Squared Milkshake</h2>
+      <p>
+        A milkshake so rich it multiplies. The head chef takes a number from the refrigerator
+        and puts it in the bowl; the sous-chef squares whatever's on top; the head chef plates
+        it. Watch how little the main method knows about <em>how</em> the sauce is made — that's
+        the whole point of functions.
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Squared Milkshake" data-input="7">
+        <div class="recipe-card-header">
+          <span>Squared Milkshake · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Squared Milkshake.
+
+Takes any number from the refrigerator and serves it multiplied by itself. The head chef does none of the real work: a sous-chef prepares the secret sauce.
+
+Ingredients.
+radishes
+
+Method.
+Take radishes from refrigerator. Put radishes into the mixing bowl. Serve with secret sauce. Fold radishes into the mixing bowl. Clean the mixing bowl. Put radishes into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+
+Secret Sauce.
+
+Ingredients.
+essence
+
+Method.
+Fold essence into the mixing bowl. Clean the mixing bowl. Put essence into the mixing bowl. Combine essence into the mixing bowl.</code></pre>
+      </figure>
+
+      <div class="output-box input-box">
+        <div class="output-label">Input panel</div>
+        <pre>7</pre>
+      </div>
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>49</pre>
+      </div>
+
+      <h2>Shift report, station by station</h2>
+      <p>With input 7:</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Station</th><th>Action</th><th>Bowls</th></tr>
+          <tr><td>Head chef</td><td><code>Take</code>, <code>Put</code></td><td>main bowl: [7]</td></tr>
+          <tr><td>— call —</td><td><code>Serve with secret sauce.</code></td><td>sous-chef's copy: [7]</td></tr>
+          <tr><td>Sous-chef</td><td><code>Fold essence</code> — scoops the 7 into <code>essence</code></td><td>copy: [ ]</td></tr>
+          <tr><td>Sous-chef</td><td><code>Clean</code>, <code>Put essence</code>, <code>Combine essence</code> — 7 × 7</td><td>copy: [49]</td></tr>
+          <tr><td>— handoff —</td><td>sous-chef's bowl one lands on top of the head chef's</td><td>main bowl: [7, 49]</td></tr>
+          <tr><td>Head chef</td><td><code>Fold radishes</code>, <code>Clean</code>, <code>Put radishes</code></td><td>main bowl: [49]</td></tr>
+          <tr><td>Head chef</td><td><code>Pour</code>, <code>Serves 1.</code></td><td>prints 49</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">The plating pattern</span>
+        <p>
+          Spot the three-step both chefs used: <code>Fold</code> the value you care about out
+          of the bowl, <code>Clean</code> away the leftovers, <code>Put</code> the value back.
+          It's how a Chef program says “keep only the result.” Without it, the head chef's bowl
+          still holds the original 7 under the 49, and dinner would print as
+          <code>497</code> — the handoff <em>stacks onto</em> your bowl, it doesn't replace it.
+        </p>
+      </div>
+
+      <p>
+        And because auxiliary recipes are full recipes, they can call other auxiliary recipes —
+        including <em>themselves</em>. That's recursion, and it's exactly how the most famous
+        Chef program, <em>Fibonacci Numbers with Caramel Sauce</em>, gets an awful lot of
+        caramel made. (Cheffers lets sous-chefs stack 64 deep before it declares the kitchen
+        overstaffed.)
+      </p>
+
+      <h2>Your graduation dish 🎓</h2>
+      <p>
+        You've now tasted the entire language — every course from <code>Put</code> to
+        <code>Serve with</code>. To prove it, here is a dish written with everything you know:
+        it approximates the <strong>golden ratio</strong> φ ≈ 1.618 using Fibonacci numbers and
+        integer-only math, then fakes the decimal point by melting a
+        <code>46 g</code> ingredient (46 is the character code for “.”). Read it slowly —
+        you can now decode every single sentence:
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Golden Ratio Biscotti">
+        <div class="recipe-card-header">
+          <span>Golden Ratio Biscotti · graduation dish</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Golden Ratio Biscotti.
+
+Approximates the golden ratio as "1.6180" using Fibonacci and fixed-point math (times 10,000). Integer-only; no external input.
+
+Ingredients.
+0 g almonds
+1 g butter
+25 g eggs
+10000 g flour
+0 g honey
+0 g chocolate
+0 g sprinkles
+0 g vanilla
+46 g chocolate chips
+
+Method.
+Beat the eggs.
+Clean the mixing bowl.
+Put almonds into the mixing bowl.
+Add butter to the mixing bowl.
+Fold honey into the mixing bowl.
+Put butter into the mixing bowl.
+Fold almonds into the mixing bowl.
+Put honey into the mixing bowl.
+Fold butter into the mixing bowl.
+Beat the eggs until beaten.
+Clean the mixing bowl.
+Put butter into the mixing bowl.
+Combine flour into the mixing bowl.
+Divide almonds into the mixing bowl.
+Fold chocolate into the mixing bowl.
+Put chocolate into the mixing bowl.
+Divide flour into the mixing bowl.
+Fold sprinkles into the mixing bowl.
+Put sprinkles into the mixing bowl.
+Combine flour into the mixing bowl.
+Fold honey into the mixing bowl.
+Put chocolate into the mixing bowl.
+Remove honey from the mixing bowl.
+Fold vanilla into the mixing bowl.
+Liquefy chocolate chips.
+Clean the mixing bowl.
+Put vanilla into the mixing bowl.
+Put chocolate chips into the mixing bowl.
+Put sprinkles into the mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>1.6180</pre>
+      </div>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>In Squared Milkshake, remove the head chef's <code>Fold</code>/<code>Clean</code>/<code>Put</code>
+            and confirm you get <code>497</code>. Then put the plating pattern back.</li>
+          <li>Promote the sous-chef: change Secret Sauce to <em>cube</em> the number instead
+            (one extra <code>Combine</code>).</li>
+          <li>Write a second auxiliary recipe — “whipped cream” that doubles — and serve the
+            milkshake with both sauces in a row. Predict the result for input 3 before running
+            it. (Squared then doubled ≠ doubled then squared!)</li>
+          <li>Decode the Biscotti's opening loop: which classic recipe from course five's family
+            is <code>Beat the eggs.</code> … <code>Beat the eggs until beaten.</code> hiding?
+            Follow <code>almonds</code> and <code>butter</code> for two laps with a pencil —
+            you'll find an old friend from the fixtures: Fibonacci.</li>
+        </ul>
+      </div>
+
+      <hr />
+      <p>
+        <strong>Compliments to the chef — that's the whole menu.</strong> Keep the
+        <a href="./reference.html">Pantry Reference</a> stuck to your fridge door, raid the
+        <a href="../editor/">playground</a>'s example recipes, and when you're ready for the
+        source of all this delicious chaos, read the
+        <a href="https://www.dangermouse.net/esoteric/chef.html">original Chef specification</a>
+        — it's short, funny, and you now speak its language fluently.
+      </p>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./06-the-great-bowl-shuffle.html">
+        <span class="nav-label">Course six</span>
+        ← The Great Bowl Shuffle
+      </a>
+      <a class="nav-next" href="./reference.html">
+        <span class="nav-label">For the fridge door</span>
+        The Pantry Reference →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Pantry Reference — The Cheffers Cookbook</title>
+  <meta name="description" content="Every Chef instruction, measure and rule on one page: the complete cheat sheet for the Chef programming language, kitchen metaphors included." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">For the fridge door</p>
+      <h1>The Pantry Reference</h1>
+      <p class="tagline">Every instruction, measure and rule — one page, no fluff. Square brackets mean “optional”.</p>
+
+      <h2>The recipe skeleton</h2>
+      <p>Parts appear in this order, each separated from the next by a blank line:</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Part</th><th>Required?</th><th>Notes</th></tr>
+          <tr><td><code>Recipe Title.</code></td><td>yes</td><td>first line, ends with a period</td></tr>
+          <tr><td>comment paragraph</td><td>no</td><td>free text; ignored by the interpreter</td></tr>
+          <tr><td><code>Ingredients.</code> + one per line</td><td>no</td><td>declares your variables</td></tr>
+          <tr><td><code>Cooking time: 25 minutes.</code></td><td>no</td><td>pure theatre — does nothing</td></tr>
+          <tr><td><code>Pre-heat oven to 180 degrees Celsius.</code></td><td>no</td><td>also theatre</td></tr>
+          <tr><td><code>Method.</code> + sentences</td><td>yes</td><td>the program; line breaks don't matter</td></tr>
+          <tr><td><code>Serves N.</code></td><td>to print anything</td><td>prints the first N baking dishes, each from the top down</td></tr>
+          <tr><td>auxiliary recipes</td><td>no</td><td>full recipes below the main one, called with <code>Serve with</code></td></tr>
+        </table>
+      </div>
+
+      <h2>Ingredients &amp; measures</h2>
+      <p>
+        Declared as <code>[value] [[heaped | level] measure] name</code> — e.g.
+        <code>108 g lard</code>, <code>2 cups flour</code>, <code>111 cups oil</code>,
+        <code>pancakes</code>. The value is optional (fill it later with <code>Take</code> or
+        <code>Fold</code>; using it while empty is a runtime error). Names may contain spaces.
+        Declaring the same name twice keeps the newest value.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Measure</th><th>State</th><th>Prints as</th></tr>
+          <tr><td><code>g</code>, <code>kg</code>, <code>pinch(es)</code></td><td>dry</td><td>number</td></tr>
+          <tr><td><code>ml</code>, <code>l</code>, <code>dash(es)</code></td><td>liquid</td><td>character (Unicode)</td></tr>
+          <tr><td><code>cup(s)</code>, <code>teaspoon(s)</code>, <code>tablespoon(s)</code>, or no measure</td><td>either</td><td>number, until liquefied</td></tr>
+          <tr><td><code>heaped</code> / <code>level</code> + any measure</td><td>dry, definitely</td><td>number</td></tr>
+        </table>
+      </div>
+
+      <h2>Bowl basics</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What it does</th></tr>
+          <tr><td><code>Put ingredient into [the] [nth] mixing bowl.</code></td><td>pushes the ingredient's value on top of the bowl (ingredient keeps its value)</td></tr>
+          <tr><td><code>Fold ingredient into [the] [nth] mixing bowl.</code></td><td>the opposite, despite the wording: takes the <em>top</em> value off the bowl and stores it in the ingredient</td></tr>
+          <tr><td><code>Clean [the] [nth] mixing bowl.</code></td><td>empties the bowl</td></tr>
+          <tr><td><code>Pour contents of the [nth] mixing bowl into the [pth] baking dish.</code></td><td><em>copies</em> the bowl onto the dish, order intact, on top of what's there; the bowl keeps its contents</td></tr>
+        </table>
+      </div>
+      <p>
+        Bowls and dishes are <strong>stacks</strong>: add to the top, take from the top, serve
+        from the top. There's an unlimited supply of both — name them <code>the 2nd mixing
+        bowl</code>, <code>the 3rd baking dish</code>… (digits + st/nd/rd/th). No number
+        means the first.
+      </p>
+
+      <h2>Kitchen math</h2>
+      <p>All arithmetic hits whatever value is on top of the bowl; the named ingredient is the other operand and is never used up.</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>Top of bowl becomes</th></tr>
+          <tr><td><code>Add ingredient [to [the] [nth] mixing bowl].</code></td><td>top + ingredient</td></tr>
+          <tr><td><code>Remove ingredient [from [the] [nth] mixing bowl].</code></td><td>top − ingredient</td></tr>
+          <tr><td><code>Combine ingredient [into [the] [nth] mixing bowl].</code></td><td>top × ingredient</td></tr>
+          <tr><td><code>Divide ingredient [into [the] [nth] mixing bowl].</code></td><td>top ÷ ingredient (whole numbers; the fraction is discarded)</td></tr>
+          <tr><td><code>Add dry ingredients [to [the] [nth] mixing bowl].</code></td><td>pushes the sum of <em>all dry</em> ingredients as a new value</td></tr>
+        </table>
+      </div>
+
+      <h2>Texture &amp; rearranging</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What it does</th></tr>
+          <tr><td><code>Liquefy ingredient.</code></td><td>the ingredient now prints as a character</td></tr>
+          <tr><td><code>Liquefy contents of the [nth] mixing bowl.</code></td><td>everything currently in the bowl prints as characters</td></tr>
+          <tr><td><code>Stir [the [nth] mixing bowl] for N minutes.</code></td><td>the top value sinks N places down the pile (or to the bottom, if the pile is short)</td></tr>
+          <tr><td><code>Stir ingredient into the [nth] mixing bowl.</code></td><td>same, sink-depth taken from the ingredient's value</td></tr>
+          <tr><td><code>Mix [the [nth] mixing bowl] well.</code></td><td>shuffles the bowl randomly</td></tr>
+        </table>
+      </div>
+
+      <h2>Control flow</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What it does</th></tr>
+          <tr><td><code>Verb the ingredient.</code></td><td>loop start: if the ingredient is 0, skip past the matching end; otherwise run the body</td></tr>
+          <tr><td><code>Verb [the ingredient] until verbed.</code></td><td>loop end: <em>verbed</em> must echo the opening verb; if an ingredient is named here, it drops by 1 each lap; then the opening ingredient is re-checked</td></tr>
+          <tr><td><code>Set aside.</code></td><td>break out of the innermost loop immediately</td></tr>
+          <tr><td><code>Serve with auxiliary recipe.</code></td><td>call the named helper recipe (see below)</td></tr>
+          <tr><td><code>Refrigerate [for N hours].</code></td><td>end this recipe now; with “for N hours”, print the first N baking dishes first</td></tr>
+        </table>
+      </div>
+
+      <h2>In &amp; out</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What it does</th></tr>
+          <tr><td><code>Take ingredient from refrigerator.</code></td><td>reads one number from input into the ingredient (playground: the Input panel, whitespace-separated, one per Take)</td></tr>
+          <tr><td><code>Serves N.</code></td><td>the recipe's final line: prints dishes 1…N, each emptied from the top. No Serves, no output</td></tr>
+        </table>
+      </div>
+
+      <h2>The sous-chef contract</h2>
+      <ul>
+        <li>An auxiliary recipe is a complete recipe placed after the main one.</li>
+        <li>On <code>Serve with sauce.</code> the sous-chef gets <strong>copies</strong> of all
+          your bowls and dishes; their changes never touch yours.</li>
+        <li>They use their <strong>own ingredient list</strong> — your ingredient names are
+          invisible to them.</li>
+        <li>When they finish (or <code>Refrigerate</code>), their <strong>first mixing
+          bowl</strong> is poured on top of <strong>your first mixing bowl</strong>.</li>
+        <li>Sous-chefs may call sous-chefs, including themselves — recursion.</li>
+      </ul>
+
+      <h2>Character codes you'll actually use</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Character</th><th>Code</th><th>Character</th><th>Code</th></tr>
+          <tr><td>newline</td><td>10</td><td>digits <code>0</code>–<code>9</code></td><td>48–57</td></tr>
+          <tr><td>space</td><td>32</td><td><code>A</code>–<code>Z</code></td><td>65–90</td></tr>
+          <tr><td><code>!</code></td><td>33</td><td><code>a</code>–<code>z</code></td><td>97–122</td></tr>
+          <tr><td><code>.</code></td><td>46</td><td><code>?</code></td><td>63</td></tr>
+        </table>
+      </div>
+      <p>
+        Remember: dry values print as numbers, back to back with <em>no separator</em>. Put a
+        <code>32 ml water</code> (space) or <code>10 ml</code> anything (newline) between them.
+      </p>
+
+      <h2>Common kitchen disasters</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Symptom</th><th>Likely cause</th></tr>
+          <tr><td>parse error on a sentence</td><td>a typo'd verb or ingredient — Chef never shrugs and moves on</td></tr>
+          <tr><td>runtime error: “declared without a value”</td><td>you used an ingredient before <code>Take</code> or <code>Fold</code> filled it</td></tr>
+          <tr><td>runtime error on Add/Remove/Combine/Divide</td><td>the bowl was empty — arithmetic needs a top value to season</td></tr>
+          <tr><td>runtime error: loop exceeded its limit</td><td>the checked ingredient never reaches 0 (Cheffers stops runaway loops at 10 million laps)</td></tr>
+          <tr><td>no output at all</td><td>you forgot <code>Serves 1.</code> — or never poured into a baking dish</td></tr>
+          <tr><td>output is a number mush like <code>54321</code></td><td>dry numbers have no separators; add a splash of water (32 ml)</td></tr>
+          <tr><td>letters print as numbers</td><td>the values are still dry — <code>Liquefy</code> them</td></tr>
+          <tr><td>message comes out backwards</td><td>stacks! last in, first out — push your message in reverse</td></tr>
+        </table>
+      </div>
+
+      <h2>House notes (this interpreter)</h2>
+      <p>
+        Where the official spec is silent, <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>
+        makes these calls: all values are integers and division truncates toward zero; loops
+        are capped at 10 million laps; sous-chefs stack at most 64 deep;
+        <code>Mix well</code> in the playground uses a fixed random seed, so shuffles are
+        reproducible there. The full details live in the
+        <a href="https://github.com/y-a-v-a/cheffers#spec-conformance-notes">README's conformance notes</a>.
+      </p>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./07-call-in-the-sous-chef.html">
+        <span class="nav-label">Course seven</span>
+        ← Call In the Sous-Chef
+      </a>
+      <a class="nav-next" href="./index.html">
+        <span class="nav-label">Back</span>
+        The menu →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

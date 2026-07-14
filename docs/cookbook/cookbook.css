@@ -1,0 +1,596 @@
+/*
+ * The Cheffers Cookbook — shared styles for the tutorial pages.
+ *
+ * Theming
+ * -------
+ * The cookbook reuses the playground's palettes verbatim (see
+ * docs/editor/editor.css) so both pages feel like one site, and the theme
+ * choice is shared through the same "cheffers-theme" localStorage key:
+ *
+ *   Parchment  (light) — a cookbook page: cream paper, espresso ink, paprika.
+ *   Cast Iron  (dark)  — a seasoned skillet: charcoal with an ember-copper glow.
+ *   Espresso   (dark)  — a coffee bar: deep roast browns with caramel.
+ *
+ * Default (no data-theme attribute) follows the machine via
+ * prefers-color-scheme; the header toggle sets data-theme to override.
+ */
+
+:root {
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  /* Parchment (light) — also the default when the OS prefers light. */
+  color-scheme: light;
+  --bg: #efe6d2;
+  --panel: #faf4e6;
+  --panel-header: #ead9bd;
+  --border: #d9c6a3;
+  --text: #3a2c23;
+  --muted: #8c745b;
+  --accent: #c0402b;
+  --accent-hover: #a5331f;
+  --on-accent: #fff6ec;
+  --error: #b22a1e;
+  --ok: #5b7d3a;
+
+  --tint: rgba(192, 64, 43, 0.07);
+}
+
+/* When the OS prefers dark and the user hasn't chosen, use Cast Iron. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #181715;
+    --panel: #221f1c;
+    --panel-header: #2a2723;
+    --border: #393530;
+    --text: #ece4d6;
+    --muted: #9d9081;
+    --accent: #e8743b;
+    --accent-hover: #f58c54;
+    --on-accent: #1b1815;
+    --error: #ff6f5e;
+    --ok: #93c069;
+
+    --tint: rgba(232, 116, 59, 0.09);
+  }
+}
+
+/* Explicit Parchment selection (matches :root, restated so the attribute
+   always wins over the OS-dark default). */
+:root[data-theme="parchment"] {
+  color-scheme: light;
+  --bg: #efe6d2;
+  --panel: #faf4e6;
+  --panel-header: #ead9bd;
+  --border: #d9c6a3;
+  --text: #3a2c23;
+  --muted: #8c745b;
+  --accent: #c0402b;
+  --accent-hover: #a5331f;
+  --on-accent: #fff6ec;
+  --error: #b22a1e;
+  --ok: #5b7d3a;
+
+  --tint: rgba(192, 64, 43, 0.07);
+}
+
+/* Explicit Cast Iron selection. */
+:root[data-theme="cast-iron"] {
+  color-scheme: dark;
+  --bg: #181715;
+  --panel: #221f1c;
+  --panel-header: #2a2723;
+  --border: #393530;
+  --text: #ece4d6;
+  --muted: #9d9081;
+  --accent: #e8743b;
+  --accent-hover: #f58c54;
+  --on-accent: #1b1815;
+  --error: #ff6f5e;
+  --ok: #93c069;
+
+  --tint: rgba(232, 116, 59, 0.09);
+}
+
+/* Espresso (dark) — deep coffee roast with caramel accent. */
+:root[data-theme="espresso"] {
+  color-scheme: dark;
+  --bg: #1f1711;
+  --panel: #281e17;
+  --panel-header: #312419;
+  --border: #443223;
+  --text: #f1e6d4;
+  --muted: #b09a80;
+  --accent: #e0a458;
+  --accent-hover: #f1b96b;
+  --on-accent: #241a10;
+  --error: #ff8068;
+  --ok: #b0c06a;
+
+  --tint: rgba(224, 164, 88, 0.09);
+}
+
+/*
+ * Layout
+ * ------
+ */
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.65;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* Smooth the palette switch, same as the playground. */
+body,
+.toolbar,
+.footer,
+.recipe-card,
+.recipe-card-header,
+.output-box,
+.output-label,
+pre,
+code,
+table,
+.callout,
+.menu-card,
+button.theme-toggle {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Header toolbar — mirrors the playground's. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--panel-header);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand .logo { font-size: 1.4rem; }
+.brand .title { letter-spacing: 0.01em; }
+
+.controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+.toolbar-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+}
+.toolbar-link:hover { border-color: var(--accent); color: var(--accent); }
+
+button.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+button.theme-toggle:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+button.theme-toggle:active { transform: translateY(1px); }
+
+/* Page column */
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 47rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/*
+ * Typography
+ * ----------
+ */
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  line-height: 1.25;
+  color: var(--text);
+}
+
+h1 { font-size: 2.1rem; margin: 0.4rem 0 0.6rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 0.6rem; }
+h3 { font-size: 1.15rem; margin: 1.8rem 0 0.5rem; }
+
+p, ul, ol { margin: 0.8rem 0; }
+li { margin: 0.25rem 0; }
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+
+strong { color: var(--text); }
+em { color: inherit; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* Small caps eyebrow above chapter titles: "Course Three". */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: 1.05rem;
+  font-family: var(--serif);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+/* Inline code — a little label chip, like writing on masking tape. */
+code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--panel-header);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.35em;
+  white-space: nowrap;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: inherit;
+  font-size: inherit;
+}
+
+/*
+ * Recipe cards — a framed card with a header bar, holding Chef source.
+ * ------------------------------------------------------------------
+ */
+
+.recipe-card {
+  margin: 1.4rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.recipe-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  background: var(--panel-header);
+  border-bottom: 1px solid var(--border);
+}
+
+.recipe-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.recipe-card-actions a {
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+.recipe-card-actions a:hover { text-decoration: underline; }
+
+button.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+}
+button.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.recipe-card pre {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+/* Generic code block (snippets that are not full recipes). */
+pre.snippet {
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+/* Output boxes — styled after the playground's output pane. */
+.output-box {
+  margin: 1rem 0 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.output-label {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  background: var(--panel-header);
+  border-bottom: 1px solid var(--border);
+}
+
+.output-box pre {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  font-family: var(--mono);
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Input boxes (what to type into the playground's Input panel). */
+.output-box.input-box .output-label { color: var(--ok); }
+
+/*
+ * Callouts
+ * --------
+ */
+
+.callout {
+  margin: 1.2rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--tint);
+}
+.callout > :first-child { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
+
+.callout .callout-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+/* "Try it" experiments get the ok-green treatment. */
+.callout.try { border-left-color: var(--ok); }
+.callout.try .callout-title { color: var(--ok); }
+
+/*
+ * Tables — ingredient walkthroughs, instruction reference.
+ * -------------------------------------------------------
+ */
+
+.table-scroll { overflow-x: auto; margin: 1rem 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  background: var(--panel-header);
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+tr:last-child td { border-bottom: none; }
+
+td code { white-space: normal; }
+
+/*
+ * Stack diagrams — a mixing bowl drawn as a pile of plates.
+ * --------------------------------------------------------
+ */
+
+.bowls {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin: 1.2rem 0;
+}
+
+.bowl { text-align: center; }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: flex-end;
+  min-height: 2rem;
+  padding: 0.5rem 0.6rem;
+  border: 2px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 1.6rem 1.6rem;
+  background: var(--panel);
+  min-width: 7rem;
+}
+
+.stack .item {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  background: var(--panel-header);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+}
+
+.stack .item.top {
+  background: var(--tint);
+  border-color: var(--accent);
+}
+
+.bowl .bowl-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.35rem;
+}
+
+/*
+ * Index page menu
+ * ---------------
+ */
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 0.9rem;
+  margin: 1.4rem 0;
+}
+
+.menu-card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 0.9rem 1rem;
+  text-decoration: none;
+  color: var(--text);
+}
+.menu-card:hover { border-color: var(--accent); }
+
+.menu-card .course {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.menu-card .dish {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.15rem 0;
+  color: var(--accent);
+}
+
+.menu-card .teaches {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* The kitchen-to-code translation table on the index. */
+.translation em { color: var(--muted); }
+
+/*
+ * Chapter navigation
+ * ------------------
+ */
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.chapter-nav a { text-decoration: none; }
+.chapter-nav a:hover { text-decoration: underline; }
+.chapter-nav .nav-next { text-align: right; margin-left: auto; }
+.chapter-nav .nav-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Footer — mirrors the playground's. */
+.footer {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--panel-header);
+  border-top: 1px solid var(--border);
+}
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 540px) {
+  h1 { font-size: 1.7rem; }
+  .page { padding: 1.4rem 1rem 2.5rem; }
+  .bowls { gap: 1rem; }
+}

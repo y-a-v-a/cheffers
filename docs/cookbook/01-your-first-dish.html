@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course One: Your First Dish — The Cheffers Cookbook</title>
+  <meta name="description" content="The anatomy of a Chef program: title, ingredients, method and Serves. Cook your first recipe and print your first number." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course one</p>
+      <h1>Your First Dish</h1>
+      <p class="tagline">On the menu: the shape of every Chef recipe, and your very first output.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p>The five parts of a recipe · ingredients as variables · <code>Put</code>, <code>Pour</code> and <code>Serves</code> · how anything gets printed at all.</p>
+      </div>
+
+      <h2>The anatomy of a recipe</h2>
+      <p>
+        Every Chef program is laid out exactly like a recipe on a food blog (minus the
+        2,000-word story about a trip to Tuscany). The parts always appear in the same order,
+        separated by blank lines:
+      </p>
+
+      <pre class="snippet">Recipe Title.
+
+A free-form comment paragraph. Say anything you like here;
+the computer skips it entirely. This part is optional.
+
+Ingredients.
+[the ingredient list — one per line]
+
+Method.
+[the actual instructions, written as sentences.]
+
+Serves 1.</pre>
+
+      <ul>
+        <li><strong>The title</strong> comes first and ends with a period. Chefs are dramatic like that.</li>
+        <li><strong>The comment</strong> is optional flavor text. Perfect for jokes.</li>
+        <li><strong>Ingredients.</strong> declares your variables (more in a second).</li>
+        <li><strong>Method.</strong> is the program itself. Every instruction is a sentence ending in a period.</li>
+        <li><strong>Serves 1.</strong> is the magic phrase that actually prints something. Forget it, and
+          your program cooks a lovely meal and then throws it in the bin.</li>
+      </ul>
+
+      <p>
+        The blank lines between sections are not decoration — they are how Chef tells the
+        sections apart. Squash two sections together and the recipe won't parse.
+      </p>
+
+      <h2>Tonight's recipe: The Answer Broth</h2>
+      <p>
+        One ingredient, two instructions. This is the “boil water” of Chef programs.
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: The Answer Broth">
+        <div class="recipe-card-header">
+          <span>The Answer Broth · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>The Answer Broth.
+
+The simplest dish in the book: one ingredient, one bowl, one perfect number. Serve warm to fans of intergalactic hitchhiking.
+
+Ingredients.
+42 g mystery beans
+
+Method.
+Put mystery beans into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>42</pre>
+      </div>
+
+      <h2>What just happened?</h2>
+      <p>
+        Start with the ingredient line: <code>42 g mystery beans</code>. In Chef, an ingredient
+        is a <strong>variable</strong> — a named container holding one number. The name is
+        “mystery beans”, and the number is 42. (The <code>g</code> means grams; measures get
+        interesting in the next course, so file that away for now.)
+      </p>
+      <p>Then the method runs, one sentence at a time:</p>
+      <ol>
+        <li>
+          <code>Put mystery beans into the mixing bowl.</code> — copies the value 42 into the
+          mixing bowl. The bowl is where all the real cooking happens; ingredients on the shelf
+          never change, but the bowl is fair game.
+        </li>
+        <li>
+          <code>Pour contents of the mixing bowl into the baking dish.</code> — copies
+          everything in the bowl to the baking dish. The dish is the serving tray: it's what
+          eventually reaches the table.
+        </li>
+      </ol>
+      <p>
+        Finally, <code>Serves 1.</code> serves one baking dish to the diners — which means:
+        print everything in it. The dish holds a single 42, so the program prints <code>42</code>.
+        Dinner is served.
+      </p>
+
+      <div class="bowls" aria-hidden="true">
+        <div class="bowl">
+          <div class="stack">
+            <div class="item top">42</div>
+          </div>
+          <div class="bowl-label">mixing bowl, after Put</div>
+        </div>
+        <div class="bowl">
+          <div class="stack">
+            <div class="item top">42</div>
+          </div>
+          <div class="bowl-label">baking dish, after Pour</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">House rules</span>
+        <ul>
+          <li>Every instruction ends with a period, like a proper sentence.</li>
+          <li>Line breaks inside the method don't matter — one long line or one sentence
+            per line, chef's choice. Traditionalists write it as a single breathless paragraph.</li>
+          <li>Ingredient names can be several words long (“mystery beans”, “red salmon”)
+            and you must spell them exactly the same way every time.</li>
+          <li>A recipe may also list a <code>Cooking time</code> and an oven temperature.
+            They do absolutely nothing. They're pure theatre, and yes, they're in the official
+            language specification.</li>
+        </ul>
+      </div>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Open the recipe in the playground and change 42 to your favorite number.</li>
+          <li>Add a second <code>Put mystery beans into the mixing bowl.</code> at the start of
+            the method. The output becomes <code>4242</code> — two servings, printed back to back
+            with nothing in between. Chef doesn't add spaces for you. (Course five has the fix,
+            and it involves a splash of water.)</li>
+          <li>Rename <code>mystery beans</code> to something tastier — in <em>both</em> places.
+            Rename it in only one and enjoy your first Chef error message.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./index.html">
+        <span class="nav-label">Back</span>
+        ← The menu
+      </a>
+      <a class="nav-next" href="./02-cooking-with-letters.html">
+        <span class="nav-label">Course two</span>
+        Cooking with Letters →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

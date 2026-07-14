@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Cheffers Cookbook — Learn the Chef programming language</title>
+  <meta name="description" content="A playful, seven-course introduction to the Chef programming language, where every program is a cooking recipe. Learn stacks, loops and functions with mixing bowls and sous-chefs." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <!-- Apply the saved theme before first paint to avoid a flash of the
+       default palette. The header toggle (cookbook.js) keeps this in sync. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">A tasting menu in seven courses</p>
+      <h1>The Cheffers Cookbook</h1>
+      <p class="tagline">Learn to write programs that read like recipes — because in Chef, they are recipes.</p>
+
+      <p>
+        Chef is a real (if gloriously silly) programming language, invented by David Morgan-Mar
+        in 2002. Every Chef program is a cooking recipe: it has a title, an ingredient list, and
+        a method. <em>Run</em> the recipe and out comes the program's result. The language's
+        official design principles even insist that programs should be
+        “easy to prepare and delicious” — some Chef programs have genuinely been baked
+        and eaten.
+      </p>
+      <p>
+        The twist: while the recipe reads like dinner instructions, every sentence is secretly a
+        precise computer instruction. Numbers hide in the ingredients, and the cooking steps
+        push them around until something tasty — a message, a calculation, a countdown — lands
+        on the plate.
+      </p>
+
+      <h2>The kitchen, translated</h2>
+      <p>
+        If you have seen any programming language before, here is the secret decoder ring.
+        If you haven't: even better, you get to learn stacks from a pile of pancakes.
+      </p>
+      <div class="table-scroll">
+        <table class="translation">
+          <tr><th>In the kitchen</th><th>In the program</th></tr>
+          <tr><td><strong>An ingredient</strong> (“42 g mystery beans”)</td><td>A variable — a named box holding one number</td></tr>
+          <tr><td><strong>The mixing bowl</strong></td><td>A stack — a pile you can only add to and take from the top</td></tr>
+          <tr><td><strong>The baking dish</strong></td><td>The serving tray for output — whatever's in it gets printed</td></tr>
+          <tr><td><strong>The method</strong></td><td>The instructions, run one sentence at a time</td></tr>
+          <tr><td><strong><code>Serves 1.</code></strong></td><td>“Print the result” — no serving, no output!</td></tr>
+          <tr><td><strong>The refrigerator</strong></td><td>Input — where numbers you type come from</td></tr>
+          <tr><td><strong>A sous-chef</strong></td><td>A function — a helper recipe you can call</td></tr>
+        </table>
+      </div>
+
+      <h2>How to use this cookbook</h2>
+      <p>
+        Keep the <a href="../editor/">Cheffers Playground</a> open in another tab. It runs the
+        real interpreter right in your browser — nothing to install, nothing sent to a server.
+        Every recipe in this book has an <strong>Open in playground</strong> button that loads
+        it straight into the editor, ready to run and mess with. And please do mess with them:
+        the “Try it” boxes at the end of each course are where the real learning happens.
+      </p>
+      <p>
+        The courses build on each other, so going in order is the easiest path. If you ever
+        forget what an instruction does, the <a href="./reference.html">Pantry Reference</a>
+        lists every one of them on a single page.
+      </p>
+
+      <h2>Tonight's menu</h2>
+      <div class="menu-grid">
+        <a class="menu-card" href="./01-your-first-dish.html">
+          <span class="course">Course one</span>
+          <span class="dish">🍲 The Answer Broth</span>
+          <span class="teaches">Your first dish: how a recipe is built, and how numbers reach the plate.</span>
+        </a>
+        <a class="menu-card" href="./02-cooking-with-letters.html">
+          <span class="course">Course two</span>
+          <span class="dish">🍜 Alphabet Soup</span>
+          <span class="teaches">Cooking with letters: dry vs. liquid ingredients, and why the bowl is a stack.</span>
+        </a>
+        <a class="menu-card" href="./03-kitchen-math.html">
+          <span class="course">Course three</span>
+          <span class="dish">🍪 Fair Share Cookies</span>
+          <span class="teaches">Kitchen math: add, remove, combine and divide, all on top of the bowl.</span>
+        </a>
+        <a class="menu-card" href="./04-raiding-the-refrigerator.html">
+          <span class="course">Course four</span>
+          <span class="dish">🥣 Porridge Weather Report</span>
+          <span class="teaches">Raiding the refrigerator: reading input while the recipe runs.</span>
+        </a>
+        <a class="menu-card" href="./05-stir-until-done.html">
+          <span class="course">Course five</span>
+          <span class="dish">🥗 Rocket Salad Countdown</span>
+          <span class="teaches">Stir until done: loops, counters, and a five-second launch sequence.</span>
+        </a>
+        <a class="menu-card" href="./06-the-great-bowl-shuffle.html">
+          <span class="course">Course six</span>
+          <span class="dish">🥞 Stressed Desserts</span>
+          <span class="teaches">The great bowl shuffle: folding, second bowls, and flipping a word backwards.</span>
+        </a>
+        <a class="menu-card" href="./07-call-in-the-sous-chef.html">
+          <span class="course">Course seven</span>
+          <span class="dish">🥤 Squared Milkshake</span>
+          <span class="teaches">Call in the sous-chef: auxiliary recipes, Chef's answer to functions.</span>
+        </a>
+        <a class="menu-card" href="./reference.html">
+          <span class="course">For the fridge door</span>
+          <span class="dish">📋 The Pantry Reference</span>
+          <span class="teaches">Every instruction, measure and rule on one page. Your cheat sheet.</span>
+        </a>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">Why learn a joke language?</span>
+        <p>
+          Because it's a joke with excellent ingredients. Under the aprons, Chef is built on the
+          same ideas as serious languages: variables, stacks, integer math, loops, input and
+          output, and function calls. Learning them here — where a stack is literally a pile of
+          pancakes — makes them much easier to recognize everywhere else.
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

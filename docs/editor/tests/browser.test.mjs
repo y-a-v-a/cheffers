@@ -147,6 +147,71 @@ try {
     assert.equal(saved, "cast-iron");
   });
 
+  /* ----- Cookbook integration ----- */
+
+  const cookbookUrl = new URL("../cookbook/", BASE_URL).href;
+
+  await step("the playground toolbar links to the cookbook", async () => {
+    const href = await page.locator(".toolbar a.toolbar-link").getAttribute("href");
+    assert.equal(href, "../cookbook/");
+  });
+
+  await step("the cookbook menu lists seven courses plus the reference", async () => {
+    await page.goto(cookbookUrl, { waitUntil: "networkidle" });
+    assert.equal(await page.locator(".menu-grid .menu-card").count(), 8);
+  });
+
+  await step("the cookbook picks up the theme saved in the playground", async () => {
+    // The earlier theme step left "cast-iron" in localStorage; the shared
+    // key must carry it across to the cookbook pages.
+    const theme = await page.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    );
+    assert.equal(theme, "cast-iron");
+  });
+
+  await step("open-in-playground loads the recipe, its input, and runs it", async () => {
+    await page.goto(new URL("04-raiding-the-refrigerator.html", cookbookUrl).href, {
+      waitUntil: "networkidle",
+    });
+    // First card on the page is Porridge Weather Report (data-input="20").
+    const link = page.locator(".recipe-card .open-playground").first();
+    assert.match(await link.getAttribute("href"), /#recipe=/);
+    await link.click();
+    await page.waitForFunction(
+      () => document.getElementById("output")?.textContent.trim() === "68",
+      { timeout: 15000 },
+    );
+    assert.equal(await page.inputValue("#stdin"), "20");
+    const doc = await page.locator(".cm-content").textContent();
+    assert.ok(doc.includes("Porridge Weather Report."), "recipe source not loaded");
+    const selected = await page.$eval("#examples", (el) => el.selectedOptions[0]?.textContent);
+    assert.equal(selected, "From the cookbook");
+  });
+
+  await step("every cookbook page serves without console errors", async () => {
+    const pages = [
+      "index.html",
+      "01-your-first-dish.html",
+      "02-cooking-with-letters.html",
+      "03-kitchen-math.html",
+      "04-raiding-the-refrigerator.html",
+      "05-stir-until-done.html",
+      "06-the-great-bowl-shuffle.html",
+      "07-call-in-the-sous-chef.html",
+      "reference.html",
+    ];
+    for (const p of pages) {
+      const before = consoleErrors.length;
+      await page.goto(new URL(p, cookbookUrl).href, { waitUntil: "networkidle" });
+      assert.equal(
+        consoleErrors.length,
+        before,
+        `console errors on ${p}: ${consoleErrors.slice(before).join("; ")}`,
+      );
+    }
+  });
+
   await step("no uncaught console/page errors occurred", async () => {
     assert.deepEqual(consoleErrors, [], `console errors: ${consoleErrors.join("; ")}`);
   });

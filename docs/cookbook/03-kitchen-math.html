@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Three: Kitchen Math — The Cheffers Cookbook</title>
+  <meta name="description" content="Arithmetic in Chef: Add, Remove, Combine and Divide all season whatever's on top of the mixing bowl. Plus integer division and Add dry ingredients." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course three</p>
+      <h1>Kitchen Math</h1>
+      <p class="tagline">On the menu: adding, subtracting, multiplying and dividing — always seasoning the top of the pile.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p><code>Add</code> · <code>Remove</code> · <code>Combine</code> · <code>Divide</code> · <code>Add dry ingredients</code> · whole-number division.</p>
+      </div>
+
+      <h2>One rule to remember</h2>
+      <p>
+        All of Chef's math follows a single rule: <strong>arithmetic happens to whatever is on
+        top of the mixing bowl.</strong> You never write “x = a + b”. Instead, you put a value
+        into the bowl, then season the top plate with other ingredients, one step at a time:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What happens to the top of the bowl</th></tr>
+          <tr><td><code>Add sugar to the mixing bowl.</code></td><td>top = top + sugar</td></tr>
+          <tr><td><code>Remove sugar from the mixing bowl.</code></td><td>top = top − sugar</td></tr>
+          <tr><td><code>Combine sugar into the mixing bowl.</code></td><td>top = top × sugar</td></tr>
+          <tr><td><code>Divide sugar into the mixing bowl.</code></td><td>top = top ÷ sugar</td></tr>
+        </table>
+      </div>
+      <p>
+        Two comforting details. First, the ingredient itself is never used up — <code>Add
+        sugar</code> reads the amount from the bag, it doesn't empty the bag. Second, the rest
+        of the pile underneath is untouched; only the top plate changes.
+      </p>
+
+      <h2>A word problem, as dinner</h2>
+      <p>
+        You baked <strong>3 batches of 12 cookies</strong>. Somebody (no names) nibbled
+        <strong>4</strong> of them. The rest are split fairly between <strong>5 friends</strong>.
+        How many cookies does each friend get? In math class you'd write
+        (12&nbsp;×&nbsp;3&nbsp;−&nbsp;4)&nbsp;÷&nbsp;5. Chef has no parentheses — instead you
+        do the steps in order, exactly like punching them into a calculator:
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Fair Share Cookies">
+        <div class="recipe-card-header">
+          <span>Fair Share Cookies · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Fair Share Cookies.
+
+Three batches of a dozen cookies, minus a few sneaky nibbles, split fairly between five hungry friends. How many does each friend get?
+
+Ingredients.
+12 g cookies
+3 g batches
+4 g sneaky nibbles
+5 g hungry friends
+
+Method.
+Put cookies into the mixing bowl. Combine batches into the mixing bowl. Remove sneaky nibbles from the mixing bowl. Divide hungry friends into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>6</pre>
+      </div>
+
+      <h2>The top of the bowl, step by step</h2>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>Top of bowl</th><th>Meaning</th></tr>
+          <tr><td><code>Put cookies…</code></td><td>12</td><td>start with one batch</td></tr>
+          <tr><td><code>Combine batches…</code></td><td>36</td><td>12 × 3 batches</td></tr>
+          <tr><td><code>Remove sneaky nibbles…</code></td><td>32</td><td>36 − 4 nibbled</td></tr>
+          <tr><td><code>Divide hungry friends…</code></td><td>6</td><td>32 ÷ 5, whole cookies only</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">Chef doesn't do crumbs</span>
+        <p>
+          Wait — 32 ÷ 5 is 6.4, so where did the .4 go? In the bin. Every value in Chef is a
+          whole number, and division simply drops the fraction. Nobody gets crumbs: 32 cookies
+          between 5 friends is 6 each, and the 2 left over silently vanish into the cook's
+          pocket. Keep this in mind whenever you divide — order matters! Dividing too early
+          can grind your numbers down to 0.
+        </p>
+      </div>
+
+      <h2>The buffet move</h2>
+      <p>
+        One more math instruction, and it's a crowd-pleaser:
+        <code>Add dry ingredients to the mixing bowl.</code> sums up <em>every dry ingredient
+        in the recipe</em> in one go and puts the total into the bowl as a new value. It's the
+        buffet approach: everything on one plate. (Only <em>dry</em> ingredients count —
+        liquids stay out of it, and so do undecided cups and teaspoons.)
+      </p>
+      <pre class="snippet">Ingredients.
+2 g flour
+3 g sugar
+
+Method.
+Add dry ingredients to the mixing bowl.   ← puts 5 into the bowl</pre>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Change <code>hungry friends</code> to 4. Now 32 ÷ 4 = 8, no cookies lost.</li>
+          <li>Compute the leftovers instead: after dividing, <code>Combine hungry friends</code>
+            (6 × 5 = 30), then… can you get to the 2 missing cookies from there? You'll want a
+            second copy of the total in the bowl — plan your <code>Put</code>s.</li>
+          <li>Swap the method order so the division happens first. Watch truncation wreck the
+            answer, and appreciate why the recipe multiplies before it divides.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./02-cooking-with-letters.html">
+        <span class="nav-label">Course two</span>
+        ← Cooking with Letters
+      </a>
+      <a class="nav-next" href="./04-raiding-the-refrigerator.html">
+        <span class="nav-label">Course four</span>
+        Raiding the Refrigerator →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

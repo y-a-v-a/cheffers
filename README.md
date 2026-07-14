@@ -27,6 +27,15 @@ whitespace-separated, one consumed per `Take`.
 The playground lives in `docs/editor/` and is built from the `cheffers-wasm` crate.
 See `docs/editor/README.md` for how to rebuild it.
 
+## The Chef Cookbook
+
+New to Chef? The **[Cheffers Cookbook](https://y-a-v-a.github.io/cheffers/cookbook/)**
+is a playful seven-course tutorial that teaches the whole language with kitchen
+metaphors — variables as ingredients, stacks as piles of plates, functions as
+sous-chefs. Every chapter is built around a runnable recipe you can open in the
+playground with one click, and the recipes themselves live in
+`docs/cookbook/recipes/` with their outputs pinned by `tests/cookbook_recipes.rs`.
+
 ## Installation
 
 ### From Source

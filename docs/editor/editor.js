@@ -179,6 +179,23 @@ function cycleTheme() {
   applyTheme(next);
 }
 
+// A recipe passed in the URL fragment (the cookbook's "Open in playground"
+// links): #recipe=<base64url of JSON {c: source, i: input}>. Mirrors
+// encodeRecipeHash in docs/cookbook/cookbook.js — keep the two in sync.
+function decodeRecipeHash() {
+  const match = /[#&]recipe=([A-Za-z0-9_-]+)/.exec(location.hash);
+  if (!match) return null;
+  try {
+    const b64 = match[1].replace(/-/g, "+").replace(/_/g, "/");
+    const bytes = Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0));
+    const parsed = JSON.parse(new TextDecoder().decode(bytes));
+    if (typeof parsed.c !== "string") return null;
+    return { source: parsed.c, input: typeof parsed.i === "string" ? parsed.i : "" };
+  } catch {
+    return null;
+  }
+}
+
 function setStatus(text, kind) {
   statusEl.textContent = text;
   statusEl.className = "status" + (kind ? " " + kind : "");
@@ -264,7 +281,20 @@ async function main() {
 
   populateExamples();
   wrapEl.checked = storedWrap();
-  buildEditor(EXAMPLES[DEFAULT_EXAMPLE].source);
+
+  // A recipe in the URL fragment (from the cookbook) beats the default
+  // example; it also gets its own entry in the examples dropdown so the
+  // selection reflects what's loaded.
+  const shared = decodeRecipeHash();
+  if (shared) {
+    const opt = document.createElement("option");
+    opt.value = "__shared";
+    opt.textContent = "From the cookbook";
+    examplesEl.appendChild(opt);
+    examplesEl.value = "__shared";
+    stdinEl.value = shared.input;
+  }
+  buildEditor(shared ? shared.source : EXAMPLES[DEFAULT_EXAMPLE].source);
   wrapEl.addEventListener("change", () => applyWrap(wrapEl.checked));
 
   setStatus("loading interpreter…");

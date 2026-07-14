@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Six: The Great Bowl Shuffle — The Cheffers Cookbook</title>
+  <meta name="description" content="Deep stack work in Chef: Fold, second mixing bowls, Clean, Stir and Mix — and reversing STRESSED into DESSERTS one pancake at a time." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course six</p>
+      <h1>The Great Bowl Shuffle</h1>
+      <p class="tagline">On the menu: serious stack technique — folding, second bowls, and a word flipped clean over.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p><code>Fold</code> · a 2nd mixing bowl · <code>Clean</code> · <code>Stir</code> · <code>Mix well</code> · why <code>Pour</code> copies instead of empties.</p>
+      </div>
+
+      <h2>Fold: the confusing one (on purpose)</h2>
+      <p>
+        Time to properly meet the instruction we sneak-previewed in course five:
+      </p>
+      <pre class="snippet">Fold pancakes into the mixing bowl.</pre>
+      <p>
+        Read as English, that sounds like putting pancakes <em>in</em>. It does the exact
+        opposite: <strong><code>Fold</code> takes the top value off the bowl and stores it in
+        the ingredient</strong>, overwriting whatever the ingredient held. It's the mirror
+        image of <code>Put</code>. Yes, the wording is misleading. It's a language written as
+        recipes; a little chaos is part of the seasoning. Just memorize the pair:
+      </p>
+      <ul>
+        <li><code>Put</code> — ingredient ➜ top of bowl (the ingredient keeps its value)</li>
+        <li><code>Fold</code> — top of bowl ➜ ingredient (the bowl loses its top plate)</li>
+      </ul>
+
+      <h2>More bowls, more moves</h2>
+      <p>
+        A real kitchen has more than one bowl, and so does Chef — an unlimited cupboard of
+        them. Name them by number: <code>the 2nd mixing bowl</code>, <code>the 3rd mixing
+        bowl</code> (digits plus st/nd/rd/th; if you don't say which bowl, you mean the first).
+        Baking dishes work the same way. And a few housekeeping moves:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>What it does</th></tr>
+          <tr><td><code>Clean the mixing bowl.</code></td><td>washes it out — the bowl is now empty</td></tr>
+          <tr><td><code>Stir the mixing bowl for 2 minutes.</code></td><td>the top value sinks 2 places down the pile; the two above it rise one</td></tr>
+          <tr><td><code>Stir sugar into the mixing bowl.</code></td><td>same, but the sink-depth comes from the sugar's value</td></tr>
+          <tr><td><code>Mix the mixing bowl well.</code></td><td>shuffles the bowl into a random order</td></tr>
+        </table>
+      </div>
+      <p>
+        And one thing you already saw in course one, now official: <strong><code>Pour</code>
+        copies</strong>. The bowl keeps its contents after pouring into a baking dish. Pour
+        twice, serve two helpings.
+      </p>
+
+      <h2>The dish-drying theorem</h2>
+      <p>
+        Here's tonight's big idea, and it's one you can prove at the sink. Take a stack of
+        dried plates and move it to the shelf <em>one plate at a time</em>. The plate that was
+        on top ends up on the bottom: <strong>moving a stack one item at a time reverses
+        it.</strong> In course two you had to spell every message backwards by hand. Now the
+        bowls can do the flipping for you.
+      </p>
+      <p>
+        The proof of the theorem is dessert. Push the letters of <code>STRESSED</code> into
+        bowl one, flip them into bowl two with a <code>Fold</code>/<code>Put</code> loop, and
+        serve bowl two:
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Stressed Desserts">
+        <div class="recipe-card-header">
+          <span>Stressed Desserts · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Stressed Desserts.
+
+Spell STRESSED into the first bowl, flip it pancake by pancake into the second, and it comes out as DESSERTS. Proof that stacks make everything better.
+
+Ingredients.
+68 g dates
+69 g eggs
+83 g sugar
+82 g rosemary
+84 g turnips
+8 pinches patience
+pancakes
+
+Method.
+Put dates into the mixing bowl. Put eggs into the mixing bowl. Put sugar into the mixing bowl. Put sugar into the mixing bowl. Put eggs into the mixing bowl. Put rosemary into the mixing bowl. Put turnips into the mixing bowl. Put sugar into the mixing bowl. Flip the patience. Fold pancakes into the mixing bowl. Put pancakes into the 2nd mixing bowl. Flip the patience until flipped. Liquefy contents of the 2nd mixing bowl. Pour contents of the 2nd mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>DESSERTS</pre>
+      </div>
+
+      <h2>Mid-flip, in the kitchen</h2>
+      <p>
+        The eight <code>Put</code>s stack up <code>STRESSED</code> in bowl one (top plate
+        first: S, T, R, E, S, S, E, D — notice you <em>typed</em> the Puts in
+        D-E-S-S-E-R-T-S order; the stack flipped it once already!). Then the loop runs eight
+        times — <code>8 pinches patience</code>, ticking down — and each lap folds one plate
+        off bowl one into <code>pancakes</code> and puts it onto bowl two. Freeze-frame after
+        three laps:
+      </p>
+
+      <div class="bowls" aria-hidden="true">
+        <div class="bowl">
+          <div class="stack">
+            <div class="item top">E</div>
+            <div class="item">S</div>
+            <div class="item">S</div>
+            <div class="item">E</div>
+            <div class="item">D</div>
+          </div>
+          <div class="bowl-label">mixing bowl — 5 plates left</div>
+        </div>
+        <div class="bowl">
+          <div class="stack">
+            <div class="item top">R</div>
+            <div class="item">T</div>
+            <div class="item">S</div>
+          </div>
+          <div class="bowl-label">2nd mixing bowl — flipped so far</div>
+        </div>
+      </div>
+
+      <p>
+        Five laps later, bowl two reads D, E, S, S, E, R, T, S from the top.
+        <code>Liquefy contents of the 2nd mixing bowl</code> melts the letters,
+        <code>Pour contents of the 2nd mixing bowl</code> plates them, and stress becomes
+        dessert. The ingredient <code>pancakes</code> is declared with no value — it's just
+        the spatula doing the flipping, one value at a time.
+      </p>
+
+      <div class="callout">
+        <span class="callout-title">Why this matters beyond dinner</span>
+        <p>
+          “Move a stack to reverse it” is a genuine classic of computer science — real
+          compilers, calculators and undo buttons lean on exactly this move. You now know it
+          as muscle memory: fold, put, repeat, done.
+        </p>
+      </div>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Serve the stress instead: delete the loop and the two “2nd bowl” sentences, then
+            liquefy and pour <em>the</em> mixing bowl. There's <code>STRESSED</code>.</li>
+          <li>Pour the 2nd bowl twice at the end — <code>DESSERTSDESSERTS</code>. Pouring
+            copies; the bowl never empties.</li>
+          <li>Lower the patience to 4 and predict the output before you run it. (Remember:
+            only what's in bowl two gets served.)</li>
+          <li>Add <code>Stir the 2nd mixing bowl for 3 minutes.</code> right before the
+            liquefy and work out where the D sinks to.</li>
+          <li>Flip a word of your own. Palindromes make for a satisfying anticlimax.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./05-stir-until-done.html">
+        <span class="nav-label">Course five</span>
+        ← Stir Until Done
+      </a>
+      <a class="nav-next" href="./07-call-in-the-sous-chef.html">
+        <span class="nav-label">Course seven</span>
+        Call In the Sous-Chef →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

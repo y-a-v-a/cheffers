@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Five: Stir Until Done — The Cheffers Cookbook</title>
+  <meta name="description" content="Loops in Chef: verb…until pairs, countdown timers, Set aside, and a rocket-salad countdown that keeps its numbers apart with a splash of water." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📖</text></svg>' />
+  <link rel="stylesheet" href="./cookbook.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./index.html">
+      <span class="logo" aria-hidden="true">📖</span>
+      <span class="title">The Cheffers Cookbook</span>
+    </a>
+    <nav class="controls">
+      <a class="toolbar-link" href="../editor/">🍳 Playground</a>
+      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <article>
+      <p class="eyebrow">Course five</p>
+      <h1>Stir Until Done</h1>
+      <p class="tagline">On the menu: loops — doing a thing over and over until the kitchen timer hits zero.</p>
+
+      <div class="callout">
+        <span class="callout-title">New kitchen skills</span>
+        <p>Loops (<code>Verb … until verbed</code>) · countdown timers · <code>Set aside</code> · keeping printed numbers apart with a splash of water.</p>
+      </div>
+
+      <h2>Every recipe repeats itself</h2>
+      <p>
+        “Knead until smooth.” “Stir until thickened.” Real recipes are full of
+        <em>do-this-until</em> instructions, so Chef's loops look exactly like that. A loop is a
+        matched pair of sentences wrapped around a body:
+      </p>
+      <pre class="snippet">Launch the rocket.
+  [ the loop body — any instructions ]
+Launch the rocket until launched.</pre>
+      <p>Here's the mechanism, piece by piece:</p>
+      <ul>
+        <li><strong>The opening sentence</strong> — any verb plus an ingredient. Chef checks the
+          ingredient: if it's <strong>zero</strong>, the whole loop is skipped; otherwise the
+          body runs.</li>
+        <li><strong>The closing sentence</strong> — repeats the verb as
+          “until&nbsp;<em>verbed</em>” (launch → launched, bake → baked, beat → beaten…
+          Chef speaks fluent grammar). When the recipe reaches it, it jumps back and checks the
+          opening ingredient again. Still not zero? Another lap.</li>
+        <li><strong>The secret handshake</strong> — if the closing sentence names an ingredient,
+          that ingredient is <strong>lowered by 1</strong> every lap. Name the same ingredient
+          in both sentences, and you've built a kitchen timer: 5, 4, 3, 2, 1, ding.</li>
+      </ul>
+      <p>
+        (Fine print for future chefs: the ingredient that gets <em>checked</em> is the one in
+        the opening sentence, and the one that gets <em>decremented</em> is the one in the
+        closing sentence. They're usually the same — but they don't have to be, and fancy
+        recipes exploit that.)
+      </p>
+
+      <h2>The sticky-numbers problem</h2>
+      <p>
+        Before we cook: a warning from course one. When Chef prints several dry numbers, it
+        prints them <em>back to back</em> — a countdown would come out as
+        <code>54321</code>, which reads more like a zip code than a launch. The fix is pure
+        kitchen logic: put something liquid between them. Water! An ingredient declared as
+        <code>32 ml water</code> is liquid with value 32 — and 32 is the character code for a
+        <em>space</em>. One splash between every number keeps the plate tidy.
+        (Same trick, different flavor: <code>10 ml</code> of anything prints as a
+        <em>newline</em>.)
+      </p>
+
+      <h2>Tonight's recipe: Rocket Salad Countdown</h2>
+      <p>
+        Rocket is a salad leaf (ask a British greengrocer), which makes
+        <code>Launch the rocket.</code> a completely legitimate cooking instruction.
+        This dish prints a five-second countdown and lifts off.
+      </p>
+
+      <figure class="recipe-card" role="group" aria-label="Chef recipe: Rocket Salad Countdown">
+        <div class="recipe-card-header">
+          <span>Rocket Salad Countdown · recipe</span>
+          <span class="recipe-card-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <a class="open-playground" href="../editor/">Open in playground ▶</a>
+          </span>
+        </div>
+        <pre><code>Rocket Salad Countdown.
+
+A zesty salad that counts down from five and launches itself off the plate. A splash of water between the numbers keeps them from sticking together.
+
+Ingredients.
+5 g rocket
+0 g sugar
+1 g salt
+32 ml water
+76 g lentils
+105 g iceberg lettuce
+102 g figs
+116 g tomatoes
+111 g olives
+33 g chili flakes
+
+Method.
+Put chili flakes into the mixing bowl. Put figs into the mixing bowl. Put figs into the mixing bowl. Put olives into the mixing bowl. Put tomatoes into the mixing bowl. Put figs into the mixing bowl. Put iceberg lettuce into the mixing bowl. Put lentils into the mixing bowl. Liquefy contents of the mixing bowl. Launch the rocket. Put water into the mixing bowl. Put salt into the mixing bowl. Add sugar to the mixing bowl. Fold sugar into the mixing bowl. Put sugar into the mixing bowl. Launch the rocket until launched. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+      </figure>
+
+      <div class="output-box">
+        <div class="output-label">Output</div>
+        <pre>5 4 3 2 1 Liftoff!</pre>
+      </div>
+
+      <h2>How the countdown cooks</h2>
+      <p>
+        <strong>Phase one — the message.</strong> The first eight <code>Put</code>s spell
+        <code>Liftoff!</code> backwards into the bowl (course two technique: last in, first
+        out), and <code>Liquefy contents</code> melts those eight letters. They'll sit at the
+        bottom of the pile, ready to print last.
+      </p>
+      <p>
+        <strong>Phase two — the loop.</strong> <code>rocket</code> starts at 5, so the body
+        runs five times, and the closing sentence lowers the rocket by 1 each lap. Inside the
+        body, a clever little four-step builds the numbers 1, 2, 3, 4, 5:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Instruction</th><th>Effect</th></tr>
+          <tr><td><code>Put water into the mixing bowl.</code></td><td>a space, to keep numbers apart</td></tr>
+          <tr><td><code>Put salt into the mixing bowl.</code></td><td>pushes 1</td></tr>
+          <tr><td><code>Add sugar to the mixing bowl.</code></td><td>top becomes sugar + 1</td></tr>
+          <tr><td><code>Fold sugar into the mixing bowl.</code></td><td>scoops the top back into <code>sugar</code> — sugar just grew by one!</td></tr>
+          <tr><td><code>Put sugar into the mixing bowl.</code></td><td>pushes the new sugar, keeping it on the pile</td></tr>
+        </table>
+      </div>
+      <p>
+        (That <code>Fold</code> is a sneak preview of course six — it's the opposite of
+        <code>Put</code>: it takes the top value <em>out</em> of the bowl and stores it in an
+        ingredient.) So sugar climbs 1, 2, 3, 4, 5 as the rocket ticks 5, 4, 3, 2, 1 — and
+        because each new number lands <em>on top</em> of the pile, serving prints them
+        biggest-first: <code>5 4 3 2 1</code>, then the melted letters underneath:
+        <code>Liftoff!</code>
+      </p>
+
+      <div class="callout">
+        <span class="callout-title">Emergency exits</span>
+        <p>
+          Two more control moves for your apron pocket. <code>Set aside.</code> bails out of
+          the innermost loop immediately — the “this is burning, moving on” move. And if a loop
+          can <em>never</em> end (say the counter never reaches zero), the Cheffers interpreter
+          won't let your browser stew forever: after 10 million laps it stops the recipe and
+          reports a runtime error. Every chef gets to meet that error once.
+        </p>
+      </div>
+
+      <div class="callout try">
+        <span class="callout-title">Try it</span>
+        <ul>
+          <li>Make it a ten-second countdown. One number changes.</li>
+          <li>Delete <code>Put water into the mixing bowl.</code> and watch the launch turn
+            into the zip code <code>54321Liftoff!</code></li>
+          <li>Count <em>up</em> instead: replace the four-step sugar trick with a single
+            <code>Put rocket into the mixing bowl.</code> (keep the splash of water). The loop
+            counter itself is an ingredient like any other — the output becomes
+            <code>1 2 3 4 5 Liftoff!</code> Can you reason out why?</li>
+          <li>Change the closing sentence to lower a different ingredient than the one being
+            checked — then rescue the recipe from the 10-million-lap safety net.</li>
+        </ul>
+      </div>
+    </article>
+
+    <nav class="chapter-nav">
+      <a class="nav-prev" href="./04-raiding-the-refrigerator.html">
+        <span class="nav-label">Course four</span>
+        ← Raiding the Refrigerator
+      </a>
+      <a class="nav-next" href="./06-the-great-bowl-shuffle.html">
+        <span class="nav-label">Course six</span>
+        The Great Bowl Shuffle →
+      </a>
+    </nav>
+  </main>
+
+  <footer class="footer">
+    Part of <a href="https://github.com/y-a-v-a/cheffers">Cheffers</a>, a Chef interpreter written in Rust.
+    <a href="../editor/">Playground</a> ·
+    <a href="https://www.dangermouse.net/esoteric/chef.html">The original Chef spec</a> ·
+    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  </footer>
+
+  <script src="./cookbook.js"></script>
+</body>
+</html>

@@ -66,6 +66,208 @@ Serves 1.
 `,
     input: "21",
   },
+  "ratatouille": {
+    label: "Remy's Ratatouille",
+    source: `Remy's Ratatouille.
+
+Anyone can cook! This recipe spells out "Ratatouille!" the way a certain rat would: every vegetable is measured so its quantity is the Unicode code point of one letter. The letters go into the bowl in reverse, because a mixing bowl is a stack and the last ingredient in is the first one served.
+
+Ingredients.
+82 g tomatoes
+97 g aubergines
+116 g zucchinis
+111 ml olive oil
+117 g red peppers
+105 g onions
+108 g garlic cloves
+101 g herbes de provence
+33 dashes tabasco
+
+Method.
+Put tabasco into the mixing bowl. Put herbes de provence into the mixing bowl. Put garlic cloves into the mixing bowl. Put garlic cloves into the mixing bowl. Put onions into the mixing bowl. Put red peppers into the mixing bowl. Put olive oil into the mixing bowl. Put zucchinis into the mixing bowl. Put aubergines into the mixing bowl. Put zucchinis into the mixing bowl. Put aubergines into the mixing bowl. Put tomatoes into the mixing bowl. Liquefy contents of the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "saturday-pancakes": {
+    label: "Saturday Pancakes",
+    source: `Saturday Pancakes.
+
+A real Saturday-morning pancake recipe that is also a computer program: it works out how many pancakes the batter makes. The eggs are whisked away to nothing, the sugar is worked into the flour, and the butter is cut in, dividing the mixture into portions. The milk and salt rest in a second bowl and never reach the plate. Serve a stack of twelve.
+
+Ingredients.
+250 g flour
+50 g sugar
+25 g butter
+3 eggs
+500 ml milk
+1 pinch salt
+
+Method.
+Whisk the eggs until whisked. Liquefy the butter. Put flour into the mixing bowl. Add sugar to the mixing bowl. Divide butter into the mixing bowl. Put milk into the 2nd mixing bowl. Put salt into the 2nd mixing bowl. Stir the mixing bowl for 2 minutes. Pour contents of the mixing bowl into the baking dish.
+
+Serves 4.
+`,
+  },
+  "gauss-layer-cake": {
+    label: "Gauss's Layer Cake (input)",
+    source: `Gauss's Layer Cake.
+
+Young Gauss added the numbers 1 to 100 in seconds; this cake does it with layers. Tell the kitchen how many layers you want (the input) and each pass of the loop stacks the current layer count onto the icing sugar, counting down one layer at a time. Ten layers make 55, one hundred make 5050.
+
+Ingredients.
+0 g layers
+0 g icing sugar
+
+Method.
+Take layers from the refrigerator. Put icing sugar into the mixing bowl. Stack the layers. Add layers to the mixing bowl. Stack the layers until stacked. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+    input: "10",
+  },
+  "tapas-times-table": {
+    label: "Tapas Times Table (input)",
+    source: `Tapas Times Table.
+
+Ten guests arrive and each orders one more helping of tapas than nobody at all would: the kitchen prints the full times table of your chosen portion size, one line per guest. The second mixing bowl is the kitchen's scratch pad, where the running total is reduced by one portion per round, and the sparkling water (character 10) pours out as newlines.
+
+Ingredients.
+0 g portions
+10 g guests
+0 g serving
+10 ml sparkling water
+
+Method.
+Take portions from the refrigerator. Put portions into the 2nd mixing bowl. Combine guests into the 2nd mixing bowl. Fold serving into the 2nd mixing bowl. Serve the guests. Put sparkling water into the mixing bowl. Put serving into the mixing bowl. Put serving into the 2nd mixing bowl. Remove portions from the 2nd mixing bowl. Fold serving into the 2nd mixing bowl. Serve the guests until served. Pour contents of the mixing bowl into the baking dish.
+
+Serves 10.
+`,
+    input: "7",
+  },
+  "steak-au-poivre": {
+    label: "Steak au Poivre (sous-chef)",
+    source: `Bistro Steak au Poivre.
+
+The steak is nothing without its sauce, so the head chef calls for a sous-chef. The sous-chef works in a copy of the kitchen with their own ingredient shelf, and whatever ends up in their first mixing bowl is handed back to the head chef. Six crushed peppercorns combined with seven spoons of cognac: the sauce knows the answer to everything.
+
+Ingredients.
+1 sirloin steak
+
+Method.
+Serve with peppercorn sauce. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+
+Peppercorn Sauce.
+
+Ingredients.
+6 g crushed peppercorns
+7 ml cognac
+
+Method.
+Put crushed peppercorns into the mixing bowl. Combine cognac into the mixing bowl.
+`,
+  },
+  "alphabet-soup": {
+    label: "Alphabet Soup (shuffle)",
+    source: `Alphabet Soup.
+
+Pasta letters spelling ALPHABET go into the pot, and then the soup is given a good mix, which shuffles the order of everything in the bowl. What ladles out is an anagram of "alphabet" chosen by the interpreter's random shuffle. Natively every run stirs differently; in the playground the shuffle is seeded per page load.
+
+Ingredients.
+97 g letter a
+98 g letter b
+101 g letter e
+104 g letter h
+108 g letter l
+112 g letter p
+116 g letter t
+
+Method.
+Put letter t into the mixing bowl. Put letter e into the mixing bowl. Put letter b into the mixing bowl. Put letter a into the mixing bowl. Put letter h into the mixing bowl. Put letter p into the mixing bowl. Put letter l into the mixing bowl. Put letter a into the mixing bowl. Liquefy contents of the mixing bowl. Mix the mixing bowl well. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "melon-sorbet": {
+    label: "Stirred Melon Sorbet",
+    source: `Stirred Melon Sorbet.
+
+The bowl starts out spelling MELON, top to bottom. Stirring rolls the top ingredient down into the bowl by the number of minutes stirred: two minutes bury the m two places, one more minute tucks the e just beneath the l, and the sorbet is served as LEMON. Same five ingredients, entirely different fruit.
+
+Ingredients.
+109 g melon balls
+101 ml elderflower cordial
+108 ml lime juice
+111 g orange zest
+110 g nutmeg
+
+Method.
+Put nutmeg into the mixing bowl. Put orange zest into the mixing bowl. Put lime juice into the mixing bowl. Put elderflower cordial into the mixing bowl. Put melon balls into the mixing bowl. Liquefy contents of the mixing bowl. Stir the mixing bowl for 2 minutes. Stir for 1 minute. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "bakers-dozen-scones": {
+    label: "Baker's Dozen Scones",
+    source: `Baker's Dozen Scones.
+
+One instruction does all the measuring: adding the dry ingredients drops the sum of every dry ingredient into the bowl in a single move. Flour, sugar, baking powder and salt are dry and count; buttermilk and melted butter are liquid and stay out of the tally. The tray comes out of the oven with a baker's dozen.
+
+Ingredients.
+8 g self-raising flour
+3 g caster sugar
+1 pinch baking powder
+1 pinch salt
+150 ml buttermilk
+55 ml melted butter
+
+Method.
+Add dry ingredients to the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 13.
+`,
+  },
+  "overnight-oats": {
+    label: "Overnight Oats",
+    source: `Overnight Oats.
+
+Some recipes end not with a bang but with a nap. Refrigerating prints the first baking dish and then stops the recipe on the spot, so the kitchen mumbles "zzz" and goes to sleep. The burnt toast (a suspicious 666) is queued up after the fridge closes and is never served, proving nothing runs past a Refrigerate.
+
+Ingredients.
+122 ml oat milk
+666 g burnt toast
+
+Method.
+Put oat milk into the mixing bowl. Put oat milk into the mixing bowl. Put oat milk into the mixing bowl. Pour contents of the mixing bowl into the baking dish. Refrigerate for 1 hour. Put burnt toast into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "two-course-supper": {
+    label: "Two Course Supper",
+    source: `Two Course Supper.
+
+A proper supper needs two courses, and this kitchen runs two mixing bowls and two baking dishes to plate them. The first bowl builds the word "soup" with a splash of sparkling water for the newline, the second bowl builds "cake", and each is poured into its own dish. Serving two dishes prints the first course, then dessert.
+
+Ingredients.
+115 ml stock
+111 g onions
+117 g udon noodles
+112 g parsnips
+99 g cocoa
+97 g ground almonds
+107 ml kirsch
+101 g beaten eggs
+10 ml sparkling water
+
+Method.
+Put sparkling water into the mixing bowl. Put parsnips into the mixing bowl. Put udon noodles into the mixing bowl. Put onions into the mixing bowl. Put stock into the mixing bowl. Liquefy contents of the mixing bowl. Put beaten eggs into the 2nd mixing bowl. Put kirsch into the 2nd mixing bowl. Put ground almonds into the 2nd mixing bowl. Put cocoa into the 2nd mixing bowl. Liquefy contents of the 2nd mixing bowl. Pour contents of the mixing bowl into the baking dish. Pour contents of the 2nd mixing bowl into the 2nd baking dish.
+
+Serves 2.
+`,
+  },
 };
 
 const DEFAULT_EXAMPLE = "hello-world";

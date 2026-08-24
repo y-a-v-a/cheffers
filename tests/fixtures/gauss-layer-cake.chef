@@ -1,0 +1,12 @@
+Gauss's Layer Cake.
+
+Young Gauss added the numbers 1 to 100 in seconds; this cake does it with layers. Tell the kitchen how many layers you want (the input) and each pass of the loop stacks the current layer count onto the icing sugar, counting down one layer at a time. Ten layers make 55, one hundred make 5050.
+
+Ingredients.
+0 g layers
+0 g icing sugar
+
+Method.
+Take layers from the refrigerator. Put icing sugar into the mixing bowl. Stack the layers. Add layers to the mixing bowl. Stack the layers until stacked. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.

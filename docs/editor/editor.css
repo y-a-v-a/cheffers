@@ -299,9 +299,10 @@ button.theme-toggle:active { transform: translateY(1px); }
   background: var(--panel);
   font-family: var(--mono);
   font-size: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.4;
+  /* No wrapping: ASCII-art output must keep its columns, so a narrow pane
+     scrolls sideways instead. The tighter line height keeps art round. */
+  white-space: pre;
+  line-height: 1.2;
 }
 .output.error { color: var(--error); }
 

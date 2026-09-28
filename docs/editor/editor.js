@@ -268,6 +268,218 @@ Put sparkling water into the mixing bowl. Put parsnips into the mixing bowl. Put
 Serves 2.
 `,
   },
+  "mandelbrot-mille-feuille": {
+    label: "Mandelbrot Mille-Feuille",
+    source: `Mandelbrot Mille-Feuille.
+
+A pastry of a thousand layers, each one a smaller copy of the whole. For every crumb on the plate the chef takes a cherry from the complex plane and folds it into a jam again and again (the jam is squared, the cherry is added back) until the jam boils over or the chef runs out of patience. Everything is baked in fixed-point arithmetic with 8192 grams of flour to the unit. The number of folds survived picks a flavour from a rack of 46 spices, from a bare plate for the impatient crumbs to a dense @ for the ones that never boil over. The spice rack arrives vacuum-packed: seven jars each hold seven characters as pairs of digits, and are ground open before baking begins. The plate is assembled back to front so that it can be served top to bottom.
+
+Ingredients.
+6053432000000 g saffron
+66756579100345 g paprika
+35491658878180 g turmeric
+78856790565342 g cumin
+31619284707488 g cardamom
+27417601739411 g cloves
+140764621226 g nutmeg
+7 jars
+7 g pod size
+100 g salt
+32 g pepper
+8192 g flour
+32769 g butter
+15 g caster sugar
+16 g brown sugar
+0 g air
+1 egg
+2 yolks
+45 minutes
+304 g cinnamon
+546 g vanilla
+5690 g cherry pits
+9826 g white cherries
+79 wafers
+37 layers
+10 ml water
+
+Cooking time: 45 minutes.
+
+Pre-heat oven to 180 degrees Celsius.
+
+Method.
+Put nutmeg into the 4th mixing bowl. Put cloves into the 4th mixing bowl. Put cardamom into the 4th mixing bowl. Put cumin into the 4th mixing bowl. Put turmeric into the 4th mixing bowl. Put paprika into the 4th mixing bowl. Put saffron into the 4th mixing bowl.
+Grate the jars. Fold spice into the 4th mixing bowl. Put pod size into the mixing bowl. Fold pods into the mixing bowl.
+Crush the pods. Put spice into the mixing bowl. Divide salt into the mixing bowl. Combine salt into the mixing bowl. Fold rest into the mixing bowl. Put spice into the mixing bowl. Remove rest from the mixing bowl. Add pepper to the mixing bowl. Fold glaze into the mixing bowl. Liquefy glaze. Put glaze into the 2nd mixing bowl. Put spice into the mixing bowl. Divide salt into the mixing bowl. Fold spice into the mixing bowl. Crush the pods until crushed.
+Grate the jars until grated.
+Layer the layers. Put water into the 3rd mixing bowl. Put cherry pits into the mixing bowl. Fold red cherries into the mixing bowl. Put wafers into the mixing bowl. Fold wafer into the mixing bowl.
+Whisk the wafer. Put air into the mixing bowl. Fold red jam into the mixing bowl. Put air into the mixing bowl. Fold white jam into the mixing bowl. Put air into the mixing bowl. Fold sprinkles into the mixing bowl. Put minutes into the mixing bowl. Fold patience into the mixing bowl.
+Knead the patience. Put red jam into the mixing bowl. Combine red jam into the mixing bowl. Divide flour into the mixing bowl. Fold red syrup into the mixing bowl. Put white jam into the mixing bowl. Combine white jam into the mixing bowl. Divide flour into the mixing bowl. Fold white syrup into the mixing bowl. Put red syrup into the mixing bowl. Add white syrup to the mixing bowl. Divide butter into the mixing bowl. Add caster sugar to the mixing bowl. Divide brown sugar into the mixing bowl. Fold smoke into the mixing bowl. Put egg into the mixing bowl. Remove smoke from the mixing bowl. Fold steam into the mixing bowl. Put sprinkles into the mixing bowl. Add steam to the mixing bowl. Fold sprinkles into the mixing bowl. Put patience into the mixing bowl. Combine steam into the mixing bowl. Add smoke to the mixing bowl. Fold patience into the mixing bowl. Put red jam into the mixing bowl. Combine white jam into the mixing bowl. Combine yolks into the mixing bowl. Divide flour into the mixing bowl. Add white cherries to the mixing bowl. Fold white jam into the mixing bowl. Put red syrup into the mixing bowl. Remove white syrup from the mixing bowl. Add red cherries to the mixing bowl. Fold red jam into the mixing bowl. Knead the patience until kneaded.
+Put sprinkles into the mixing bowl. Fold turns into the mixing bowl. Turn the turns. Stir sprinkles into the 2nd mixing bowl. Turn the turns until turned. Fold glaze into the 2nd mixing bowl. Put glaze into the 2nd mixing bowl. Put glaze into the 3rd mixing bowl. Stir sprinkles into the 2nd mixing bowl.
+Put red cherries into the mixing bowl. Remove cinnamon from the mixing bowl. Fold red cherries into the mixing bowl. Whisk the wafer until whisked.
+Put white cherries into the mixing bowl. Remove vanilla from the mixing bowl. Fold white cherries into the mixing bowl. Layer the layers until layered.
+Pour contents of the 3rd mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "pi-pie": {
+    label: "Pi Pie",
+    source: `Pi Pie.
+
+A round pie filled with 1501 decimals of pi, every one of them computed in the kitchen. The filling is made with the spigot method: a long row of apples in the second mixing bowl is swept from the far end to the near end, each apple passing a carry of dough to its neighbour, and after every sweep four fresh digits of pi drip out of the end of the row. The row of apples is flipped back and fourteen apples are eaten, because they have nothing more to give. Once the filling is ready it is spooned into a pie dish shaped by the equation of a circle, and the rim is crimped by hand into a crust.
+
+Ingredients.
+10000 g flour
+2000 g sugar
+5264 apples
+14 cloves
+376 slices
+1504 pips
+0 g air
+1 egg
+2 yolks
+1000 g butter
+100 g cream
+10 g raisins
+48 g lemon zest
+46 g poppy seeds
+40 g pastry
+32 g steam
+33 rows
+67 g lattice
+68 g overhang
+-33 g rim
+-32 g depth
+961 g filling line
+1089 g crust line
+
+Cooking time: 1 hour.
+
+Pre-heat oven to 314 degrees Celsius.
+
+Method.
+Put apples into the mixing bowl. Remove egg from the mixing bowl. Fold layers into the mixing bowl. Sprinkle the layers. Put sugar into the 2nd mixing bowl. Sprinkle the layers until sprinkled. Put air into the 2nd mixing bowl.
+Put air into the mixing bowl. Fold leftover into the mixing bowl.
+Bake the slices. Put air into the mixing bowl. Fold dough into the mixing bowl. Put apples into the mixing bowl. Combine yolks into the mixing bowl. Fold heat into the mixing bowl. Put apples into the mixing bowl. Fold apple into the mixing bowl.
+Peel the apple. Fold filling into the 2nd mixing bowl. Put dough into the mixing bowl. Combine apple into the mixing bowl. Put filling into the mixing bowl. Combine flour into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Fold dough into the mixing bowl. Put heat into the mixing bowl. Remove egg from the mixing bowl. Fold heat into the mixing bowl. Put dough into the mixing bowl. Divide heat into the mixing bowl. Fold risen dough into the mixing bowl. Put dough into the 3rd mixing bowl. Put risen dough into the mixing bowl. Combine heat into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the 3rd mixing bowl. Put risen dough into the mixing bowl. Fold dough into the mixing bowl. Put heat into the mixing bowl. Remove egg from the mixing bowl. Fold heat into the mixing bowl. Peel the apple until peeled.
+Put dough into the mixing bowl. Divide flour into the mixing bowl. Add leftover to the mixing bowl. Fold wedge into the mixing bowl. Put dough into the mixing bowl. Divide flour into the mixing bowl. Combine flour into the mixing bowl. Fold crumbs into the mixing bowl. Put dough into the mixing bowl. Remove crumbs from the mixing bowl. Fold leftover into the mixing bowl.
+Put wedge into the 4th mixing bowl. Divide butter into the 4th mixing bowl. Add lemon zest to the 4th mixing bowl.
+Put wedge into the 4th mixing bowl. Divide cream into the 4th mixing bowl. Put wedge into the mixing bowl. Divide butter into the mixing bowl. Combine raisins into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the 4th mixing bowl. Add lemon zest to the 4th mixing bowl.
+Put wedge into the 4th mixing bowl. Divide raisins into the 4th mixing bowl. Put wedge into the mixing bowl. Divide cream into the mixing bowl. Combine raisins into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the 4th mixing bowl. Add lemon zest to the 4th mixing bowl.
+Put wedge into the 4th mixing bowl. Put wedge into the mixing bowl. Divide raisins into the mixing bowl. Combine raisins into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the 4th mixing bowl. Add lemon zest to the 4th mixing bowl.
+Put apples into the mixing bowl. Remove cloves from the mixing bowl. Fold apples into the mixing bowl. Put apples into the mixing bowl. Fold handful into the mixing bowl. Flip the handful. Fold filling into the 3rd mixing bowl. Put filling into the 2nd mixing bowl. Flip the handful until flipped. Clean the 3rd mixing bowl.
+Bake the slices until baked.
+Stack the pips. Fold piece into the 4th mixing bowl. Put piece into the 5th mixing bowl. Stack the pips until stacked. Fold piece into the 5th mixing bowl. Put poppy seeds into the 5th mixing bowl. Put piece into the 5th mixing bowl.
+Put air into the mixing bowl. Fold portions into the mixing bowl. Put air into the mixing bowl. Fold parity into the mixing bowl.
+Roll the rows. Put rim into the mixing bowl. Fold across into the mixing bowl. Put lattice into the mixing bowl. Fold strips into the mixing bowl. Put depth into the mixing bowl. Combine depth into the mixing bowl. Fold depth squared into the mixing bowl.
+Crimp the strips. Put across into the mixing bowl. Combine across into the mixing bowl. Add depth squared to the mixing bowl. Fold distance into the mixing bowl. Put distance into the mixing bowl. Divide filling line into the mixing bowl. Add egg to the mixing bowl. Divide yolks into the mixing bowl. Fold filled into the mixing bowl. Put distance into the mixing bowl. Divide crust line into the mixing bowl. Fold crusted into the mixing bowl. Put egg into the mixing bowl. Remove filled from the mixing bowl. Fold digit flag into the mixing bowl. Put filled into the mixing bowl. Remove crusted from the mixing bowl. Fold crust flag into the mixing bowl. Put lattice into the mixing bowl. Remove across from the mixing bowl. Divide overhang into the mixing bowl. Combine crusted into the mixing bowl. Fold space flag into the mixing bowl.
+Scoop the digit flag. Fold piece into the 5th mixing bowl. Put piece into the 6th mixing bowl. Set aside. Scoop until scooped.
+Pinch the crust flag. Put pastry into the 6th mixing bowl. Add parity to the 6th mixing bowl. Set aside. Pinch until pinched.
+Dust the space flag. Put steam into the 6th mixing bowl. Set aside. Dust until dusted.
+Put portions into the mixing bowl. Add digit flag to the mixing bowl. Add crust flag to the mixing bowl. Add space flag to the mixing bowl. Fold portions into the mixing bowl. Put egg into the mixing bowl. Remove parity from the mixing bowl. Fold parity into the mixing bowl. Put across into the mixing bowl. Add egg to the mixing bowl. Fold across into the mixing bowl. Crimp the strips until crimped.
+Put raisins into the 6th mixing bowl. Put portions into the mixing bowl. Add egg to the mixing bowl. Fold portions into the mixing bowl. Put depth into the mixing bowl. Add yolks to the mixing bowl. Fold depth into the mixing bowl. Roll the rows until rolled.
+Plate the portions. Fold piece into the 6th mixing bowl. Put piece into the 7th mixing bowl. Plate the portions until plated.
+Liquefy contents of the 7th mixing bowl. Pour contents of the 7th mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
+  "mirror-glaze-bombe": {
+    label: "Mirror Glaze Bombe",
+    source: `Mirror Glaze Bombe on a Gingham Tablecloth.
+
+A ray tracer disguised as a dessert. A perfectly round bombe hovers over a gingham tablecloth that stretches all the way to the horizon, glazed so shiny that the tablecloth can be seen in it. For every crumb on the plate the chef follows a ray of light from the eye into the scene. If the ray strikes the bombe, the chef finds the exact spot with a square root (refined twenty-four times by Newton's method), measures how squarely the sunlight lands there, adds a sparkle where the sun is mirrored, and bounces the ray off the glaze. Whatever the ray reaches next, the tablecloth or the sky, is added to the flavour. On the tablecloth the chef works out which gingham square was hit, and whether the bombe stands between that square and the sun; if it does, the square lies in shadow. Faraway squares fade into the haze of the horizon. The flavour is then matched to a row of fourteen liquids, from clear steam to dark chocolate. There is no "if" in a kitchen, so every decision is a loop that runs at most once; and there is no "less than" either, so every comparison is made by dividing by a pinch of sea salt the size of an ocean. Everything is measured in fixed-point grams, 1024 to the unit, with no fractions in sight.
+
+Ingredients.
+1024 g flour
+1048576 g icing sugar
+2305843009213693952 g sea salt
+0 g air
+1 cherry
+2 eggs
+4 quarters
+9 g gloss
+10 g salt
+14 spices
+1025 g sieve
+4096 g first guess
+24 rounds of patience
+650 g lentils
+78 g breadcrumbs
+215 g tilt
+79 g width
+36 rows
+-35 g frost
+250 g eye height
+-3600 g eye distance
+100 g eye lift
+-3686400 g dough
+11642 g crust
+150 g bombe height
+-1024 g table height
+-561 g west sun
+729 g high sun
+-280 g south sun
+-855846 g noon shadow
+329700 g tablecloth
+65536 g gingham offset
+700 g gingham
+110 g dye
+890 g bleach
+8192 g haze
+260 g sky blue
+780 g sky fade
+409 g mirror glaze
+10 ml water
+32 ml steam
+46 ml milk
+44 ml cream
+58 ml syrup
+59 ml honey
+45 ml juice
+61 ml broth
+43 ml wine
+42 ml rum
+111 ml brandy
+35 ml coffee
+37 ml cocoa
+38 ml ganache
+64 ml chocolate
+
+Cooking time: 3 hours.
+
+Pre-heat oven to 220 degrees Celsius (gas mark 7).
+
+Method.
+Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put chocolate into the 2nd mixing bowl. Put ganache into the 2nd mixing bowl. Put cocoa into the 2nd mixing bowl. Put coffee into the 2nd mixing bowl. Put brandy into the 2nd mixing bowl. Put rum into the 2nd mixing bowl. Put wine into the 2nd mixing bowl. Put broth into the 2nd mixing bowl. Put juice into the 2nd mixing bowl. Put honey into the 2nd mixing bowl. Put syrup into the 2nd mixing bowl. Put cream into the 2nd mixing bowl. Put milk into the 2nd mixing bowl. Put steam into the 2nd mixing bowl.
+Put frost into the mixing bowl. Fold row lift into the mixing bowl.
+Chill the rows. Put water into the 3rd mixing bowl. Put row lift into the mixing bowl. Combine lentils into the mixing bowl. Divide breadcrumbs into the mixing bowl. Combine eggs into the mixing bowl. Remove tilt from the mixing bowl. Fold row ray into the mixing bowl. Put breadcrumbs into the mixing bowl. Fold column lift into the mixing bowl. Put width into the mixing bowl. Fold columns into the mixing bowl.
+Pipe the columns. Put column lift into the mixing bowl. Combine lentils into the mixing bowl. Divide breadcrumbs into the mixing bowl. Fold ray x into the mixing bowl. Put row ray into the mixing bowl. Fold ray y into the mixing bowl. Put flour into the mixing bowl. Fold ray z into the mixing bowl. Put air into the mixing bowl. Fold eye x into the mixing bowl. Put eye height into the mixing bowl. Fold eye y into the mixing bowl. Put eye distance into the mixing bowl. Fold eye z into the mixing bowl. Put air into the mixing bowl. Fold brightness into the mixing bowl. Put flour into the mixing bowl. Fold sheen into the mixing bowl.
+Put ray x into the mixing bowl. Combine ray x into the mixing bowl. Put ray y into the mixing bowl. Combine ray y into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Add icing sugar to the mixing bowl. Divide flour into the mixing bowl. Fold span into the mixing bowl. Put ray y into the mixing bowl. Combine eye lift into the mixing bowl. Add dough to the mixing bowl. Divide flour into the mixing bowl. Fold bias into the mixing bowl. Put bias into the mixing bowl. Combine bias into the mixing bowl. Put span into the mixing bowl. Combine crust into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the mixing bowl. Fold batter into the mixing bowl. Put batter into the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Fold contact into the mixing bowl.
+Dip the contact. Put first guess into the mixing bowl. Fold root into the mixing bowl. Put rounds of patience into the mixing bowl. Fold rounds into the mixing bowl. Refine the rounds. Put batter into the mixing bowl. Divide root into the mixing bowl. Add root to the mixing bowl. Add cherry to the mixing bowl. Divide eggs into the mixing bowl. Fold root into the mixing bowl. Refine the rounds until refined.
+Put air into the mixing bowl. Remove bias from the mixing bowl. Remove root from the mixing bowl. Combine flour into the mixing bowl. Divide span into the mixing bowl. Fold depth into the mixing bowl. Put depth into the mixing bowl. Combine ray x into the mixing bowl. Divide flour into the mixing bowl. Fold eye x into the mixing bowl. Put depth into the mixing bowl. Combine ray y into the mixing bowl. Divide flour into the mixing bowl. Add eye y to the mixing bowl. Fold eye y into the mixing bowl. Put depth into the mixing bowl. Add eye z to the mixing bowl. Fold eye z into the mixing bowl. Put eye y into the mixing bowl. Remove bombe height from the mixing bowl. Fold normal y into the mixing bowl.
+Put eye x into the mixing bowl. Combine west sun into the mixing bowl. Put normal y into the mixing bowl. Combine high sun into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Put eye z into the mixing bowl. Combine south sun into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Divide flour into the mixing bowl. Fold light into the mixing bowl. Put light into the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Combine light into the mixing bowl. Fold light into the mixing bowl.
+Put ray x into the mixing bowl. Combine eye x into the mixing bowl. Put ray y into the mixing bowl. Combine normal y into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Put flour into the mixing bowl. Combine eye z into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Divide flour into the mixing bowl. Fold bounce into the mixing bowl.
+Put bounce into the mixing bowl. Combine eggs into the mixing bowl. Combine eye x into the mixing bowl. Divide flour into the mixing bowl. Fold crumbs into the mixing bowl. Put ray x into the mixing bowl. Remove crumbs from the mixing bowl. Fold ray x into the mixing bowl. Put bounce into the mixing bowl. Combine eggs into the mixing bowl. Combine normal y into the mixing bowl. Divide flour into the mixing bowl. Fold crumbs into the mixing bowl. Put ray y into the mixing bowl. Remove crumbs from the mixing bowl. Fold ray y into the mixing bowl. Put bounce into the mixing bowl. Combine eggs into the mixing bowl. Combine eye z into the mixing bowl. Divide flour into the mixing bowl. Fold crumbs into the mixing bowl. Put flour into the mixing bowl. Remove crumbs from the mixing bowl. Fold ray z into the mixing bowl.
+Put ray x into the mixing bowl. Combine west sun into the mixing bowl. Put ray y into the mixing bowl. Combine high sun into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Put ray z into the mixing bowl. Combine south sun into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Divide flour into the mixing bowl. Fold shine into the mixing bowl. Put ray x into the mixing bowl. Combine ray x into the mixing bowl. Put ray y into the mixing bowl. Combine ray y into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Put ray z into the mixing bowl. Combine ray z into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Fold length into the mixing bowl.
+Put shine into the mixing bowl. Combine shine into the mixing bowl. Combine flour into the mixing bowl. Divide length into the mixing bowl. Fold sparkle into the mixing bowl. Put shine into the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Combine sparkle into the mixing bowl. Fold sparkle into the mixing bowl. Put sparkle into the mixing bowl. Combine sparkle into the mixing bowl. Divide flour into the mixing bowl. Fold sparkle into the mixing bowl. Put sparkle into the mixing bowl. Combine sparkle into the mixing bowl. Divide flour into the mixing bowl. Fold sparkle into the mixing bowl. Put sparkle into the mixing bowl. Combine sparkle into the mixing bowl. Divide flour into the mixing bowl. Fold sparkle into the mixing bowl.
+Put light into the mixing bowl. Combine gloss into the mixing bowl. Divide salt into the mixing bowl. Add sparkle to the mixing bowl. Fold brightness into the mixing bowl. Put mirror glaze into the mixing bowl. Fold sheen into the mixing bowl. Set aside. Dip until dipped.
+Put air into the mixing bowl. Remove ray y from the mixing bowl. Remove cherry from the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Fold table flag into the mixing bowl. Put cherry into the mixing bowl. Remove table flag from the mixing bowl. Fold sky flag into the mixing bowl.
+Spread the table flag. Put table height into the mixing bowl. Remove eye y from the mixing bowl. Combine flour into the mixing bowl. Divide ray y into the mixing bowl. Fold depth into the mixing bowl. Put depth into the mixing bowl. Combine ray x into the mixing bowl. Divide flour into the mixing bowl. Add eye x to the mixing bowl. Fold spot x into the mixing bowl. Put depth into the mixing bowl. Combine ray z into the mixing bowl. Divide flour into the mixing bowl. Add eye z to the mixing bowl. Fold spot z into the mixing bowl.
+Put spot x into the mixing bowl. Add gingham offset to the mixing bowl. Divide gingham into the mixing bowl. Put spot z into the mixing bowl. Add gingham offset to the mixing bowl. Divide gingham into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Fold check into the mixing bowl. Put check into the mixing bowl. Put check into the mixing bowl. Divide eggs into the mixing bowl. Combine eggs into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the mixing bowl. Fold check into the mixing bowl. Put check into the mixing bowl. Combine check into the mixing bowl. Combine bleach into the mixing bowl. Add dye to the mixing bowl. Fold base into the mixing bowl.
+Put spot x into the mixing bowl. Combine west sun into the mixing bowl. Put spot z into the mixing bowl. Combine south sun into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Add noon shadow to the mixing bowl. Divide flour into the mixing bowl. Fold shade into the mixing bowl. Put spot x into the mixing bowl. Combine spot x into the mixing bowl. Put spot z into the mixing bowl. Combine spot z into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Add tablecloth to the mixing bowl. Divide flour into the mixing bowl. Fold cloth into the mixing bowl. Put shade into the mixing bowl. Combine shade into the mixing bowl. Put cloth into the mixing bowl. Combine flour into the mixing bowl. Fold crumbs into the mixing bowl. Remove crumbs from the mixing bowl. Fold eclipse into the mixing bowl.
+Put eclipse into the mixing bowl. Remove cherry from the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Fold umbra into the mixing bowl. Put air into the mixing bowl. Remove shade from the mixing bowl. Remove cherry from the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Combine umbra into the mixing bowl. Fold umbra into the mixing bowl. Put base into the mixing bowl. Divide quarters into the mixing bowl. Fold crumbs into the mixing bowl. Put base into the mixing bowl. Remove crumbs from the mixing bowl. Combine umbra into the mixing bowl. Fold crumbs into the mixing bowl. Put base into the mixing bowl. Remove crumbs from the mixing bowl. Fold base into the mixing bowl.
+Put haze into the mixing bowl. Add depth to the mixing bowl. Fold fog into the mixing bowl. Put base into the mixing bowl. Combine haze into the mixing bowl. Put depth into the mixing bowl. Combine sky blue into the mixing bowl. Fold crumbs into the mixing bowl. Add crumbs to the mixing bowl. Divide fog into the mixing bowl. Fold view into the mixing bowl. Set aside. Spread until spread.
+Paint the sky flag. Put ray y into the mixing bowl. Combine sky fade into the mixing bowl. Divide flour into the mixing bowl. Fold crumbs into the mixing bowl. Put sky blue into the mixing bowl. Remove crumbs from the mixing bowl. Fold view into the mixing bowl. Put view into the mixing bowl. Add sea salt to the mixing bowl. Divide sea salt into the mixing bowl. Combine view into the mixing bowl. Fold view into the mixing bowl. Set aside. Paint until painted.
+Put view into the mixing bowl. Combine sheen into the mixing bowl. Divide flour into the mixing bowl. Add brightness to the mixing bowl. Fold brightness into the mixing bowl. Put brightness into the mixing bowl. Combine spices into the mixing bowl. Divide sieve into the mixing bowl. Fold pick into the mixing bowl.
+Put pick into the mixing bowl. Fold turns into the mixing bowl. Turn the turns. Stir pick into the 2nd mixing bowl. Turn the turns until turned. Fold dab into the 2nd mixing bowl. Put dab into the 2nd mixing bowl. Put dab into the 3rd mixing bowl. Stir pick into the 2nd mixing bowl.
+Put column lift into the mixing bowl. Remove eggs from the mixing bowl. Fold column lift into the mixing bowl. Pipe the columns until piped.
+Put row lift into the mixing bowl. Add eggs to the mixing bowl. Fold row lift into the mixing bowl. Chill the rows until chilled.
+Pour contents of the 3rd mixing bowl into the baking dish.
+
+Serves 1.
+`,
+  },
 };
 
 const DEFAULT_EXAMPLE = "hello-world";

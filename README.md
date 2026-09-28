@@ -36,6 +36,32 @@ sous-chefs. Every chapter is built around a runnable recipe you can open in the
 playground with one click, and the recipes themselves live in
 `docs/cookbook/recipes/` with their outputs pinned by `tests/cookbook_recipes.rs`.
 
+## Showpieces
+
+Three bigger recipes show how far a kitchen of stacks can go. All three are in
+the playground's example menu and in `tests/fixtures/`:
+
+- **Mandelbrot Mille-Feuille** (`mandelbrot-mille-feuille.chef`): renders the
+  Mandelbrot set in fixed-point arithmetic. Its 46-character palette arrives
+  packed two digits per character in seven "spice jar" numbers and is unpacked
+  before baking.
+- **Pi Pie** (`pi-pie.chef`): computes 1501 decimals of π with a spigot
+  algorithm that sweeps a row of 5264 "apples" back and forth between two
+  mixing bowls, then serves them in a round pie with a crimped crust.
+- **Mirror Glaze Bombe on a Gingham Tablecloth** (`mirror-glaze-bombe.chef`):
+  a ray tracer. It draws a shiny sphere floating over a checkered floor that
+  runs to the horizon, with diffuse and specular lighting, a reflection of the
+  floor in the sphere, a cast shadow and distance haze. Square roots use
+  Newton's method, and every `if` is a loop that runs at most once.
+
+```
+                         )()()()()()()()()
+                    )()()(3.1415926535897()()()
+                ()()932384626433832795028841971)()(
+             ()()693993751058209749445923078164062)()(
+           )()862089986280348253421170679821480865132)()
+```
+
 ## Installation
 
 ### From Source

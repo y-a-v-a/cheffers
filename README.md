@@ -54,6 +54,8 @@ the playground's example menu and in `tests/fixtures/`:
   floor in the sphere, a cast shadow and distance haze. Square roots use
   Newton's method, and every `if` is a loop that runs at most once.
 
+![The Mirror Glaze Bombe ray tracer running in the Cheffers Playground](docs/editor/mirror-glaze-bombe.png)
+
 ```
                          )()()()()()()()()
                     )()()(3.1415926535897()()()

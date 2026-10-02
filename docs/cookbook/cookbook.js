@@ -10,29 +10,11 @@
 // The theme toggle is shared with the playground (../assets/theme.js).
 // No build step: this file is served as-is, as an ES module.
 
-import { tokenizeChef } from "../assets/chef-syntax.js";
+import { highlightChef } from "../assets/chef-syntax.js";
 
 /* ----- Syntax highlighting ----- */
 
-// Rebuild a <pre>/<code> element's text as plain text nodes plus classed
-// spans. textContent is unchanged, so copying still yields the exact source.
-function highlight(el) {
-  const text = el.textContent;
-  const fragment = document.createDocumentFragment();
-  let last = 0;
-  for (const { from, to, type } of tokenizeChef(text)) {
-    if (from > last) fragment.append(text.slice(last, from));
-    const span = document.createElement("span");
-    span.className = "tok-" + type;
-    span.textContent = text.slice(from, to);
-    fragment.append(span);
-    last = to;
-  }
-  if (last < text.length) fragment.append(text.slice(last));
-  el.replaceChildren(fragment);
-}
-
-document.querySelectorAll(".recipe-card pre code, pre.snippet").forEach(highlight);
+document.querySelectorAll(".recipe-card pre code, pre.snippet").forEach(highlightChef);
 
 /* ----- Recipe cards: copy + open-in-playground ----- */
 

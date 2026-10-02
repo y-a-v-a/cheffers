@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cheffers — a Chef interpreter written in Rust</title>
+  <meta name="description" content="Cheffers is a complete Rust interpreter for Chef, the esoteric programming language where programs are written as cooking recipes. Try it in the browser playground or learn it with the cookbook." />
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍳</text></svg>' />
+  <link rel="preload" href="./assets/fonts/archivo-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./assets/site.css" />
+  <link rel="stylesheet" href="./home.css" />
+  <!-- Apply the saved theme before first paint to avoid a flash of the
+       default palette. The header toggle (./assets/theme.js) keeps this in sync. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("cheffers-theme");
+        if (t && t !== "system") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="Cheffers home">Cheffers<span class="dot">.</span></a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="./editor/">Playground</a>
+      <a href="./cookbook/">Cookbook</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn github-link" href="https://github.com/y-a-v-a/cheffers" title="Source on GitHub" aria-label="Source on GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+      <button id="theme" class="icon-btn" type="button" aria-label="Theme: System. Click to change."></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div class="hero-copy">
+        <p class="eyebrow">A Chef interpreter, written in Rust</p>
+        <h1>Programs that read like <span class="accent">recipes</span>.</h1>
+        <p class="lede">
+          Cheffers is a complete interpreter for Chef, the esoteric programming language where
+          every program is a cooking recipe: ingredients are variables, mixing bowls are stacks,
+          and the method is the code.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="./editor/">
+            Open the playground
+            <span class="icon icon-arrow" aria-hidden="true"></span>
+          </a>
+          <a class="btn btn-lg" href="./cookbook/">Learn Chef in seven courses</a>
+        </div>
+        <p class="hero-note">Runs entirely in your browser via WebAssembly — nothing to install, nothing sent to a server.</p>
+      </div>
+
+      <div class="preview-wrap">
+        <figure class="preview" role="group" aria-label="Chef recipe: The Answer Broth">
+          <div class="preview-bar">
+            <span class="preview-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="preview-title">the-answer-broth.chef</span>
+            <a class="btn btn-soft" href="./editor/#recipe=eyJjIjoiVGhlIEFuc3dlciBCcm90aC5cblxuVGhlIHNpbXBsZXN0IGRpc2ggaW4gdGhlIGJvb2s6IG9uZSBpbmdyZWRpZW50LCBvbmUgYm93bCwgb25lIHBlcmZlY3QgbnVtYmVyLiBTZXJ2ZSB3YXJtIHRvIGZhbnMgb2YgaW50ZXJnYWxhY3RpYyBoaXRjaGhpa2luZy5cblxuSW5ncmVkaWVudHMuXG40MiBnIG15c3RlcnkgYmVhbnNcblxuTWV0aG9kLlxuUHV0IG15c3RlcnkgYmVhbnMgaW50byB0aGUgbWl4aW5nIGJvd2wuIFBvdXIgY29udGVudHMgb2YgdGhlIG1peGluZyBib3dsIGludG8gdGhlIGJha2luZyBkaXNoLlxuXG5TZXJ2ZXMgMS5cbiIsImkiOiIifQ">
+              <span class="icon icon-play" aria-hidden="true"></span>
+              Run it
+            </a>
+          </div>
+          <pre><code data-chef>The Answer Broth.
+
+The simplest dish in the book: one ingredient, one bowl, one perfect number. Serve warm to fans of intergalactic hitchhiking.
+
+Ingredients.
+42 g mystery beans
+
+Method.
+Put mystery beans into the mixing bowl. Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.</code></pre>
+          <div class="preview-output">
+            <span class="preview-label">Output</span>
+            <samp>42</samp>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="start-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Start here</p>
+          <h2 id="start-title">Three ways into the kitchen</h2>
+        </div>
+        <div class="paths">
+          <a class="path-card" href="./editor/">
+            <span class="path-kicker">Playground</span>
+            <span class="path-title">Try it in your browser</span>
+            <span class="path-text">Write and run Chef recipes instantly in a JsBin-style editor, powered by the Rust interpreter compiled to WebAssembly.</span>
+            <span class="path-more">Open the playground</span>
+          </a>
+          <a class="path-card" href="./cookbook/">
+            <span class="path-kicker">Cookbook</span>
+            <span class="path-title">Learn it in seven courses</span>
+            <span class="path-text">A playful tutorial where stacks are piles of pancakes and functions are sous-chefs. Every recipe opens in the playground.</span>
+            <span class="path-more">Start cooking</span>
+          </a>
+          <a class="path-card" href="#install">
+            <span class="path-kicker">Command line</span>
+            <span class="path-title">Install it locally</span>
+            <span class="path-text">One <code>cargo install</code> and <code>cheffers</code> runs any <code>.chef</code> recipe straight from your terminal.</span>
+            <span class="path-more">Get started</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="chef-title">
+      <div class="container split">
+        <div class="section-head prose">
+          <p class="eyebrow">The language</p>
+          <h2 id="chef-title">What is Chef?</h2>
+          <p>
+            Chef is an esoteric programming language created by David Morgan-Mar in 2002.
+            Programs in Chef look like cooking recipes — ingredients represent variables, mixing
+            bowls are stacks, and cooking instructions translate to program operations.
+          </p>
+          <p>When executed, your recipe doesn't just cook a dish — it computes!</p>
+        </div>
+        <ul class="kitchen-map" aria-label="The kitchen, translated">
+          <li><span class="k">Ingredient</span><span class="arrow" aria-hidden="true">→</span><span class="c">variable</span></li>
+          <li><span class="k">Mixing bowl</span><span class="arrow" aria-hidden="true">→</span><span class="c">stack</span></li>
+          <li><span class="k">Baking dish</span><span class="arrow" aria-hidden="true">→</span><span class="c">output</span></li>
+          <li><span class="k">Refrigerator</span><span class="arrow" aria-hidden="true">→</span><span class="c">input</span></li>
+          <li><span class="k">Sous-chef</span><span class="arrow" aria-hidden="true">→</span><span class="c">function</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Features</p>
+          <h2 id="features-title">Cooked to the spec</h2>
+        </div>
+        <div class="features">
+          <div class="feature">
+            <span class="feature-stat">62 / 62</span>
+            <h3>100% complete</h3>
+            <p>All 62 specification tests passing.</p>
+          </div>
+          <div class="feature">
+            <span class="feature-stat">Rust</span>
+            <h3>Fast &amp; efficient</h3>
+            <p>Built with Rust for optimal performance.</p>
+          </div>
+          <div class="feature">
+            <span class="feature-stat">1 command</span>
+            <h3>Easy to use</h3>
+            <p>A simple command-line interface: <code>cheffers recipe.chef</code>.</p>
+          </div>
+          <div class="feature">
+            <span class="feature-stat">CI / CD</span>
+            <h3>Well tested</h3>
+            <p>A comprehensive test suite runs on every push.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install" aria-labelledby="install-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Getting started</p>
+          <h2 id="install-title">Install it, then serve a recipe</h2>
+        </div>
+        <div class="code-grid">
+          <figure class="code-card">
+            <figcaption class="code-card-head">
+              <span>Installation</span>
+              <button class="btn copy-btn" type="button" data-copy="install-code"><span class="icon icon-copy" aria-hidden="true"></span><span class="copy-label">Copy</span></button>
+            </figcaption>
+            <pre id="install-code"><span class="tok-comment"># From GitHub</span>
+cargo install --git https://github.com/y-a-v-a/cheffers
+
+<span class="tok-comment"># From source</span>
+git clone https://github.com/y-a-v-a/cheffers.git
+cd cheffers
+cargo install --path .</pre>
+          </figure>
+          <figure class="code-card">
+            <figcaption class="code-card-head">
+              <span>Quick example</span>
+              <button class="btn copy-btn" type="button" data-copy="example-code"><span class="icon icon-copy" aria-hidden="true"></span><span class="copy-label">Copy</span></button>
+            </figcaption>
+            <pre id="example-code"><span class="tok-comment"># Run a Chef recipe</span>
+cheffers path/to/recipe.chef
+
+<span class="tok-comment"># Try the included examples</span>
+cheffers tests/fixtures/hello-world.chef
+cheffers tests/fixtures/fibonacci.chef</pre>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="docs-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Documentation</p>
+          <h2 id="docs-title">Go deeper</h2>
+        </div>
+        <div class="docs-grid">
+          <div>
+            <h3 class="list-title">Guides</h3>
+            <ul class="link-list">
+              <li>
+                <a class="link-card" href="./stack-based-programming.html">
+                  <span class="link-title">Understanding Stack-Based Programming in Chef</span>
+                  <span class="link-text">How Chef's stack-based paradigm works and how to think in stacks instead of variables. Perfect for developers coming from JavaScript, Python, or other imperative languages.</span>
+                </a>
+              </li>
+              <li>
+                <a class="link-card" href="./fibonacci-spec-analysis.html">
+                  <span class="link-title">Fibonacci Program — Spec Analysis</span>
+                  <span class="link-text">A deep dive into the canonical Fibonacci implementation: recursive auxiliary calls, Refrigerate as conditional exit, and other spec ambiguities.</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="list-title">Reference</h3>
+            <ul class="link-list">
+              <li>
+                <a class="link-card" href="https://github.com/y-a-v-a/cheffers/blob/main/language-spec/Chef.md">
+                  <span class="link-title">Chef Language Specification</span>
+                  <span class="link-text">The complete formal specification of the Chef programming language.</span>
+                </a>
+              </li>
+              <li>
+                <a class="link-card" href="https://github.com/y-a-v-a/cheffers/tree/main/tests/fixtures">
+                  <span class="link-title">Example Recipes</span>
+                  <span class="link-text">Browse working Chef programs, including Hello World, Fibonacci, and more.</span>
+                </a>
+              </li>
+              <li>
+                <a class="link-card" href="./cookbook/reference.html">
+                  <span class="link-title">The Pantry Reference</span>
+                  <span class="link-text">Every instruction, measure and rule on one page — the cookbook's cheat sheet.</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="about-title">
+      <div class="container split">
+        <div>
+          <div class="section-head">
+            <p class="eyebrow">Project</p>
+            <h2 id="about-title">About Cheffers</h2>
+          </div>
+          <dl class="facts">
+            <div><dt>Repository</dt><dd><a href="https://github.com/y-a-v-a/cheffers">y-a-v-a/cheffers</a></dd></div>
+            <div><dt>Version</dt><dd>0.2.0</dd></div>
+            <div><dt>License</dt><dd>MIT</dd></div>
+            <div><dt>Language</dt><dd>Rust (2021 edition)</dd></div>
+          </dl>
+        </div>
+        <div class="about-notes">
+          <h3>Contributing</h3>
+          <p>
+            Found a bug or want to contribute? Visit the
+            <a href="https://github.com/y-a-v-a/cheffers">GitHub repository</a> to open an issue
+            or submit a pull request.
+          </p>
+          <h3>External resources</h3>
+          <ul>
+            <li><a href="https://www.dangermouse.net/esoteric/chef.html">Original Chef website</a> — the official Chef language homepage by David Morgan-Mar</li>
+            <li><a href="https://esolangs.org/wiki/Chef">Esolang Wiki: Chef</a> — community wiki page with examples and discussion</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="cta">
+        <h2>Ready to start cooking with code?</h2>
+        <p>Learn the fundamentals with the stack-based programming guide, or jump straight into the playground.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="./stack-based-programming.html">
+            Read the stack-based programming guide
+            <span class="icon icon-arrow" aria-hidden="true"></span>
+          </a>
+          <a class="btn btn-lg" href="./editor/">Open the playground</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Chef was created by David Morgan-Mar. Cheffers is MIT-licensed.</span>
+    <nav aria-label="More">
+      <a href="./editor/">Playground</a>
+      <a href="./cookbook/">Cookbook</a>
+      <a href="https://github.com/y-a-v-a/cheffers">Source on GitHub</a>
+      <span>Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a></span>
+    </nav>
+  </footer>
+
+  <script src="./assets/theme.js"></script>
+  <script type="module" src="./home.js"></script>
+</body>
+</html>

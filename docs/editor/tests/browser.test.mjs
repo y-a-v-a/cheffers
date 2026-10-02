@@ -234,6 +234,22 @@ try {
     assert.equal(selected, "From the cookbook");
   });
 
+  /* ----- Landing page ----- */
+
+  await step("the landing page highlights its recipe and runs it in the playground", async () => {
+    await page.goto(new URL("../", BASE_URL).href, { waitUntil: "networkidle" });
+    assert.ok((await page.locator(".preview code .tok-verb").count()) > 0, "hero recipe not highlighted");
+    assert.equal(await page.locator('.site-nav a[href="./editor/"]').count(), 1);
+    assert.equal(await page.locator('.site-nav a[href="./cookbook/"]').count(), 1);
+    await page.locator('.preview a[href*="#recipe="]').click();
+    await page.waitForFunction(
+      () => document.getElementById("output")?.textContent.trim() === "42",
+      { timeout: 15000 },
+    );
+    const doc = await page.locator(".cm-content").textContent();
+    assert.ok(doc.includes("The Answer Broth."), "hero recipe not loaded");
+  });
+
   await step("every cookbook page serves without console errors", async () => {
     const pages = [
       "index.html",

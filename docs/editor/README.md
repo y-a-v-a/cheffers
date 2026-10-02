@@ -87,7 +87,7 @@ tests). Run the whole suite across all layers with `./scripts/test-all.sh`.
 | `pkg/`              | wasm-bindgen output (generated)                      |
 | `package.json`      | Dev dependencies + bundle script                     |
 
-Shared with the cookbook, in `../assets/`:
+Shared with the cookbook and the landing page (`../index.html`), in `../assets/`:
 
 | Path              | Purpose                                                          |
 | ----------------- | ---------------------------------------------------------------- |

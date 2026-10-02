@@ -1,0 +1,611 @@
+/*
+ * Cheffers — landing page (docs/index.html).
+ *
+ * Fonts, palettes, the header, footer, buttons and syntax colors come from
+ * ./assets/site.css, shared with the playground and the cookbook. This file
+ * lays out the landing page: a hero with a live recipe card, then a stack of
+ * sections on a 72rem container.
+ */
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+/* Same sticky, frosted header as the cookbook. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  backdrop-filter: saturate(1.4) blur(14px);
+}
+
+.container {
+  width: min(72rem, 100% - 2 * var(--gutter));
+  margin-inline: auto;
+}
+
+/* Anchor jumps (#install) land below the sticky header. */
+:target { scroll-margin-top: calc(var(--header-h) + 1rem); }
+
+html { scroll-behavior: smooth; }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.38em;
+  border-radius: 5px;
+  background: var(--surface-2);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+pre code {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font-size: inherit;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.btn-lg {
+  height: 2.75rem;
+  padding: 0 1.15rem;
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+}
+
+/*
+ * Hero
+ * ----
+ */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(3rem, 6vw, 5rem);
+  padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(3.5rem, 8vw, 6rem);
+}
+
+.hero h1 {
+  margin: 1rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 1.5rem + 4.4vw, 4.75rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.hero h1 .accent { color: var(--accent); }
+
+.lede {
+  max-width: 34em;
+  margin: 1.5rem 0 0;
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3125rem);
+  line-height: 1.55;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.hero-note {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.hero-note::before {
+  content: "";
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--ok);
+  translate: 0 -0.05rem;
+}
+
+/* The recipe card, set on a tilted dashed "recipe card" edge like the
+   project's social cards. The card itself stays straight for legibility. */
+.preview-wrap {
+  position: relative;
+  min-width: 0;
+}
+.preview-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -0.9rem;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 1.4rem;
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+
+.preview {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow), 0 30px 60px -32px rgb(40 25 10 / 0.3);
+  overflow: hidden;
+}
+
+.preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.55rem 0.55rem 0.55rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-dots {
+  display: flex;
+  gap: 6px;
+}
+.preview-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.preview-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.preview-bar .btn { margin-left: auto; }
+
+.preview pre {
+  margin: 0;
+  padding: 1.1rem 1.25rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.preview-output {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.preview-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ok);
+}
+.preview-label::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.preview-output samp {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/*
+ * Sections
+ * --------
+ */
+
+.section {
+  padding: clamp(3.5rem, 8vw, 5.5rem) 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-head {
+  max-width: 40rem;
+  margin-bottom: 2.25rem;
+}
+
+.section-head h2,
+.cta h2 {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.35rem + 1.5vw, 2.5rem);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.prose p {
+  max-width: 36em;
+  margin: 1rem 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+.split > .section-head { margin-bottom: 0; }
+
+/* Shared look for every clickable card on the page. */
+.path-card,
+.link-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.path-card:hover,
+.link-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+/* Three ways in */
+.paths {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.path-card {
+  gap: 0.6rem;
+  padding: 1.5rem 1.5rem 1.35rem;
+}
+
+.path-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.path-title {
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.path-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.path-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.path-more::after,
+.link-card::after {
+  content: "";
+  width: 0.9rem;
+  height: 0.9rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") no-repeat center / contain;
+  transition: transform 0.15s ease;
+}
+.path-card:hover .path-more::after { transform: translateX(3px); }
+
+/* What is Chef? — the kitchen, translated */
+.kitchen-map {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+.kitchen-map li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.95rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.kitchen-map li:last-child { border-bottom: none; }
+.kitchen-map .k {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.kitchen-map .arrow { color: var(--muted); }
+.kitchen-map .c {
+  justify-self: start;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Features */
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.feature {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.feature-stat {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+.feature h3 {
+  margin: 1rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.feature p {
+  margin: 0.4rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Getting started — code cards */
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.code-card {
+  margin: 0;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.code-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.55rem 0.55rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.code-card pre {
+  margin: 0;
+  padding: 1.1rem 1.25rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Documentation */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem clamp(1.5rem, 4vw, 3rem);
+}
+
+.list-title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.link-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link-card {
+  gap: 0.3rem;
+  padding: 1.1rem 3rem 1.2rem 1.25rem;
+}
+.link-card::after {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.2rem;
+  background: var(--muted);
+}
+.link-card:hover::after {
+  background: var(--accent);
+  transform: translateX(3px);
+}
+
+.link-title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.link-text {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* About */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--border);
+  overflow: hidden;
+}
+.facts > div {
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+}
+.facts dt {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.facts dd {
+  margin: 0.3rem 0 0;
+  font-weight: 600;
+}
+
+.about-notes h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.about-notes h3 + * { margin-top: 0.6rem; }
+.about-notes * + h3 { margin-top: 2rem; }
+.about-notes p,
+.about-notes ul {
+  margin-bottom: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.about-notes ul { padding-left: 1.25rem; }
+.about-notes li + li { margin-top: 0.4rem; }
+.about-notes li::marker { color: var(--muted); }
+
+/* Links in running text: accent with a soft underline. */
+:is(.about-notes, .facts) a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+:is(.about-notes, .facts) a:hover { text-decoration-color: currentColor; }
+
+/* Closing call to action, on a dashed recipe-card edge. */
+.cta {
+  margin: 0 0 clamp(3.5rem, 8vw, 5.5rem);
+  padding: clamp(2.25rem, 6vw, 3.75rem) clamp(1.25rem, 5vw, 3rem);
+  border: 2px dashed var(--border-strong);
+  border-radius: 1.5rem;
+  text-align: center;
+}
+.cta h2 { margin-top: 0; }
+.cta p {
+  max-width: 34em;
+  margin: 1rem auto 0;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.cta .hero-actions { justify-content: center; }
+
+@media (max-width: 60rem) {
+  .hero,
+  .split { grid-template-columns: minmax(0, 1fr); }
+  /* Keep the tilted dashed edge inside the page gutter. */
+  .preview-wrap { margin: 0 0.75rem; }
+  .paths,
+  .docs-grid,
+  .code-grid { grid-template-columns: minmax(0, 1fr); }
+  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 36rem) {
+  .features,
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .hero-actions .btn { flex: 1 1 auto; }
+}

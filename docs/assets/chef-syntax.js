@@ -1,6 +1,7 @@
 // Chef syntax tokenizer, shared by the playground (CodeMirror decorations,
-// bundled into editor.bundle.js) and the cookbook (recipe cards, loaded as an
-// ES module). Pure: text in, token ranges out — no DOM, no dependencies.
+// bundled into editor.bundle.js), the cookbook and the landing page (static
+// <pre> blocks, loaded as an ES module). tokenizeChef is pure — text in, token
+// ranges out; highlightChef applies it to a DOM element. No dependencies.
 //
 // Chef has no reserved words in the usual sense, so highlighting follows the
 // shape of a recipe instead: the title, the comment, the ingredient list
@@ -151,4 +152,25 @@ export function tokenizeChef(text) {
     pushRuns(types, start, tokens);
   }
   return tokens;
+}
+
+/**
+ * Highlight a <pre>/<code> element in place: its text is rebuilt as plain
+ * text nodes plus `tok-*` spans. textContent is unchanged, so copying the
+ * element still yields the exact source.
+ */
+export function highlightChef(el) {
+  const text = el.textContent;
+  const fragment = document.createDocumentFragment();
+  let last = 0;
+  for (const { from, to, type } of tokenizeChef(text)) {
+    if (from > last) fragment.append(text.slice(last, from));
+    const span = document.createElement("span");
+    span.className = "tok-" + type;
+    span.textContent = text.slice(from, to);
+    fragment.append(span);
+    last = to;
+  }
+  if (last < text.length) fragment.append(text.slice(last));
+  el.replaceChildren(fragment);
 }

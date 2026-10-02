@@ -1,101 +1,82 @@
 // The Cheffers Cookbook — small enhancements shared by every tutorial page:
 //
-//   1. The theme toggle, identical to the playground's and stored under the
-//      same localStorage key, so the reader's choice follows them between
-//      the cookbook and the playground.
+//   1. Chef syntax highlighting on recipe cards and snippets, using the same
+//      tokenizer as the playground editor (../assets/chef-syntax.js).
 //   2. "Copy" buttons on recipe cards.
 //   3. "Open in playground" links: the recipe source (and Input panel text,
 //      if any) is packed into the URL fragment as base64url JSON, which the
 //      playground unpacks on load (see docs/editor/editor.js).
 //
-// No build step: this file is served as-is.
+// The theme toggle is shared with the playground (../assets/theme.js).
+// No build step: this file is served as-is, as an ES module.
 
-(function () {
-  "use strict";
+import { tokenizeChef } from "../assets/chef-syntax.js";
 
-  /* ----- Theme toggle (mirrors docs/editor/editor.js) ----- */
+/* ----- Syntax highlighting ----- */
 
-  var THEMES = [
-    { id: "system", label: "System", icon: "🖥️" },
-    { id: "parchment", label: "Parchment", icon: "📜" },
-    { id: "cast-iron", label: "Cast Iron", icon: "🍳" },
-    { id: "espresso", label: "Espresso", icon: "☕" },
-  ];
-  var THEME_STORAGE_KEY = "cheffers-theme";
-  var themeBtn = document.getElementById("theme");
+// Rebuild a <pre>/<code> element's text as plain text nodes plus classed
+// spans. textContent is unchanged, so copying still yields the exact source.
+function highlight(el) {
+  const text = el.textContent;
+  const fragment = document.createDocumentFragment();
+  let last = 0;
+  for (const { from, to, type } of tokenizeChef(text)) {
+    if (from > last) fragment.append(text.slice(last, from));
+    const span = document.createElement("span");
+    span.className = "tok-" + type;
+    span.textContent = text.slice(from, to);
+    fragment.append(span);
+    last = to;
+  }
+  if (last < text.length) fragment.append(text.slice(last));
+  el.replaceChildren(fragment);
+}
 
-  function storedThemeId() {
-    try {
-      return localStorage.getItem(THEME_STORAGE_KEY) || "system";
-    } catch (e) {
-      return "system";
-    }
+document.querySelectorAll(".recipe-card pre code, pre.snippet").forEach(highlight);
+
+/* ----- Recipe cards: copy + open-in-playground ----- */
+
+// base64url-encode a Unicode string (mirrored by decodeRecipeHash in the
+// playground's editor.js — keep the two in sync).
+function encodeRecipeHash(source, input) {
+  const json = JSON.stringify({ c: source, i: input || "" });
+  const bytes = new TextEncoder().encode(json);
+  let bin = "";
+  for (const byte of bytes) bin += String.fromCharCode(byte);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+document.querySelectorAll(".recipe-card").forEach((card) => {
+  const pre = card.querySelector("pre");
+  if (!pre) return;
+  const source = pre.textContent.replace(/\s+$/, "") + "\n";
+  const input = card.getAttribute("data-input") || "";
+
+  const copyBtn = card.querySelector(".copy-btn");
+  if (copyBtn) {
+    const label = copyBtn.querySelector(".copy-label") || copyBtn;
+    const icon = copyBtn.querySelector(".icon");
+    let timer;
+    const flash = (text, ok, ms) => {
+      label.textContent = text;
+      icon?.classList.toggle("icon-check", ok);
+      icon?.classList.toggle("icon-copy", !ok);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        label.textContent = "Copy";
+        icon?.classList.replace("icon-check", "icon-copy");
+      }, ms);
+    };
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(source).then(
+        () => flash("Copied", true, 1400),
+        () => flash("Press Ctrl+C", false, 1800),
+      );
+    });
   }
 
-  function applyTheme(id) {
-    var root = document.documentElement;
-    if (id === "system") root.removeAttribute("data-theme");
-    else root.setAttribute("data-theme", id);
-
-    var theme = THEMES.find(function (t) { return t.id === id; }) || THEMES[0];
-    if (themeBtn) {
-      themeBtn.textContent = theme.icon;
-      themeBtn.title = "Theme: " + theme.label + " — click to change";
-      themeBtn.setAttribute("aria-label", "Theme: " + theme.label + ". Click to change.");
-    }
+  const openLink = card.querySelector(".open-playground");
+  if (openLink) {
+    openLink.href = "../editor/#recipe=" + encodeRecipeHash(source, input);
   }
-
-  function cycleTheme() {
-    var index = THEMES.findIndex(function (t) { return t.id === storedThemeId(); });
-    var next = THEMES[(index + 1) % THEMES.length].id;
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch (e) {
-      /* storage may be unavailable; theme still applies for this session */
-    }
-    applyTheme(next);
-  }
-
-  applyTheme(storedThemeId());
-  if (themeBtn) themeBtn.addEventListener("click", cycleTheme);
-
-  /* ----- Recipe cards: copy + open-in-playground ----- */
-
-  // base64url-encode a Unicode string (mirrored by decodeRecipeHash in the
-  // playground's editor.js — keep the two in sync).
-  function encodeRecipeHash(source, input) {
-    var json = JSON.stringify({ c: source, i: input || "" });
-    var bytes = new TextEncoder().encode(json);
-    var bin = "";
-    for (var k = 0; k < bytes.length; k++) bin += String.fromCharCode(bytes[k]);
-    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-
-  document.querySelectorAll(".recipe-card").forEach(function (card) {
-    var pre = card.querySelector("pre");
-    if (!pre) return;
-    var source = pre.textContent.replace(/\s+$/, "") + "\n";
-    var input = card.getAttribute("data-input") || "";
-
-    var copyBtn = card.querySelector(".copy-btn");
-    if (copyBtn) {
-      copyBtn.addEventListener("click", function () {
-        navigator.clipboard.writeText(source).then(
-          function () {
-            copyBtn.textContent = "Copied!";
-            setTimeout(function () { copyBtn.textContent = "Copy"; }, 1200);
-          },
-          function () {
-            copyBtn.textContent = "Press Ctrl+C";
-            setTimeout(function () { copyBtn.textContent = "Copy"; }, 1600);
-          }
-        );
-      });
-    }
-
-    var openLink = card.querySelector(".open-playground");
-    if (openLink) {
-      openLink.href = "../editor/#recipe=" + encodeRecipeHash(source, input);
-    }
-  });
-})();
+});

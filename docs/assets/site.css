@@ -1,0 +1,538 @@
+/*
+ * Cheffers — shared site styles for the playground (docs/editor/) and the
+ * cookbook (docs/cookbook/). Page-specific layout lives next to each page;
+ * this file owns everything the two share: fonts, color tokens, the header,
+ * footer, buttons, switches, and the Chef syntax / ANSI color classes.
+ *
+ * Type
+ * ----
+ *   Archivo        display (headings, wordmark) — self-hosted, OFL
+ *   IBM Plex Mono  code, recipe source, labels  — self-hosted, OFL
+ *   system-ui      body copy — the most legible face on every platform
+ *
+ * Theming
+ * -------
+ * All colors are semantic custom properties so the three palettes — and the
+ * OS default — share one vocabulary. Palettes lean on the kitchen:
+ *
+ *   Parchment  (light) — a cookbook page: warm paper, espresso ink, paprika.
+ *   Cast Iron  (dark)  — a seasoned skillet: charcoal with an ember glow.
+ *   Espresso   (dark)  — a coffee bar: deep roast browns with caramel.
+ *
+ * Every text color clears WCAG AA (4.5:1) against --bg, --surface and
+ * --surface-2 in its palette. Default (no data-theme attribute) follows the
+ * machine via prefers-color-scheme; the header toggle (theme.js) sets
+ * data-theme to override, stored under the "cheffers-theme" key.
+ */
+
+@font-face {
+  font-family: "Archivo";
+  src: url("./fonts/archivo-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+:root {
+  --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  --radius-sm: 7px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --header-h: 3.5rem;
+  --gutter: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Parchment (light) — also the default when the OS prefers light. */
+:root,
+:root[data-theme="parchment"] {
+  color-scheme: light;
+  --bg: #f6f1e7;
+  --surface: #fffdf8;
+  --surface-2: #efe7d8;
+  --border: #e3d7c3;
+  --border-strong: #cdbb9c;
+  --text: #2a1f18;
+  --muted: #6b5948;
+  --accent: #b93a25;
+  --accent-hover: #9c2f1c;
+  --on-accent: #ffffff;
+  --accent-soft: rgb(185 58 37 / 0.07);
+  --ok: #3d7428;
+  --ok-soft: rgb(61 116 40 / 0.1);
+  --error: #b3261e;
+  --error-soft: rgb(179 38 30 / 0.08);
+  --shadow: 0 1px 2px rgb(60 40 20 / 0.04), 0 6px 20px -8px rgb(60 40 20 / 0.12);
+  --knob: #ffffff;
+
+  --syn-section: #b93a25;
+  --syn-verb: #b93a25;
+  --syn-number: #1d6a85;
+  --syn-bowl: #4a7329;
+  --syn-comment: #76644f;
+
+  --ansi-red: #b3261e;
+  --ansi-green: #276b31;
+  --ansi-yellow: #8a5a00;
+  --ansi-blue: #2453c4;
+  --ansi-magenta: #8b3aa8;
+  --ansi-cyan: #0b6f7a;
+}
+
+/* When the OS prefers dark and the reader hasn't chosen, use Cast Iron. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #151311;
+    --surface: #1d1a17;
+    --surface-2: #26221e;
+    --border: #332e29;
+    --border-strong: #4a433c;
+    --text: #efe7da;
+    --muted: #a89a8c;
+    --accent: #ec7a43;
+    --accent-hover: #f59262;
+    --on-accent: #1a1410;
+    --accent-soft: rgb(236 122 67 / 0.08);
+    --ok: #95c46c;
+    --ok-soft: rgb(149 196 108 / 0.1);
+    --error: #ff7b6b;
+    --error-soft: rgb(255 123 107 / 0.09);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
+    --knob: #f4ede2;
+
+    --syn-section: #f08a55;
+    --syn-verb: #f08a55;
+    --syn-number: #7cc7e8;
+    --syn-bowl: #a8cf7f;
+    --syn-comment: #968878;
+
+    --ansi-red: #ff7b72;
+    --ansi-green: #7ee2a8;
+    --ansi-yellow: #f2cc60;
+    --ansi-blue: #79b8ff;
+    --ansi-magenta: #d2a8ff;
+    --ansi-cyan: #76e3ea;
+  }
+}
+
+/* Explicit Cast Iron selection (same values as the OS-dark default). */
+:root[data-theme="cast-iron"] {
+  color-scheme: dark;
+  --bg: #151311;
+  --surface: #1d1a17;
+  --surface-2: #26221e;
+  --border: #332e29;
+  --border-strong: #4a433c;
+  --text: #efe7da;
+  --muted: #a89a8c;
+  --accent: #ec7a43;
+  --accent-hover: #f59262;
+  --on-accent: #1a1410;
+  --accent-soft: rgb(236 122 67 / 0.08);
+  --ok: #95c46c;
+  --ok-soft: rgb(149 196 108 / 0.1);
+  --error: #ff7b6b;
+  --error-soft: rgb(255 123 107 / 0.09);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
+  --knob: #f4ede2;
+
+  --syn-section: #f08a55;
+  --syn-verb: #f08a55;
+  --syn-number: #7cc7e8;
+  --syn-bowl: #a8cf7f;
+  --syn-comment: #968878;
+
+  --ansi-red: #ff7b72;
+  --ansi-green: #7ee2a8;
+  --ansi-yellow: #f2cc60;
+  --ansi-blue: #79b8ff;
+  --ansi-magenta: #d2a8ff;
+  --ansi-cyan: #76e3ea;
+}
+
+/* Espresso (dark) — deep coffee roast with a caramel accent. */
+:root[data-theme="espresso"] {
+  color-scheme: dark;
+  --bg: #1b130e;
+  --surface: #241a14;
+  --surface-2: #2e221a;
+  --border: #3f3026;
+  --border-strong: #5a4536;
+  --text: #f4e9d8;
+  --muted: #bca58c;
+  --accent: #e6a95e;
+  --accent-hover: #f2bd78;
+  --on-accent: #23180f;
+  --accent-soft: rgb(230 169 94 / 0.08);
+  --ok: #b9c86e;
+  --ok-soft: rgb(185 200 110 / 0.1);
+  --error: #ff8a70;
+  --error-soft: rgb(255 138 112 / 0.09);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
+  --knob: #f7eddd;
+
+  --syn-section: #eab06a;
+  --syn-verb: #eab06a;
+  --syn-number: #8fcfe0;
+  --syn-bowl: #c3cf7c;
+  --syn-comment: #a48d76;
+
+  --ansi-red: #ff8a7a;
+  --ansi-green: #8fdcab;
+  --ansi-yellow: #f2cc60;
+  --ansi-blue: #8cc0ff;
+  --ansi-magenta: #dcb4ff;
+  --ansi-cyan: #86e0e6;
+}
+
+/*
+ * Base
+ * ----
+ */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Smooth the palette switch (CodeMirror repaints itself). */
+body,
+.site-header,
+.site-footer,
+.btn,
+.icon-btn {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection { background: color-mix(in srgb, var(--accent) 24%, transparent); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Header — wordmark, section switcher, GitHub + theme buttons.
+ * ------------------------------------------------------------
+ */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2.5vw, 1.5rem);
+  height: var(--header-h);
+  padding: 0 var(--gutter);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wordmark .dot { color: var(--accent); }
+
+/* Segmented switcher between the two halves of the site. */
+.site-nav {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.site-nav a {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.site-nav a:hover { color: var(--text); }
+.site-nav a[aria-current]:not([aria-current="false"]) {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.icon-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.icon-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+@media (max-width: 30rem) {
+  .header-actions .github-link { display: none; }
+  .site-nav a { padding: 0.3rem 0.7rem; }
+}
+
+/*
+ * Footer
+ * ------
+ */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.35rem 1.5rem;
+  padding: 1rem var(--gutter);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+}
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+.site-footer a:hover {
+  color: var(--text);
+  text-decoration-color: currentColor;
+}
+
+/*
+ * Buttons & form controls
+ * -----------------------
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 0.8125rem/1 var(--font-sans);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* Accent-tinted secondary action ("Open in playground"). */
+.btn-soft {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.btn-soft:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+/* Keyboard hint inside a button, e.g. Run ⌘↵. */
+.btn kbd {
+  font: 500 0.6875rem/1 var(--font-mono);
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+/* Icons drawn with CSS masks so they inherit currentColor in every theme. */
+.icon {
+  display: inline-block;
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  background: currentColor;
+  -webkit-mask: var(--icon) no-repeat center / contain;
+  mask: var(--icon) no-repeat center / contain;
+}
+.icon-play { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z'/%3E%3C/svg%3E"); }
+.icon-arrow { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E"); }
+.icon-copy { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='13' height='13' rx='2.5'/%3E%3Cpath d='M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8'/%3E%3C/svg%3E"); }
+.icon-check { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5l5 5L20 6.5'/%3E%3C/svg%3E"); }
+
+/* iOS-style switch built on a real checkbox (keyboard + screen-reader
+   friendly, and still .checked to scripts). */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.switch:hover { color: var(--text); }
+.switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  width: 1.875rem;
+  height: 1.125rem;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.switch input::before {
+  content: "";
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--knob);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  transition: transform 0.15s ease;
+}
+.switch input:checked { background: var(--accent); }
+.switch input:checked::before { transform: translateX(0.75rem); }
+.switch input:focus-visible { outline-offset: 3px; border-radius: 999px; }
+
+/*
+ * Chef syntax colors — the token classes emitted by chef-syntax.js, shared
+ * by the playground editor and the cookbook's recipe cards.
+ * ---------------------------------------------------------------
+ */
+
+.tok-title { color: var(--text); font-weight: 600; }
+.tok-section { color: var(--syn-section); font-weight: 600; }
+.tok-verb { color: var(--syn-verb); }
+.tok-number { color: var(--syn-number); }
+.tok-bowl { color: var(--syn-bowl); }
+.tok-unit,
+.tok-meta,
+.tok-comment { color: var(--syn-comment); }
+
+/*
+ * Interpreter diagnostics — ANSI colors mapped per palette (ansi.js emits
+ * these classes), so error text stays legible on light and dark alike.
+ * ------------------------------------------------------------------
+ */
+
+.ansi-bold { font-weight: 600; }
+.ansi-red { color: var(--ansi-red); }
+.ansi-green { color: var(--ansi-green); }
+.ansi-yellow { color: var(--ansi-yellow); }
+.ansi-blue { color: var(--ansi-blue); }
+.ansi-magenta { color: var(--ansi-magenta); }
+.ansi-cyan { color: var(--ansi-cyan); }
+.ansi-white { color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

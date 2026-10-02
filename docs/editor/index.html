@@ -6,9 +6,12 @@
   <title>Cheffers — Chef Playground</title>
   <meta name="description" content="Write and run Chef recipes in your browser. A JsBin-style playground powered by the Cheffers Rust interpreter compiled to WebAssembly." />
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍳</text></svg>' />
+  <link rel="preload" href="../assets/fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../assets/fonts/archivo-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../assets/site.css" />
   <link rel="stylesheet" href="./editor.css" />
   <!-- Apply the saved theme before first paint to avoid a flash of the
-       default palette. The header toggle (editor.js) keeps this in sync. -->
+       default palette. The header toggle (../assets/theme.js) keeps this in sync. -->
   <script>
     (function () {
       try {
@@ -19,59 +22,77 @@
   </script>
 </head>
 <body>
-  <header class="toolbar">
-    <div class="brand">
-      <span class="logo" aria-hidden="true">🍳</span>
-      <span class="title">Cheffers Playground</span>
-    </div>
-    <div class="controls">
-      <label class="examples">
-        Example:
-        <select id="examples" aria-label="Load an example recipe"></select>
-      </label>
-      <label class="autorun">
-        <input type="checkbox" id="autorun" checked />
-        Auto-run
-      </label>
-      <label class="wrap">
-        <input type="checkbox" id="wrap" checked />
-        Wrap
-      </label>
-      <button id="run" type="button">Run ▶</button>
-      <a class="toolbar-link" href="../cookbook/" title="Learn Chef with the cookbook">📖 Cookbook</a>
-      <button id="theme" class="theme-toggle" type="button" aria-label="Theme: System. Click to change.">🖥️</button>
+  <header class="site-header">
+    <a class="wordmark" href="../" aria-label="Cheffers home">Cheffers<span class="dot">.</span></a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="./" aria-current="page">Playground</a>
+      <a href="../cookbook/">Cookbook</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn github-link" href="https://github.com/y-a-v-a/cheffers" title="Source on GitHub" aria-label="Source on GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+      <button id="theme" class="icon-btn" type="button" aria-label="Theme: System. Click to change."></button>
     </div>
   </header>
 
-  <main class="panes">
-    <section class="pane editor-pane">
-      <div class="pane-header">Recipe</div>
-      <div id="editor" class="editor-host"></div>
-      <div class="pane-header input-header">
-        Input
-        <span class="hint">numbers for “Take … from refrigerator”</span>
-      </div>
-      <textarea id="stdin" class="stdin" rows="2" spellcheck="false"
-                aria-label="Input values for Take instructions"
-                placeholder="One number per Take instruction, e.g. 21"></textarea>
-    </section>
-    <section class="pane output-pane">
+  <main class="workspace">
+    <h1 class="visually-hidden">Chef Playground</h1>
+    <section class="pane editor-pane" aria-labelledby="recipe-title">
       <div class="pane-header">
-        Output
-        <span id="status" class="status" role="status"></span>
+        <h2 class="pane-title" id="recipe-title">Recipe</h2>
+        <span class="select-wrap">
+          <select id="examples" aria-label="Load an example recipe"></select>
+        </span>
+        <div class="pane-tools">
+          <label class="switch">
+            <input type="checkbox" id="wrap" role="switch" checked />
+            Wrap
+          </label>
+        </div>
       </div>
-      <pre id="output" class="output" aria-live="polite"></pre>
+      <div id="editor" class="editor-host"></div>
+      <div class="input-area">
+        <label class="input-label" for="stdin">
+          Input
+          <span class="hint">numbers for “Take … from refrigerator”</span>
+        </label>
+        <textarea id="stdin" class="stdin" rows="1" spellcheck="false"
+                  placeholder="One number per Take, e.g. 21"></textarea>
+      </div>
+    </section>
+
+    <section class="pane output-pane" aria-labelledby="output-title">
+      <div class="pane-header">
+        <h2 class="pane-title" id="output-title">Output</h2>
+        <span id="status" class="status" role="status"></span>
+        <div class="pane-tools">
+          <label class="switch">
+            <input type="checkbox" id="autorun" role="switch" checked />
+            Auto-run
+          </label>
+          <button id="run" class="btn btn-primary" type="button" aria-keyshortcuts="Control+Enter Meta+Enter">
+            <span class="icon icon-play" aria-hidden="true"></span>
+            Run
+            <kbd id="run-shortcut" aria-hidden="true">Ctrl ↵</kbd>
+          </button>
+        </div>
+      </div>
+      <pre id="output" class="output" aria-live="polite" tabindex="0"></pre>
     </section>
   </main>
 
-  <footer class="footer">
-    Runs entirely in your browser via WebAssembly — nothing is sent to a server.
-    New to Chef? <a href="../cookbook/">Learn it with the cookbook</a> ·
-    <a href="https://github.com/y-a-v-a/cheffers">Source on GitHub</a> ·
-    <a href="https://www.dangermouse.net/esoteric/chef.html">About the Chef language</a> ·
-    Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a>
+  <footer class="site-footer">
+    <span>Runs entirely in your browser via WebAssembly — nothing is sent to a server.</span>
+    <nav aria-label="More">
+      <a href="../cookbook/">New to Chef? Read the cookbook</a>
+      <a href="https://github.com/y-a-v-a/cheffers">Source on GitHub</a>
+      <a href="https://www.dangermouse.net/esoteric/chef.html">About the Chef language</a>
+      <span>Created by <a href="https://www.vincentbruijn.nl">Vincent Bruijn</a></span>
+    </nav>
   </footer>
 
+  <script src="../assets/theme.js"></script>
   <script type="module" src="./editor.bundle.js"></script>
 </body>
 </html>

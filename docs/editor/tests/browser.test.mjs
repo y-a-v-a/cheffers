@@ -51,6 +51,14 @@ try {
     assert.equal(status.trim(), "ok");
   });
 
+  await step("the editor highlights Chef syntax", async () => {
+    // "Ingredients." and "Method." are sections (CodeMirror only renders the
+    // lines in view, so "Serves 1." may be off-screen); Put, Pour are verbs.
+    assert.ok((await page.locator(".cm-content .tok-section").count()) >= 2);
+    assert.ok((await page.locator(".cm-content .tok-verb").count()) > 0);
+    assert.ok((await page.locator(".cm-content .tok-bowl").count()) > 0);
+  });
+
   await step("switching to the Countdown example outputs '54321'", async () => {
     await page.selectOption("#examples", "countdown-cake");
     await page.waitForFunction(
@@ -118,10 +126,36 @@ try {
       { timeout: 10000 },
     );
     const html = await page.locator("#output").innerHTML();
-    assert.match(html, /<span style="[^"]*color:/, "expected a colored span in the error output");
+    assert.match(html, /<span class="[^"]*ansi-/, "expected a colored span in the error output");
     assert.ok(!html.includes("\x1b"), "raw ANSI escape leaked into the DOM");
     const status = await page.locator("#status").textContent();
     assert.equal(status.trim(), "error");
+  });
+
+  await step("⌘/Ctrl+Enter runs the recipe when auto-run is off", async () => {
+    await page.uncheck("#autorun");
+    await page.locator(".cm-content").click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type(
+      "Seven Soup.\n\nIngredients.\n7 g salt\n\nMethod.\n" +
+        "Put salt into the mixing bowl. Pour contents of the mixing bowl into the baking dish.\n\n" +
+        "Serves 1.",
+    );
+    // Auto-run is off: the stale error stays put...
+    await page.waitForTimeout(700);
+    assert.ok(
+      (await page.locator("#output").textContent()).includes("invalid title"),
+      "recipe ran without auto-run or the shortcut",
+    );
+    // ...until the shortcut runs it (and must not insert a blank line).
+    const before = await page.locator(".cm-content").textContent();
+    await page.keyboard.press("ControlOrMeta+Enter");
+    await page.waitForFunction(
+      () => document.getElementById("output")?.textContent.trim() === "7",
+      { timeout: 10000 },
+    );
+    assert.equal(await page.locator(".cm-content").textContent(), before);
+    await page.check("#autorun");
   });
 
   await step("theme toggle cycles to Cast Iron and darkens the gutter", async () => {
@@ -151,14 +185,25 @@ try {
 
   const cookbookUrl = new URL("../cookbook/", BASE_URL).href;
 
-  await step("the playground toolbar links to the cookbook", async () => {
-    const href = await page.locator(".toolbar a.toolbar-link").getAttribute("href");
-    assert.equal(href, "../cookbook/");
+  await step("the playground header links to the cookbook", async () => {
+    assert.equal(await page.locator('.site-nav a[href="../cookbook/"]').count(), 1);
   });
 
   await step("the cookbook menu lists seven courses plus the reference", async () => {
     await page.goto(cookbookUrl, { waitUntil: "networkidle" });
     assert.equal(await page.locator(".menu-grid .menu-card").count(), 8);
+  });
+
+  await step("cookbook recipe cards are highlighted without changing their source", async () => {
+    await page.goto(new URL("01-your-first-dish.html", cookbookUrl).href, {
+      waitUntil: "networkidle",
+    });
+    const code = page.locator(".recipe-card pre code").first();
+    assert.ok((await code.locator(".tok-verb").count()) > 0, "no highlighted verbs");
+    assert.ok(
+      (await code.textContent()).includes("Put mystery beans into the mixing bowl."),
+      "highlighting altered the recipe text",
+    );
   });
 
   await step("the cookbook picks up the theme saved in the playground", async () => {

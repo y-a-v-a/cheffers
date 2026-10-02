@@ -2,14 +2,17 @@
 // safe HTML. Kept free of any browser/DOM/CodeMirror imports so it can be
 // unit-tested directly under Node (`node --test`).
 
-export const ANSI_COLORS = {
-  31: "#ff6b6b", // red
-  32: "#5ad19a", // green
-  33: "#ffd166", // yellow
-  34: "#6ea8ff", // blue
-  35: "#c792ea", // magenta
-  36: "#56d4dd", // cyan
-  37: "#e6e6ef", // white
+// SGR color codes -> CSS classes. The actual colors are defined per palette
+// in docs/assets/site.css (.ansi-*), so diagnostics stay legible on the light
+// theme as well as the dark ones.
+export const ANSI_CLASSES = {
+  31: "ansi-red",
+  32: "ansi-green",
+  33: "ansi-yellow",
+  34: "ansi-blue",
+  35: "ansi-magenta",
+  36: "ansi-cyan",
+  37: "ansi-white",
 };
 
 /** Escape the HTML-significant characters so text renders literally. */
@@ -20,7 +23,7 @@ export function escapeHtml(text) {
     .replace(/>/g, "&gt;");
 }
 
-// Convert ANSI SGR sequences (bold + the colors above) into <span> elements.
+// Convert ANSI SGR sequences (bold + the colors above) into classed <span>s.
 // All literal text is escaped before being wrapped, so recipe content echoed
 // inside error messages can never inject markup.
 export function ansiToHtml(text) {
@@ -39,11 +42,11 @@ export function ansiToHtml(text) {
     }
   };
   const openSpan = () => {
-    const styles = [];
-    if (bold) styles.push("font-weight:600");
-    if (color) styles.push("color:" + color);
-    if (styles.length) {
-      html += '<span style="' + styles.join(";") + '">';
+    const classes = [];
+    if (bold) classes.push("ansi-bold");
+    if (color) classes.push(color);
+    if (classes.length) {
+      html += '<span class="' + classes.join(" ") + '">';
       open = true;
     }
   };
@@ -59,8 +62,8 @@ export function ansiToHtml(text) {
         color = null;
       } else if (code === 1) {
         bold = true;
-      } else if (ANSI_COLORS[code]) {
-        color = ANSI_COLORS[code];
+      } else if (ANSI_CLASSES[code]) {
+        color = ANSI_CLASSES[code];
       }
     }
     openSpan();

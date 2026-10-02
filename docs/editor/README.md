@@ -12,7 +12,8 @@ Live at: <https://y-a-v-a.github.io/cheffers/editor/>
   `input` is optional whitespace-separated numbers for `Take ... from refrigerator`).
 - `wasm-bindgen` generates the JS glue + `.wasm` into `pkg/`.
 - `editor.js` wires a [CodeMirror 6](https://codemirror.net/) editor to the
-  interpreter with debounced auto-run. It is bundled (with CodeMirror) into the
+  interpreter with debounced auto-run (or ⌘/Ctrl+Enter), and highlights Chef
+  syntax with the tokenizer shared with the cookbook (`../assets/chef-syntax.js`). It is bundled (with CodeMirror) into the
   committed `editor.bundle.js` so the page has no runtime CDN dependency.
 - Errors reuse the interpreter's rich, ANSI-colored diagnostics, converted to
   safe HTML for display.
@@ -80,8 +81,17 @@ tests). Run the whole suite across all layers with `./scripts/test-all.sh`.
 | Path                | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
 | `index.html`        | Page markup                                          |
-| `editor.css`        | Styling                                              |
+| `editor.css`        | Workspace layout (panes, editor, output)             |
 | `editor.js`         | Editor source (imports CodeMirror + the wasm module) |
 | `editor.bundle.js`  | Built bundle loaded by the page (generated)          |
 | `pkg/`              | wasm-bindgen output (generated)                      |
 | `package.json`      | Dev dependencies + bundle script                     |
+
+Shared with the cookbook, in `../assets/`:
+
+| Path              | Purpose                                                          |
+| ----------------- | ---------------------------------------------------------------- |
+| `site.css`        | Fonts, the three palettes, header/footer, buttons, syntax colors |
+| `theme.js`        | Header theme toggle (System → Parchment → Cast Iron → Espresso)  |
+| `chef-syntax.js`  | Chef syntax tokenizer (bundled into `editor.bundle.js`)          |
+| `fonts/`          | Self-hosted Archivo + IBM Plex Mono (OFL), no font CDN           |

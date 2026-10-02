@@ -3,11 +3,15 @@
 //
 // CodeMirror is bundled into editor.bundle.js at build time (see package.json),
 // and the interpreter is the locally-built wasm-bindgen output in ./pkg/.
+// The theme toggle is shared with the cookbook (../assets/theme.js); so is the
+// Chef syntax tokenizer, which esbuild bundles in from ../assets/.
 
 import { EditorView, basicSetup } from "codemirror";
-import { Compartment } from "@codemirror/state";
+import { Decoration, ViewPlugin, keymap } from "@codemirror/view";
+import { Compartment, Prec, RangeSetBuilder } from "@codemirror/state";
 import init, { run_chef } from "./pkg/cheffers_wasm.js";
 import { escapeHtml, ansiToHtml } from "./ansi.js";
+import { tokenizeChef } from "../assets/chef-syntax.js";
 
 const EXAMPLES = {
   "hello-world": {
@@ -491,46 +495,77 @@ const autorunEl = document.getElementById("autorun");
 const examplesEl = document.getElementById("examples");
 const stdinEl = document.getElementById("stdin");
 const wrapEl = document.getElementById("wrap");
-const themeBtn = document.getElementById("theme");
+const shortcutEl = document.getElementById("run-shortcut");
 
 let editor;
 let ready = false;
 let debounceTimer = null;
 
-// CodeMirror theme wired entirely to the page's --cm-* custom properties, so
-// it follows whichever palette is active. A real EditorView.theme() is needed
-// to beat CodeMirror's default light theme (its generated `.ͼ2` classes
-// otherwise win on specificity).
+// CodeMirror theme wired entirely to the page's custom properties (see
+// ../assets/site.css), so it follows whichever palette is active. A real
+// EditorView.theme() is needed to beat CodeMirror's default light theme (its
+// generated `.ͼ2` classes otherwise win on specificity).
 const cookTheme = EditorView.theme({
-  "&": { backgroundColor: "var(--cm-bg)", color: "var(--cm-text)", height: "100%" },
+  "&": { backgroundColor: "var(--surface)", color: "var(--text)", height: "100%" },
   "&.cm-focused": { outline: "none" },
-  ".cm-scroller": { fontFamily: "var(--mono)", fontSize: "14px" },
-  ".cm-content": { caretColor: "var(--cm-cursor)" },
-  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--cm-cursor)" },
+  ".cm-scroller": {
+    fontFamily: "var(--font-mono)",
+    fontSize: "14px",
+    lineHeight: "1.65",
+  },
+  ".cm-content": { caretColor: "var(--accent)", padding: "12px 0" },
+  ".cm-line": { padding: "0 16px 0 8px" },
+  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--accent)", borderLeftWidth: "2px" },
   ".cm-gutters": {
-    backgroundColor: "var(--cm-gutter-bg)",
-    color: "var(--cm-gutter-text)",
+    backgroundColor: "var(--surface)",
+    color: "var(--muted)",
     border: "none",
-    borderRight: "1px solid var(--border)",
   },
-  ".cm-lineNumbers .cm-gutterElement": { color: "var(--cm-gutter-text)" },
-  ".cm-activeLine": { backgroundColor: "var(--cm-active-line)" },
-  ".cm-activeLineGutter": {
-    backgroundColor: "var(--cm-active-gutter)",
-    color: "var(--cm-text)",
+  ".cm-lineNumbers .cm-gutterElement": {
+    color: "var(--muted)",
+    opacity: "0.7",
+    padding: "0 4px 0 16px",
+    minWidth: "40px",
   },
+  ".cm-activeLine": { backgroundColor: "color-mix(in srgb, var(--text) 4%, transparent)" },
+  ".cm-activeLineGutter": { backgroundColor: "transparent" },
+  ".cm-activeLineGutter.cm-gutterElement": { color: "var(--text)", opacity: "1" },
+  ".cm-foldGutter .cm-gutterElement": { color: "var(--muted)" },
   "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
-    { backgroundColor: "var(--cm-selection)" },
+    { backgroundColor: "color-mix(in srgb, var(--accent) 22%, transparent)" },
+  ".cm-selectionMatch": { backgroundColor: "color-mix(in srgb, var(--accent) 12%, transparent)" },
+  "&.cm-focused .cm-matchingBracket": {
+    backgroundColor: "color-mix(in srgb, var(--accent) 18%, transparent)",
+    outline: "none",
+  },
 });
 
-// Available themes, in cycle order. "system" follows prefers-color-scheme.
-const THEMES = [
-  { id: "system", label: "System", icon: "🖥️" },
-  { id: "parchment", label: "Parchment", icon: "📜" },
-  { id: "cast-iron", label: "Cast Iron", icon: "🍳" },
-  { id: "espresso", label: "Espresso", icon: "☕" },
-];
-const THEME_STORAGE_KEY = "cheffers-theme";
+// Chef syntax highlighting: the shared tokenizer (also used by the cookbook)
+// returns sorted, non-overlapping ranges, which become `tok-*` class marks.
+// Recipes are small, so the whole document is re-tokenized on each change.
+const tokenMarks = {};
+
+function chefDecorations(doc) {
+  const builder = new RangeSetBuilder();
+  for (const { from, to, type } of tokenizeChef(doc.toString())) {
+    tokenMarks[type] ??= Decoration.mark({ class: "tok-" + type });
+    builder.add(from, to, tokenMarks[type]);
+  }
+  return builder.finish();
+}
+
+const chefHighlighting = ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.decorations = chefDecorations(view.state.doc);
+    }
+    update(update) {
+      if (update.docChanged) this.decorations = chefDecorations(update.state.doc);
+    }
+  },
+  { decorations: (plugin) => plugin.decorations },
+);
+
 const WRAP_STORAGE_KEY = "cheffers-wrap";
 
 // Line wrapping is toggled live by reconfiguring this compartment. Chef
@@ -559,38 +594,6 @@ function applyWrap(enabled) {
   } catch {
     /* storage may be unavailable; the setting still applies this session */
   }
-}
-
-function storedThemeId() {
-  try {
-    return localStorage.getItem(THEME_STORAGE_KEY) || "system";
-  } catch {
-    return "system";
-  }
-}
-
-function applyTheme(id) {
-  const root = document.documentElement;
-  if (id === "system") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", id);
-
-  const theme = THEMES.find((t) => t.id === id) ?? THEMES[0];
-  if (themeBtn) {
-    themeBtn.textContent = theme.icon;
-    themeBtn.title = `Theme: ${theme.label} — click to change`;
-    themeBtn.setAttribute("aria-label", `Theme: ${theme.label}. Click to change.`);
-  }
-}
-
-function cycleTheme() {
-  const index = THEMES.findIndex((t) => t.id === storedThemeId());
-  const next = THEMES[(index + 1) % THEMES.length].id;
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, next);
-  } catch {
-    /* storage may be unavailable; theme still applies for this session */
-  }
-  applyTheme(next);
 }
 
 // A recipe passed in the URL fragment (the cookbook's "Open in playground"
@@ -658,12 +661,32 @@ function scheduleRun() {
   debounceTimer = setTimeout(runNow, 400);
 }
 
+// ⌘↵ / Ctrl↵ runs the recipe from anywhere on the page. Inside the editor it
+// must outrank basicSetup's own Mod-Enter (insert blank line).
+const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform ?? navigator.platform);
+
+function runShortcut() {
+  runNow();
+  return true;
+}
+
+function onPageKeydown(event) {
+  // The editor's keymap already handled (and prevented) its own presses.
+  if (event.defaultPrevented) return;
+  if (event.key === "Enter" && (IS_MAC ? event.metaKey : event.ctrlKey)) {
+    event.preventDefault();
+    runNow();
+  }
+}
+
 function buildEditor(initialDoc) {
   editor = new EditorView({
     doc: initialDoc,
     extensions: [
+      Prec.highest(keymap.of([{ key: "Mod-Enter", run: runShortcut }])),
       basicSetup,
       cookTheme,
+      chefHighlighting,
       wrapCompartment.of(wrapExtension(wrapEl.checked)),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) scheduleRun();
@@ -690,8 +713,9 @@ function populateExamples() {
 }
 
 async function main() {
-  applyTheme(storedThemeId());
-  themeBtn.addEventListener("click", cycleTheme);
+  shortcutEl.textContent = IS_MAC ? "⌘↵" : "Ctrl ↵";
+  runBtn.setAttribute("aria-keyshortcuts", IS_MAC ? "Meta+Enter" : "Control+Enter");
+  runBtn.title = `Run the recipe (${IS_MAC ? "⌘ Return" : "Ctrl+Enter"})`;
 
   populateExamples();
   wrapEl.checked = storedWrap();
@@ -711,12 +735,13 @@ async function main() {
   buildEditor(shared ? shared.source : EXAMPLES[DEFAULT_EXAMPLE].source);
   wrapEl.addEventListener("change", () => applyWrap(wrapEl.checked));
 
-  setStatus("loading interpreter…");
+  setStatus("loading interpreter…", "busy");
   await init();
   ready = true;
   setStatus("");
 
   runBtn.addEventListener("click", runNow);
+  document.addEventListener("keydown", onPageKeydown);
   stdinEl.addEventListener("input", scheduleRun);
   examplesEl.addEventListener("change", () => {
     const example = EXAMPLES[examplesEl.value];

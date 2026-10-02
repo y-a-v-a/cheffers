@@ -13,35 +13,35 @@ test("plain text passes through unchanged", () => {
   assert.equal(ansiToHtml("just text"), "just text");
 });
 
-test("a color code wraps following text in a colored span", () => {
+test("a color code wraps following text in a classed span", () => {
   // ESC[31m red ESC[0m
   const html = ansiToHtml("\x1b[31mred\x1b[0m");
-  assert.equal(html, '<span style="color:#ff6b6b">red</span>');
+  assert.equal(html, '<span class="ansi-red">red</span>');
 });
 
 test("bold + color combine into one span", () => {
   const html = ansiToHtml("\x1b[1;31mbold red\x1b[0m");
   assert.equal(
     html,
-    '<span style="font-weight:600;color:#ff6b6b">bold red</span>',
+    '<span class="ansi-bold ansi-red">bold red</span>',
   );
 });
 
 test("reset closes the open span", () => {
   const html = ansiToHtml("\x1b[34mblue\x1b[0m plain");
-  assert.equal(html, '<span style="color:#6ea8ff">blue</span> plain');
+  assert.equal(html, '<span class="ansi-blue">blue</span> plain');
 });
 
 test("an unterminated sequence still closes its span at end of input", () => {
   const html = ansiToHtml("\x1b[32mgreen");
-  assert.equal(html, '<span style="color:#5ad19a">green</span>');
+  assert.equal(html, '<span class="ansi-green">green</span>');
 });
 
 test("text inside a colored span is HTML-escaped (no injection)", () => {
   const html = ansiToHtml("\x1b[31m<script>alert(1)</script>\x1b[0m");
   assert.equal(
     html,
-    '<span style="color:#ff6b6b">&lt;script&gt;alert(1)&lt;/script&gt;</span>',
+    '<span class="ansi-red">&lt;script&gt;alert(1)&lt;/script&gt;</span>',
   );
 });
 
@@ -59,7 +59,8 @@ test("a realistic interpreter error renders colored, escaped HTML", () => {
   const sample =
     "\x1b[1m\x1b[31merror\x1b[0m: \x1b[1m\x1b[37minvalid title\x1b[0m\n";
   const html = ansiToHtml(sample);
-  assert.match(html, /<span style="[^"]*color:#ff6b6b[^"]*">error<\/span>/);
+  assert.match(html, /<span class="ansi-bold ansi-red">error<\/span>/);
+  assert.match(html, /<span class="ansi-bold ansi-white">invalid title<\/span>/);
   assert.ok(html.includes("invalid title"));
   // No raw escape bytes survive in the output.
   assert.ok(!html.includes("\x1b"));

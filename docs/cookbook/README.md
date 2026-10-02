@@ -26,8 +26,13 @@ Every teaching recipe is a real program in `recipes/*.chef`, embedded verbatim
 in the chapter pages. `tests/cookbook_recipes.rs` (run by `cargo test`) pins
 each recipe's exact output, so the tutorial cannot drift from the interpreter.
 
-The pages share the playground's palettes and its `cheffers-theme`
-localStorage key, so the theme follows the reader between the two.
+The pages share the playground's look through `../assets/` — `site.css`
+(fonts, palettes, header, footer, syntax colors), `theme.js` (the theme toggle,
+stored under the `cheffers-theme` localStorage key, so the theme follows the
+reader between the two) and `chef-syntax.js` (the Chef highlighter, which
+`cookbook.js` applies to recipe cards and snippets). `cookbook.js` is an ES
+module, so preview the pages over HTTP (`python3 -m http.server` in `docs/`)
+rather than from `file://`.
 "Open in playground" links pack a recipe (and Input panel text) into the URL
 fragment as `#recipe=<base64url JSON>`; the decoding lives in
 `../editor/editor.js` (`decodeRecipeHash`) and the encoding in `cookbook.js`
